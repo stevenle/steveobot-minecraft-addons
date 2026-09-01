@@ -1,45 +1,44 @@
 #!/usr/bin/env node
 /**
  * Zips built add-ons into distributable `.mcaddon` files (and optionally one
- * `.mcpack` per pack). Double-clicking a `.mcaddon` imports it into Minecraft
- * on any platform.
+ * `.mcpack` per pack). Opening a `.mcaddon` imports it into Minecraft.
  *
  * Usage:
- *   node tools/package.mjs [slug...] [--mcpack] [--no-build]
+ *   node tools/package.ts [slug...] [--mcpack] [--no-build]
  */
 import fs from 'node:fs';
 import path from 'node:path';
 
 import AdmZip from 'adm-zip';
 
-import { parseArgs, selectedSlugs } from './lib/args.mjs';
-import { buildAddon } from './build.mjs';
-import { loadAddons, versionString } from './lib/addons.mjs';
-import { ensureDir, exists } from './lib/fsx.mjs';
-import { color, fail, log } from './lib/log.mjs';
-import { packagesDir, rel } from './lib/paths.mjs';
+import { boolFlag, parseArgs, selectedSlugs } from './lib/args.ts';
+import { buildAddon } from './build.ts';
+import { loadAddons, versionString, type Addon } from './lib/addons.ts';
+import { ensureDir, exists } from './lib/fsx.ts';
+import { color, fail, log } from './lib/log.ts';
+import { packagesDir, rel } from './lib/paths.ts';
 
-function humanSize(bytes) {
+function humanSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
   return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
 }
 
-function writeZip(zip, outFile) {
+function writeZip(zip: AdmZip, outFile: string): number {
   ensureDir(path.dirname(outFile));
   zip.writeZip(outFile);
   return fs.statSync(outFile).size;
 }
 
-async function main() {
+async function main(): Promise<void> {
   const args = parseArgs();
-  const alsoMcpack = Boolean(args.flags.mcpack);
+  const alsoMcpack = boolFlag(args, 'mcpack');
 
-  let addons;
+  let addons: Addon[];
   try {
     addons = loadAddons(selectedSlugs(args));
   } catch (err) {
-    fail(err.message);
+    fail(err instanceof Error ? err.message : String(err));
   }
 
   if (addons.length === 0) {
@@ -47,7 +46,7 @@ async function main() {
     return;
   }
 
-  if (args.flags['no-build'] !== true) {
+  if (!boolFlag(args, 'no-build')) {
     for (const addon of addons) {
       await buildAddon(addon, { release: true });
     }
@@ -86,4 +85,4 @@ async function main() {
   }
 }
 
-main().catch((err) => fail(err.stack ?? String(err)));
+main().catch((err: unknown) => fail(err instanceof Error ? (err.stack ?? err.message) : String(err)));

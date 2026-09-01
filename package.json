@@ -6,27 +6,36 @@
   "license": "MIT",
   "author": "Steven Le",
   "type": "module",
+  "packageManager": "pnpm@10.33.0",
   "engines": {
-    "node": ">=20"
+    "node": ">=24",
+    "pnpm": ">=10"
   },
   "scripts": {
-    "build": "node tools/build.mjs",
-    "build:release": "node tools/build.mjs --release",
-    "watch": "node tools/watch.mjs",
-    "deploy": "node tools/deploy.mjs",
-    "package": "node tools/package.mjs",
-    "validate": "node tools/validate.mjs",
-    "typecheck": "tsc --noEmit",
-    "clean": "node tools/clean.mjs",
-    "new": "node tools/new-addon.mjs",
-    "check": "npm run validate && npm run typecheck && npm run build"
+    "build": "node tools/build.ts",
+    "build:release": "node tools/build.ts --release",
+    "watch": "node tools/watch.ts",
+    "deploy": "node tools/deploy.ts",
+    "package": "node tools/package.ts",
+    "validate": "node tools/validate.ts",
+    "typecheck": "tsc -p tsconfig.json && tsc -p tools/tsconfig.json",
+    "clean": "node tools/clean.ts",
+    "new": "node tools/new-addon.ts",
+    "check": "pnpm run validate && pnpm run typecheck && pnpm run build"
   },
   "devDependencies": {
     "@minecraft/server": "2.9.0",
     "@minecraft/server-ui": "2.1.0",
+    "@types/adm-zip": "^0.5.7",
+    "@types/node": "^24.0.0",
     "adm-zip": "^0.5.16",
     "chokidar": "^4.0.3",
     "esbuild": "^0.25.0",
     "typescript": "^5.7.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
   }
 }

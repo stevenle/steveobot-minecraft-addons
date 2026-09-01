@@ -11,24 +11,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Reads the version from package.json's "packageManager" field.
+      - uses: pnpm/action-setup@v4
+
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
-          cache: npm
+          node-version: 24
+          cache: pnpm
 
-      - run: npm ci
+      - run: pnpm install --frozen-lockfile
 
       - name: Validate manifests
-        run: npm run validate
+        run: pnpm run validate
 
       - name: Typecheck
-        run: npm run typecheck
+        run: pnpm run typecheck
 
       - name: Build
-        run: npm run build:release
+        run: pnpm run build:release
 
       - name: Package
-        run: node tools/package.mjs
+        run: node tools/package.ts --no-build
 
       - uses: actions/upload-artifact@v4
         with:

@@ -1,11 +1,11 @@
 import fs from 'node:fs';
 
 /**
- * Removes `//` and comments from a JSON document. Bedrock content
- * files are frequently authored with comments, and the game tolerates them, so
- * our tooling has to as well.
+ * Removes `//` and block comments from a JSON document. Bedrock content files
+ * are frequently authored with comments, and the game tolerates them, so our
+ * tooling has to as well.
  */
-export function stripJsonComments(text) {
+export function stripJsonComments(text: string): string {
   let out = '';
   let inString = false;
   let inLine = false;
@@ -60,17 +60,16 @@ export function stripJsonComments(text) {
   return out;
 }
 
-/** Reads a JSON file, tolerating comments and a UTF-8 BOM. */
-export function readJson(file) {
+/**
+ * Reads a JSON file, tolerating comments and a UTF-8 BOM. The caller names the
+ * expected shape; nothing here validates it, which is what `validate.ts` is for.
+ */
+export function readJson<T>(file: string): T {
   const raw = fs.readFileSync(file, 'utf8').replace(/^﻿/, '');
   try {
-    return JSON.parse(stripJsonComments(raw));
+    return JSON.parse(stripJsonComments(raw)) as T;
   } catch (err) {
-    throw new Error(`Invalid JSON in ${file}: ${err.message}`);
+    const message = err instanceof Error ? err.message : String(err);
+    throw new Error(`Invalid JSON in ${file}: ${message}`);
   }
-}
-
-/** Writes a JSON file with two-space indentation and a trailing newline. */
-export function writeJson(file, value) {
-  fs.writeFileSync(file, `${JSON.stringify(value, null, 2)}\n`);
 }

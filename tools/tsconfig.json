@@ -1,0 +1,17 @@
+{
+  // Build tooling. Runs on Node via native type stripping (`node tools/x.ts`),
+  // so nothing here is ever emitted -- tsc only type-checks. Relative imports
+  // carry explicit .ts extensions because that is what Node's loader requires.
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "types": ["node"],
+    "allowImportingTsExtensions": true,
+    "erasableSyntaxOnly": true
+  },
+  "include": ["**/*.ts"],
+  "exclude": ["template"]
+}

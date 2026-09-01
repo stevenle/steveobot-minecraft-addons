@@ -11,7 +11,7 @@ export const packagesDir = path.join(distDir, '_packages');
 export const templateDir = path.join(repoRoot, 'tools', 'template');
 
 /** Formats an absolute path relative to the repo root, for tidy log output. */
-export function rel(p) {
+export function rel(p: string): string {
   const r = path.relative(repoRoot, p);
   return r === '' ? '.' : r;
 }

@@ -3,7 +3,7 @@
 A monorepo for a series of custom **Minecraft Bedrock Edition** add-ons.
 
 Each add-on lives in its own folder under [`addons/`](addons) and is built,
-validated, deployed, and packaged by a small set of Node scripts in
+validated, deployed, and packaged by a small set of TypeScript scripts in
 [`tools/`](tools). Behaviour is written in TypeScript against the
 [`@minecraft/server` Script API](https://learn.microsoft.com/en-us/minecraft/creator/scriptapi/)
 and bundled into each behavior pack at build time.
@@ -15,7 +15,8 @@ first: one command to scaffold it, one command to get it into the game.
 
 | | |
 |---|---|
-| **Node.js** | 20 or newer (22 recommended) |
+| **Node.js** | 24 LTS (Krypton). The build tooling is TypeScript run directly by Node's native type stripping, which needs Node 22.18+ |
+| **pnpm** | 10 or newer — `corepack enable` picks up the pinned version from `packageManager` |
 | **Minecraft Bedrock Edition** | 1.26.40 or newer, for the `@minecraft/server` 2.9.0 script module |
 | **Editor** | Anything; VS Code plus the Blockception *Minecraft Bedrock Development* extension is a good pairing |
 
@@ -27,8 +28,9 @@ build, validate, and package `.mcaddon` files; see
 ## Quick start
 
 ```bash
-npm install                    # once
-npm run deploy -- hello-world  # build + copy into Minecraft's dev pack folders
+corepack enable             # once, if you do not already have pnpm
+pnpm install               # once
+pnpm deploy hello-world    # build + copy into Minecraft's dev pack folders
 ```
 
 Then in Minecraft: create or edit a world → **Behavior Packs** → **My Packs** →
@@ -39,7 +41,7 @@ greeted in chat; run `/scriptevent steveo:hello` and the add-on answers.
 While iterating, leave a watcher running:
 
 ```bash
-npm run watch -- hello-world --deploy
+pnpm watch hello-world --deploy
 ```
 
 Every save rebuilds and re-copies the pack. Re-enter the world to load the
@@ -58,7 +60,8 @@ addons/                  One folder per add-on; this is where you work.
                            UI, texts. Copied verbatim into the build.
 shared/                  TypeScript shared by every add-on, imported as `@shared/*`.
 tools/                   Build, validate, deploy, package, and scaffold scripts.
-  template/                Skeleton copied by `npm run new`.
+                         TypeScript, run directly by Node (no build step).
+  template/                Skeleton copied by `pnpm new`.
 dist/                    Build output (git-ignored).
   <slug>/<slug>_bp/        Built behavior pack — the folder Minecraft loads.
   <slug>/<slug>_rp/        Built resource pack.
@@ -73,31 +76,40 @@ Two rules keep this predictable:
 - **Manifests are the source of truth** for UUIDs, pack versions, and
   `min_engine_version`. `addon.json` only carries build settings.
 
+The build tooling is TypeScript too, executed straight from source by Node's
+native type stripping (`node tools/build.ts`) — there is no compile step for it
+and no `dist` for the tooling. Type checking is split into two projects because
+the two halves target different runtimes: `tsconfig.json` covers add-on and
+shared code with no Node types at all, so a stray `setTimeout` or `Buffer` fails
+to compile rather than failing inside the game; `tools/tsconfig.json` covers the
+tooling with `@types/node`.
+
 ## Commands
 
 | Command | What it does |
 |---|---|
-| `npm run build` | Build every add-on into `dist/` |
-| `npm run build:release` | Same, with the script bundle minified |
-| `npm run watch` | Rebuild on change; add `--deploy` to also copy into the game |
-| `npm run deploy` | Build, then copy into Minecraft's development pack folders |
-| `npm run package` | Release-build, then zip `.mcaddon` files into `dist/_packages/` |
-| `npm run validate` | Static checks over every manifest (see below) |
-| `npm run typecheck` | `tsc --noEmit` across all add-ons and shared code |
-| `npm run check` | validate + typecheck + build — what CI runs |
-| `npm run new -- <slug>` | Scaffold a new add-on |
-| `npm run clean` | Delete `dist/` |
+| `pnpm build` | Build every add-on into `dist/` |
+| `pnpm build:release` | Same, with the script bundle minified |
+| `pnpm watch` | Rebuild on change; add `--deploy` to also copy into the game |
+| `pnpm deploy` | Build, then copy into Minecraft's development pack folders |
+| `pnpm package` | Release-build, then zip `.mcaddon` files into `dist/_packages/` |
+| `pnpm validate` | Static checks over every manifest (see below) |
+| `pnpm typecheck` | Type-checks add-on code and build tooling (two separate projects) |
+| `pnpm check` | validate + typecheck + build — what CI runs |
+| `pnpm new <slug>` | Scaffold a new add-on |
+| `pnpm clean` | Delete `dist/` |
 
 Every command takes an optional list of add-on slugs and operates on all of
-them when you pass none. Remember npm's `--` separator:
+them when you pass none. pnpm forwards arguments straight through, so no `--`
+separator is needed (one is tolerated if you type it out of npm habit):
 
 ```bash
-npm run build -- hello-world
-npm run deploy -- hello-world --target preview
-npm run package -- hello-world --mcpack   # also emit standalone .mcpack files
+pnpm build hello-world
+pnpm deploy hello-world --target preview
+pnpm package hello-world --mcpack   # also emit standalone .mcpack files
 ```
 
-`npm run validate` catches the mistakes that make a pack silently fail to
+`pnpm validate` catches the mistakes that make a pack silently fail to
 appear in-game: malformed or duplicate UUIDs, a bad `min_engine_version`, a
 missing script module, a script `entry` that does not match what the build
 writes, and a behavior pack whose resource-pack dependency points at the wrong
@@ -107,17 +119,17 @@ UUID or version.
 
 ### Development deploy (the fast loop)
 
-`npm run deploy` copies each built pack into Minecraft's `com.mojang` data
+`pnpm deploy` copies each built pack into Minecraft's `com.mojang` data
 folder, under `development_behavior_packs/` and `development_resource_packs/`.
 Packs in those folders are re-read every time you enter a world, so there is no
 import step and no version bumping while you iterate.
 
 ```bash
-npm run deploy                                  # every add-on, release Minecraft
-npm run deploy -- hello-world                   # just one
-npm run deploy -- --target preview              # Minecraft Preview
-npm run deploy -- --target education            # Minecraft Education
-npm run deploy -- --dir "/path/to/com.mojang"   # explicit location
+pnpm deploy                                  # every add-on, release Minecraft
+pnpm deploy hello-world                      # just one
+pnpm deploy --target preview                 # Minecraft Preview
+pnpm deploy --target education               # Minecraft Education
+pnpm deploy --dir "/path/to/com.mojang"      # explicit location
 ```
 
 The `com.mojang` folder is found automatically. In resolution order:
@@ -159,7 +171,7 @@ you delete locally also disappear from the game's copy.
 ### Sharing a build
 
 ```bash
-npm run package
+pnpm package
 # -> dist/_packages/hello-world-v1.0.0.mcaddon
 ```
 
@@ -183,7 +195,7 @@ BDS reads packs from its own `behavior_packs/` and `resource_packs/` folders
 and activates them per world:
 
 ```bash
-npm run build:release -- hello-world
+pnpm build:release hello-world
 cp -r dist/hello-world/hello-world_bp /path/to/bds/behavior_packs/
 cp -r dist/hello-world/hello-world_rp /path/to/bds/resource_packs/
 ```
@@ -201,7 +213,7 @@ Restart the server to load them.
 ## Creating a new add-on
 
 ```bash
-npm run new -- frost-walker --description "Freezes the water you walk on."
+pnpm new frost-walker --description "Freezes the water you walk on."
 ```
 
 This copies `tools/template/` into `addons/frost-walker/` and generates fresh
@@ -213,7 +225,7 @@ Afterwards:
 
 1. Replace the placeholder `pack_icon.png` in each pack (128×128 PNG).
 2. Write your behavior in `src/main.ts`.
-3. `npm run deploy -- frost-walker`.
+3. `pnpm deploy frost-walker`.
 
 Slugs are lowercase, with `-` or `_` separators. The slug names the folder, the
 built pack folders (`frost-walker_bp`), and the `.mcaddon`.
@@ -243,7 +255,7 @@ declares the handful of extra globals that do exist.
 
 | Symptom | Likely cause |
 |---|---|
-| Pack missing from **My Packs** | `min_engine_version` newer than your game, a duplicate UUID, or invalid manifest JSON — run `npm run validate` |
+| Pack missing from **My Packs** | `min_engine_version` newer than your game, a duplicate UUID, or invalid manifest JSON — run `pnpm validate` |
 | Pack loads, script never runs | Manifest script `entry` does not match the built path, or the declared `@minecraft/server` version is newer than your game provides. Check the content log |
 | Chat shows `hello_world.welcome` literally | The resource pack is not active — translations are resolved client-side from `resource_pack/texts/*.lang` |
 | Edits do not take effect | Re-enter the world; development packs reload on world entry, not live |

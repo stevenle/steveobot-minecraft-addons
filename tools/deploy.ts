@@ -6,32 +6,32 @@
  * available for Bedrock.
  *
  * Usage:
- *   node tools/deploy.mjs [slug...] [--target stable|preview|education]
- *                                   [--dir <com.mojang path>] [--no-build]
+ *   node tools/deploy.ts [slug...] [--target stable|preview|education]
+ *                                  [--dir <com.mojang path>] [--no-build]
  */
 import path from 'node:path';
 
-import { parseArgs, selectedSlugs } from './lib/args.mjs';
-import { buildAddon } from './build.mjs';
-import { loadAddons } from './lib/addons.mjs';
-import { copyDir, ensureDir, exists, rmrf } from './lib/fsx.mjs';
-import { DEPLOY_TARGETS, resolveMojangDir } from './lib/mojang.mjs';
-import { color, fail, log } from './lib/log.mjs';
-import { rel } from './lib/paths.mjs';
+import { boolFlag, parseArgs, selectedSlugs, stringFlag } from './lib/args.ts';
+import { buildAddon } from './build.ts';
+import { loadAddons, type Addon } from './lib/addons.ts';
+import { copyDir, ensureDir, exists, rmrf } from './lib/fsx.ts';
+import { DEPLOY_TARGETS, isDeployTarget, resolveMojangDir } from './lib/mojang.ts';
+import { color, fail, log } from './lib/log.ts';
+import { rel } from './lib/paths.ts';
 
-async function main() {
+async function main(): Promise<void> {
   const args = parseArgs();
-  const target = typeof args.flags.target === 'string' ? args.flags.target : 'stable';
-  if (!DEPLOY_TARGETS.includes(target)) {
+  const target = stringFlag(args, 'target') ?? 'stable';
+  if (!isDeployTarget(target)) {
     fail(`Unknown --target "${target}". Expected one of: ${DEPLOY_TARGETS.join(', ')}`);
   }
 
   const { dir: mojangDir, source, checked } = resolveMojangDir({
     target,
-    dir: typeof args.flags.dir === 'string' ? args.flags.dir : null,
+    dir: stringFlag(args, 'dir'),
   });
 
-  if (!mojangDir) {
+  if (mojangDir === null) {
     log.error(`Could not find a com.mojang folder for the "${target}" install.`);
     log.info('Checked:');
     for (const candidate of checked) log.info(`  ${candidate}`);
@@ -41,14 +41,14 @@ async function main() {
     fail(`com.mojang folder does not exist: ${mojangDir}`);
   }
 
-  let addons;
+  let addons: Addon[];
   try {
     addons = loadAddons(selectedSlugs(args));
   } catch (err) {
-    fail(err.message);
+    fail(err instanceof Error ? err.message : String(err));
   }
 
-  if (args.flags['no-build'] !== true) {
+  if (!boolFlag(args, 'no-build')) {
     for (const addon of addons) {
       await buildAddon(addon);
     }
@@ -68,7 +68,9 @@ async function main() {
       // linger in the game's copy.
       rmrf(dest);
       copyDir(pack.outDir, dest);
-      log.done(`${addon.slug} ${pack.kind} ${color.dim(`-> ${path.join(pack.deployDir, pack.outName)}`)}`);
+      log.done(
+        `${addon.slug} ${pack.kind} ${color.dim(`-> ${path.join(pack.deployDir, pack.outName)}`)}`,
+      );
       deployed++;
     }
   }
@@ -78,4 +80,4 @@ async function main() {
   log.info('under Behavior Packs / Resource Packs, then re-enter the world to pick up changes.');
 }
 
-main().catch((err) => fail(err.stack ?? String(err)));
+main().catch((err: unknown) => fail(err instanceof Error ? (err.stack ?? err.message) : String(err)));

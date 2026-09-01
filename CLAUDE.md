@@ -7,28 +7,33 @@ Guidance for Claude Code when working in this repository.
 A monorepo of custom Minecraft Bedrock Edition add-ons. Each add-on is a folder
 under `addons/<slug>/` containing a behavior pack, an optional resource pack,
 and TypeScript sources that are bundled into the behavior pack at build time.
-`tools/` holds the Node build scripts; `shared/` holds TypeScript reused across
-add-ons.
+`tools/` holds the build scripts; `shared/` holds TypeScript reused across
+add-ons. Everything is TypeScript, the package manager is pnpm, and the target
+runtime is Node 24 LTS.
 
 See [README.md](README.md) for user-facing docs, including deployment.
 
 ## Commands
 
 ```bash
-npm run check                  # validate + typecheck + build — run before committing
-npm run build [-- <slug>]      # build into dist/
-npm run watch -- <slug>        # rebuild on change (add --deploy to copy into the game)
-npm run deploy [-- <slug>]     # build, then copy into Minecraft's dev pack folders
-npm run package [-- <slug>]    # release-build, then zip .mcaddon into dist/_packages/
-npm run validate               # manifest checks
-npm run typecheck              # tsc --noEmit
-npm run new -- <slug>          # scaffold a new add-on from tools/template
+pnpm check                 # validate + typecheck + build — run before committing
+pnpm build [<slug>]        # build into dist/
+pnpm watch <slug>          # rebuild on change (add --deploy to copy into the game)
+pnpm deploy [<slug>]       # build, then copy into Minecraft's dev pack folders
+pnpm package [<slug>]      # release-build, then zip .mcaddon into dist/_packages/
+pnpm validate              # manifest checks
+pnpm typecheck             # type-check add-on code and tooling
+pnpm new <slug>            # scaffold a new add-on from tools/template
 ```
 
 Every command defaults to all add-ons and accepts a slug list to narrow it.
-Note npm's `--` separator before any argument.
+pnpm forwards arguments straight through, so do not add npm's `--` separator
+(the parser tolerates a stray one, but it is noise).
 
-There is no test suite. `npm run check` is the gate: it is what CI runs, and a
+Use pnpm, never npm — the repo has a `pnpm-lock.yaml` and a pinned
+`packageManager`. `corepack enable` installs the right pnpm version.
+
+There is no test suite. `pnpm check` is the gate: it is what CI runs, and a
 change is not done until it passes.
 
 ## Architecture
@@ -54,20 +59,45 @@ Key files:
 
 | File | Role |
 |---|---|
-| `tools/build.mjs` | Copy packs, bundle scripts. `buildAddon()` is reused by watch/deploy/package |
-| `tools/lib/addons.mjs` | Add-on discovery and the descriptor every tool consumes |
-| `tools/lib/mojang.mjs` | Locating `com.mojang` per platform and target |
-| `tools/validate.mjs` | Manifest checks — extend this when a new class of mistake bites |
-| `tools/template/` | Skeleton for `npm run new`, with `{{PLACEHOLDER}}` tokens |
+| `tools/build.ts` | Copy packs, bundle scripts. `buildAddon()` is reused by watch/deploy/package |
+| `tools/lib/addons.ts` | Add-on discovery and the descriptor every tool consumes |
+| `tools/lib/mojang.ts` | Locating `com.mojang` per platform and target |
+| `tools/validate.ts` | Manifest checks — extend this when a new class of mistake bites |
+| `tools/template/` | Skeleton for `pnpm new`, with `{{PLACEHOLDER}}` tokens |
 | `shared/env.d.ts` | Ambient globals the script runtime provides (`console`) |
+
+## Two TypeScript projects, on purpose
+
+`tools/*.ts` runs on Node via native type stripping — `node tools/build.ts`,
+no compile step, no build output for the tooling. Two consequences:
+
+- Relative imports inside `tools/` **must** carry the `.ts` extension
+  (`./lib/log.ts`), because that is what Node's loader resolves.
+- Only erasable syntax is allowed: no `enum`, no `namespace`, no parameter
+  properties. `erasableSyntaxOnly` in `tools/tsconfig.json` enforces this, so
+  tsc catches it before Node does.
+
+The two configs are separate because the halves target different runtimes:
+
+| Project | Covers | `types` |
+|---|---|---|
+| `tsconfig.json` | `addons/*/src`, `shared/` | *(empty)* — Minecraft's engine has no Node globals |
+| `tools/tsconfig.json` | build tooling | `node` |
+
+Keeping Node types out of the add-on project is deliberate: it makes a stray
+`setTimeout` or `Buffer` in game code a compile error instead of a runtime
+failure inside Minecraft. Do not merge the two configs, and do not add `"types":
+["node"]` to the add-on project.
+
+`pnpm typecheck` runs both. Shared strictness lives in `tsconfig.base.json`.
 
 ## Conventions
 
 - **Slugs** are lowercase with `-` or `_` separators. The slug names the folder,
   the built pack folders (`<slug>_bp`), and the `.mcaddon`.
-- **UUIDs** are always generated, never hand-written or copied. `npm run new`
+- **UUIDs** are always generated, never hand-written or copied. `pnpm new`
   does this; if you add a pack by hand use `crypto.randomUUID()`. Every UUID in
-  the repo must be unique — `npm run validate` enforces it.
+  the repo must be unique — `pnpm validate` enforces it.
 - **Identifiers and script events** use the `steveo:` namespace
   (`/scriptevent steveo:hello`). Always pass a namespace filter to
   `system.afterEvents.scriptEventReceive.subscribe`.

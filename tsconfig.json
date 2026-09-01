@@ -1,24 +1,15 @@
 {
+  // Add-on and shared code. This runs inside Minecraft's script engine, which
+  // is neither Node nor a browser, so "types" is empty on purpose: it keeps
+  // Node globals such as setTimeout and Buffer from type-checking here when
+  // they do not exist at runtime. Build tooling has its own config in tools/.
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "target": "ES2022",
     "lib": ["ES2022"],
     "module": "ES2022",
     "moduleResolution": "Bundler",
     "types": [],
-
-    "strict": true,
-    "noImplicitOverride": true,
-    "noUncheckedIndexedAccess": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "exactOptionalPropertyTypes": true,
-    "verbatimModuleSyntax": true,
-    "isolatedModules": true,
-    "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true,
-
-    "noEmit": true,
     "baseUrl": ".",
     "paths": {
       "@shared/*": ["shared/*"]

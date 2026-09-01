@@ -3,55 +3,52 @@
  * Rebuilds (and optionally redeploys) add-ons whenever their sources change.
  *
  * Usage:
- *   node tools/watch.mjs [slug...] [--deploy] [--target stable|preview]
+ *   node tools/watch.ts [slug...] [--deploy] [--target stable|preview]
  */
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
-import process from 'node:process';
 
 import chokidar from 'chokidar';
 
-import { parseArgs, selectedSlugs } from './lib/args.mjs';
-import { buildAddon } from './build.mjs';
-import { loadAddon, loadAddons } from './lib/addons.mjs';
-import { color, fail, log } from './lib/log.mjs';
-import { addonsDir, repoRoot, sharedDir } from './lib/paths.mjs';
+import { boolFlag, parseArgs, selectedSlugs, stringFlag } from './lib/args.ts';
+import { buildAddon } from './build.ts';
+import { loadAddon, loadAddons, type Addon } from './lib/addons.ts';
+import { color, fail, log } from './lib/log.ts';
+import { addonsDir, repoRoot, sharedDir } from './lib/paths.ts';
 
 const DEBOUNCE_MS = 150;
 
 /** Maps a changed file back to the add-on slug it belongs to, if any. */
-function slugForPath(file) {
+function slugForPath(file: string): string | null {
   const relPath = path.relative(addonsDir, file);
   if (relPath.startsWith('..') || path.isAbsolute(relPath)) return null;
-  const [slug] = relPath.split(path.sep);
-  return slug || null;
+  return relPath.split(path.sep)[0] ?? null;
 }
 
-function deploy(slugs, target) {
-  const args = ['tools/deploy.mjs', ...slugs];
-  if (target) args.push('--target', target);
-  const result = spawnSync(process.execPath, args, { cwd: repoRoot, stdio: 'inherit' });
+function deploy(slugs: string[], target: string | undefined): void {
+  const argv = ['tools/deploy.ts', ...slugs, '--no-build'];
+  if (target !== undefined) argv.push('--target', target);
+  const result = spawnSync(process.execPath, argv, { cwd: repoRoot, stdio: 'inherit' });
   if (result.status !== 0) log.error('Deploy failed');
 }
 
-function main() {
+function main(): void {
   const args = parseArgs();
-  const requested = selectedSlugs(args);
-  const shouldDeploy = Boolean(args.flags.deploy);
-  const target = typeof args.flags.target === 'string' ? args.flags.target : undefined;
+  const shouldDeploy = boolFlag(args, 'deploy');
+  const target = stringFlag(args, 'target');
 
-  let addons;
+  let addons: Addon[];
   try {
-    addons = loadAddons(requested);
+    addons = loadAddons(selectedSlugs(args));
   } catch (err) {
-    fail(err.message);
+    fail(err instanceof Error ? err.message : String(err));
   }
   const watchedSlugs = new Set(addons.map((a) => a.slug));
 
-  const pending = new Set();
-  let timer = null;
+  const pending = new Set<string>();
+  let timer: NodeJS.Timeout | null = null;
 
-  async function flush() {
+  async function flush(): Promise<void> {
     timer = null;
     const slugs = [...pending];
     pending.clear();
@@ -59,18 +56,17 @@ function main() {
     for (const slug of slugs) {
       try {
         // Reload from disk each time: manifests and addon.json can change too.
-        const addon = loadAddon(slug);
-        await buildAddon(addon);
+        await buildAddon(loadAddon(slug));
         log.done(`rebuilt ${color.bold(slug)}`);
       } catch (err) {
-        log.error(`${slug}: ${err.message}`);
+        log.error(`${slug}: ${err instanceof Error ? err.message : String(err)}`);
         return;
       }
     }
     if (shouldDeploy && slugs.length > 0) deploy(slugs, target);
   }
 
-  function queue(slug) {
+  function queue(slug: string): void {
     pending.add(slug);
     if (timer) clearTimeout(timer);
     timer = setTimeout(() => void flush(), DEBOUNCE_MS);
@@ -78,12 +74,12 @@ function main() {
 
   const watcher = chokidar.watch([addonsDir, sharedDir], {
     ignoreInitial: true,
-    ignored: (p) => p.includes(`${path.sep}node_modules${path.sep}`),
+    ignored: (p: string) => p.includes(`${path.sep}node_modules${path.sep}`),
   });
 
   watcher.on('all', (_event, file) => {
     const slug = slugForPath(file);
-    if (slug) {
+    if (slug !== null) {
       if (watchedSlugs.has(slug)) queue(slug);
       return;
     }
