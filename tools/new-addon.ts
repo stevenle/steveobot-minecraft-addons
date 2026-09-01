@@ -13,7 +13,7 @@ import { randomUUID } from 'node:crypto';
 
 import { boolFlag, parseArgs, stringFlag } from './lib/args.ts';
 import { copyDir, exists, rmrf } from './lib/fsx.ts';
-import { readJson } from './lib/json.ts';
+import { formatJson, readJson } from './lib/json.ts';
 import type { PackManifest } from './lib/addons.ts';
 import { color, fail, log } from './lib/log.ts';
 import { addonsDir, rel, templateDir } from './lib/paths.ts';
@@ -27,15 +27,6 @@ function titleCase(slug: string): string {
     .split(/[-_]/)
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
-}
-
-/**
- * Serializes a manifest, keeping version triples like `[1, 0, 0]` on one line
- * the way the template writes them.
- */
-function formatManifest(manifest: PackManifest): string {
-  const json = JSON.stringify(manifest, null, 2);
-  return `${json.replace(/\[\s+(\d+),\s+(\d+),\s+(\d+)\s+\]/g, '[$1, $2, $3]')}\n`;
 }
 
 /** Rewrites every {{PLACEHOLDER}} in the scaffolded text files. */
@@ -109,7 +100,7 @@ function main(): void {
         (d) => d.module_name !== '@minecraft/server',
       );
     }
-    fs.writeFileSync(manifestPath, formatManifest(manifest));
+    fs.writeFileSync(manifestPath, formatJson(manifest));
   }
 
   log.done(`Created ${color.bold(rel(dest))}`);

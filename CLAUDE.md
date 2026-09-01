@@ -21,6 +21,7 @@ pnpm build [<slug>]        # build into dist/
 pnpm watch <slug>          # rebuild on change (add --deploy to copy into the game)
 pnpm deploy [<slug>]       # build, then copy into Minecraft's dev pack folders
 pnpm package [<slug>]      # release-build, then zip .mcaddon into dist/_packages/
+pnpm realm <slug> --world <path>  # bake add-ons into a world -> upload-ready .mcworld
 pnpm validate              # manifest checks
 pnpm typecheck             # type-check add-on code and tooling
 pnpm new <slug>            # scaffold a new add-on from tools/template
@@ -63,6 +64,8 @@ Key files:
 | `tools/lib/addons.ts` | Add-on discovery and the descriptor every tool consumes |
 | `tools/lib/mojang.ts` | Locating `com.mojang` per platform and target |
 | `tools/validate.ts` | Manifest checks — extend this when a new class of mistake bites |
+| `tools/realm.ts` | Applies add-ons to a world and writes a `.mcworld` for Realms |
+| `tools/lib/world.ts` | Reading/writing Bedrock world folders and their pack lists |
 | `tools/template/` | Skeleton for `pnpm new`, with `{{PLACEHOLDER}}` tokens |
 | `shared/env.d.ts` | Ambient globals the script runtime provides (`console`) |
 
@@ -133,6 +136,25 @@ that loads but does nothing:
 Currently `2.9.0` / `2.9.0` / `[1, 26, 40]`. Bump or lower all three together,
 in every add-on. Raising `min_engine_version` above the installed game hides the
 pack from the in-game list entirely.
+
+## Realms
+
+Realms has no public API for installing packs. Do not add code that tries to
+talk to one, and do not tell the user a Realm can be deployed to directly — the
+only supported route is uploading a world that already has the packs applied,
+via the client's *Replace World*. `tools/realm.ts` produces that world.
+
+Applying a pack to a world means two things, and both are required: the pack
+folder under `behavior_packs/` or `resource_packs/`, **and** an entry in
+`world_behavior_packs.json` or `world_resource_packs.json` keyed by the pack's
+header UUID. A pack present in only one of the two is silently ignored by the
+game. `upsertPackEntry` in `tools/lib/world.ts` matches on `pack_id` so
+re-applying updates the entry instead of duplicating it.
+
+`realm.ts` defaults to non-destructive: it stages a copy and writes a new
+`.mcworld`. Only `--in-place` touches the user's world folder. Keep it that way
+— the destructive counterpart on the Realm side (*Replace World*) is
+irreversible without a backup.
 
 ## Gotchas
 

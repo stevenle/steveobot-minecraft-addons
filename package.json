@@ -16,6 +16,7 @@
     "build:release": "node tools/build.ts --release",
     "watch": "node tools/watch.ts",
     "deploy": "node tools/deploy.ts",
+    "realm": "node tools/realm.ts",
     "package": "node tools/package.ts",
     "validate": "node tools/validate.ts",
     "typecheck": "tsc -p tsconfig.json && tsc -p tools/tsconfig.json",

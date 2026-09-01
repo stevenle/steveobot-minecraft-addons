@@ -93,6 +93,7 @@ tooling with `@types/node`.
 | `pnpm watch` | Rebuild on change; add `--deploy` to also copy into the game |
 | `pnpm deploy` | Build, then copy into Minecraft's development pack folders |
 | `pnpm package` | Release-build, then zip `.mcaddon` files into `dist/_packages/` |
+| `pnpm realm` | Bake add-ons into a world and write an upload-ready `.mcworld` |
 | `pnpm validate` | Static checks over every manifest (see below) |
 | `pnpm typecheck` | Type-checks add-on code and build tooling (two separate projects) |
 | `pnpm check` | validate + typecheck + build — what CI runs |
@@ -188,6 +189,60 @@ every push and uploads them as workflow artifacts.
 
 Consoles cannot sideload packs. To play an add-on there, apply it to a world
 and upload that world to a Realm, or import the world on a device that can.
+
+### Realms
+
+Realms has **no public API for installing packs**, so nothing can push an add-on
+to a Realm directly. The supported route is the client's *Replace World* flow:
+you upload a world that already has the packs applied. `pnpm realm` builds that
+world for you, so the manual part is one upload instead of a pile of file
+juggling.
+
+```bash
+# From a world downloaded off the Realm (Realm settings -> Download World)
+pnpm realm hello-world --world ~/Downloads/MyRealm.mcworld
+
+# -> dist/_realm/my-realm-world.mcworld
+```
+
+Then, in Minecraft:
+
+1. **Back up first.** Realm settings → **Download World**. *Replace World*
+   overwrites the live Realm, and a bad upload with no backup costs you
+   everything on it.
+2. Import the generated `.mcworld` (open the file, or copy it to your device).
+3. Realm settings → **Replace World**, and pick the imported world.
+4. Rejoin and confirm the packs are active in the Realm's world settings.
+
+`--world` also accepts an unpacked world folder, e.g. one under
+`com.mojang/minecraftWorlds/<id>`:
+
+```bash
+pnpm realm hello-world --world "/path/to/com.mojang/minecraftWorlds/AbCdEf=="
+```
+
+By default the source world is left untouched and a new `.mcworld` is written.
+Pass `--in-place` to modify a local world folder directly instead — handy when
+you would rather open the world in Minecraft, sanity-check it, and upload from
+there.
+
+To see what a world currently has applied, including packs that are listed but
+whose folder is missing (the usual reason an add-on "does not work" after an
+upload):
+
+```bash
+pnpm realm --world ~/Downloads/MyRealm.mcworld --list
+```
+
+Two Realms-specific gotchas worth knowing:
+
+- A pack must be **both** present under the world's `behavior_packs/` /
+  `resource_packs/` folder **and** listed in `world_behavior_packs.json` /
+  `world_resource_packs.json`. One without the other is silently ignored.
+  `pnpm realm` always writes both; `--list` verifies them.
+- Realms can be fussy about activating several behavior packs from a single
+  upload. If a pack does not take, apply them one at a time, re-entering the
+  Realm between uploads.
 
 ### Bedrock Dedicated Server
 

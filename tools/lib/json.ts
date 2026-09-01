@@ -73,3 +73,13 @@ export function readJson<T>(file: string): T {
     throw new Error(`Invalid JSON in ${file}: ${message}`);
   }
 }
+
+/**
+ * Serializes JSON with two-space indentation, but keeps version triples like
+ * `[1, 0, 0]` on one line. Bedrock's JSON files are full of them, and letting
+ * them expand across four lines each makes a manifest hard to scan.
+ */
+export function formatJson(value: unknown): string {
+  const json = JSON.stringify(value, null, 2);
+  return `${json.replace(/\[\s+(\d+),\s+(\d+),\s+(\d+)\s+\]/g, '[$1, $2, $3]')}\n`;
+}
