@@ -1,0 +1,38 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Hello World BP",
+    "description": "Reference behavior pack for steveobot-minecraft-addons.",
+    "uuid": "2bdba555-b0e4-4044-af7f-f9fe3cca6a20",
+    "version": [1, 0, 0],
+    "min_engine_version": [1, 26, 40]
+  },
+  "modules": [
+    {
+      "type": "data",
+      "uuid": "3a5f0e78-e243-483a-8bf7-cf6eff9d32cf",
+      "version": [1, 0, 0]
+    },
+    {
+      "type": "script",
+      "language": "javascript",
+      "entry": "scripts/main.js",
+      "uuid": "d8c4defa-693b-403a-99f6-4848227c1229",
+      "version": [1, 0, 0]
+    }
+  ],
+  "dependencies": [
+    {
+      "uuid": "28876739-fb60-4a4d-9f3d-baec5f118551",
+      "version": [1, 0, 0]
+    },
+    {
+      "module_name": "@minecraft/server",
+      "version": "2.9.0"
+    }
+  ],
+  "metadata": {
+    "authors": ["Steven Le"],
+    "license": "MIT"
+  }
+}

@@ -1,0 +1,6 @@
+## Strings for the Hello World add-on.
+## Client-side translations live in the resource pack; the behavior pack
+## references them by key with RawMessage { translate: ... }.
+
+hello_world.welcome=§aWelcome, %s!§r This world is running the Hello World add-on.
+hello_world.ping=§bHello World§r is loaded and responding.

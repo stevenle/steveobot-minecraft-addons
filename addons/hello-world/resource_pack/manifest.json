@@ -1,0 +1,21 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Hello World RP",
+    "description": "Reference resource pack for steveobot-minecraft-addons.",
+    "uuid": "28876739-fb60-4a4d-9f3d-baec5f118551",
+    "version": [1, 0, 0],
+    "min_engine_version": [1, 26, 40]
+  },
+  "modules": [
+    {
+      "type": "resources",
+      "uuid": "c506bd98-3c14-4312-ba46-b92e5f0bb385",
+      "version": [1, 0, 0]
+    }
+  ],
+  "metadata": {
+    "authors": ["Steven Le"],
+    "license": "MIT"
+  }
+}

@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Validate manifests
+        run: npm run validate
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build:release
+
+      - name: Package
+        run: node tools/package.mjs
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mcaddons
+          path: dist/_packages/*.mcaddon
+          if-no-files-found: error

@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/stevenle/steveobot-minecraft-addons/tools/schemas/addon.schema.json",
+  "title": "Add-on build configuration",
+  "description": "Build-time settings for one add-on. Pack identity (UUIDs, versions, min_engine_version) lives in each pack's manifest.json, not here.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "name": {
+      "type": "string",
+      "description": "Human-readable add-on name, used in build output and package filenames."
+    },
+    "description": {
+      "type": "string",
+      "description": "One-line summary of what the add-on does."
+    },
+    "scriptEntry": {
+      "type": "string",
+      "default": "src/main.ts",
+      "description": "TypeScript entry point, relative to the add-on folder. If the file is absent, the add-on is treated as script-free."
+    },
+    "scriptOut": {
+      "type": "string",
+      "default": "scripts/main.js",
+      "description": "Where the bundle is written inside the built behavior pack. Must match the script module's \"entry\" in behavior_pack/manifest.json."
+    }
+  },
+  "required": ["name"]
+}

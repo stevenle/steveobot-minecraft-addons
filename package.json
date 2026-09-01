@@ -1,0 +1,32 @@
+{
+  "name": "steveobot-minecraft-addons",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A monorepo of custom Minecraft Bedrock Edition add-ons.",
+  "license": "MIT",
+  "author": "Steven Le",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "node tools/build.mjs",
+    "build:release": "node tools/build.mjs --release",
+    "watch": "node tools/watch.mjs",
+    "deploy": "node tools/deploy.mjs",
+    "package": "node tools/package.mjs",
+    "validate": "node tools/validate.mjs",
+    "typecheck": "tsc --noEmit",
+    "clean": "node tools/clean.mjs",
+    "new": "node tools/new-addon.mjs",
+    "check": "npm run validate && npm run typecheck && npm run build"
+  },
+  "devDependencies": {
+    "@minecraft/server": "2.9.0",
+    "@minecraft/server-ui": "2.1.0",
+    "adm-zip": "^0.5.16",
+    "chokidar": "^4.0.3",
+    "esbuild": "^0.25.0",
+    "typescript": "^5.7.0"
+  }
+}

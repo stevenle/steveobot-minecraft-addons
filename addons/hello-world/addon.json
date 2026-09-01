@@ -1,0 +1,5 @@
+{
+  "$schema": "../../tools/schemas/addon.schema.json",
+  "name": "Hello World",
+  "description": "Reference add-on: greets players, responds to a script event, and shows how scripts, packs, and translations fit together."
+}

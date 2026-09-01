@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Local tooling state
+.env
+.env.local
+*.tsbuildinfo
+.cache/
+
+# Editors / OS
+.DS_Store
+Thumbs.db
+.idea/
+*.swp

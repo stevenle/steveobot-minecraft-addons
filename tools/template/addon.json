@@ -1,0 +1,5 @@
+{
+  "$schema": "../../tools/schemas/addon.schema.json",
+  "name": "{{NAME}}",
+  "description": "{{DESCRIPTION}}"
+}

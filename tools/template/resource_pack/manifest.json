@@ -1,0 +1,21 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "{{NAME}} RP",
+    "description": "{{DESCRIPTION}}",
+    "uuid": "{{RP_HEADER_UUID}}",
+    "version": [1, 0, 0],
+    "min_engine_version": [1, 26, 40]
+  },
+  "modules": [
+    {
+      "type": "resources",
+      "uuid": "{{RP_RESOURCES_UUID}}",
+      "version": [1, 0, 0]
+    }
+  ],
+  "metadata": {
+    "authors": ["{{AUTHOR}}"],
+    "license": "MIT"
+  }
+}
