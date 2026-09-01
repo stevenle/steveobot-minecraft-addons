@@ -20,9 +20,10 @@
     "package": "node tools/package.ts",
     "validate": "node tools/validate.ts",
     "typecheck": "tsc -p tsconfig.json && tsc -p tools/tsconfig.json",
+    "test": "node --test \"tools/**/*.test.ts\"",
     "clean": "node tools/clean.ts",
     "new": "node tools/new-addon.ts",
-    "check": "pnpm run validate && pnpm run typecheck && pnpm run build"
+    "check": "pnpm run validate && pnpm run typecheck && pnpm run test && pnpm run build"
   },
   "devDependencies": {
     "@minecraft/server": "2.9.0",
@@ -32,6 +33,7 @@
     "adm-zip": "^0.5.16",
     "chokidar": "^4.0.3",
     "esbuild": "^0.25.0",
+    "prismarine-auth": "^3.1.1",
     "typescript": "^5.7.0"
   },
   "pnpm": {

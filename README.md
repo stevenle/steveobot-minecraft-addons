@@ -94,9 +94,10 @@ tooling with `@types/node`.
 | `pnpm deploy` | Build, then copy into Minecraft's development pack folders |
 | `pnpm package` | Release-build, then zip `.mcaddon` files into `dist/_packages/` |
 | `pnpm realm` | Bake add-ons into a world and write an upload-ready `.mcworld` |
+| `pnpm test` | Run the tooling tests (`node --test`) |
 | `pnpm validate` | Static checks over every manifest (see below) |
 | `pnpm typecheck` | Type-checks add-on code and build tooling (two separate projects) |
-| `pnpm check` | validate + typecheck + build — what CI runs |
+| `pnpm check` | validate + typecheck + test + build — what CI runs |
 | `pnpm new <slug>` | Scaffold a new add-on |
 | `pnpm clean` | Delete `dist/` |
 
@@ -213,6 +214,41 @@ Then, in Minecraft:
 2. Import the generated `.mcworld` (open the file, or copy it to your device).
 3. Realm settings → **Replace World**, and pick the imported world.
 4. Rejoin and confirm the packs are active in the Realm's world settings.
+
+#### Pulling the world straight off the Realm
+
+Instead of downloading the world by hand, the tooling can fetch it from the
+Realms service for you:
+
+```bash
+pnpm realm --login                        # one-time Microsoft sign-in
+pnpm realm --list-realms                  # check what the account can see
+pnpm realm hello-world --realm "My Realm" # download live world, apply, write .mcworld
+```
+
+`--realm` takes a Realm id or part of its name. The world comes from the
+Realm's **active slot** as it stands right now (not the last scheduled backup),
+so you are never applying packs to a stale export. `--slot <n>` and
+`--backup <id>` override that.
+
+Sign-in uses Microsoft's device-code flow: it prints a URL and a code, you
+approve in a browser, and the resulting tokens are cached in `.realms-auth/`
+(git-ignored — treat that folder like a password). No password ever reaches
+this tooling. Add `--account you@example.com` to keep several accounts apart,
+and `--preview` for Preview Realms, which hold entirely separate worlds.
+
+Two caveats you should weigh before using this:
+
+- **The Realms API is undocumented and unofficial.** Mojang can change or
+  withdraw it without notice, and driving it with a non-Microsoft client is at
+  odds with the Minecraft usage guidelines. Enforcement against personal tools
+  appears rare, but the risk to your account is not zero.
+- **It only saves the download.** The service has *no endpoint for replacing
+  world content*, so the upload back is still the manual *Replace World* step.
+  Anything advertising a programmatic Realm upload is not using a real API.
+
+If you would rather not touch it, `--world` does the same job from a world you
+exported yourself, and nothing else in the repo depends on the API.
 
 `--world` also accepts an unpacked world folder, e.g. one under
 `com.mojang/minecraftWorlds/<id>`:

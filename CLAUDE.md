@@ -22,6 +22,8 @@ pnpm watch <slug>          # rebuild on change (add --deploy to copy into the ga
 pnpm deploy [<slug>]       # build, then copy into Minecraft's dev pack folders
 pnpm package [<slug>]      # release-build, then zip .mcaddon into dist/_packages/
 pnpm realm <slug> --world <path>  # bake add-ons into a world -> upload-ready .mcworld
+pnpm realm <slug> --realm <id>    # same, pulling the world off a live Realm
+pnpm test                  # node --test over tools/**/*.test.ts
 pnpm validate              # manifest checks
 pnpm typecheck             # type-check add-on code and tooling
 pnpm new <slug>            # scaffold a new add-on from tools/template
@@ -34,8 +36,10 @@ pnpm forwards arguments straight through, so do not add npm's `--` separator
 Use pnpm, never npm — the repo has a `pnpm-lock.yaml` and a pinned
 `packageManager`. `corepack enable` installs the right pnpm version.
 
-There is no test suite. `pnpm check` is the gate: it is what CI runs, and a
-change is not done until it passes.
+`pnpm check` is the gate: it is what CI runs, and a change is not done until it
+passes. Tests use the built-in `node:test` runner and cover the Realms client
+only — everything else is verified by `validate` and `typecheck`. Add tests when
+code cannot be exercised by hand, which in practice means the Realms API layer.
 
 ## Architecture
 
@@ -66,6 +70,7 @@ Key files:
 | `tools/validate.ts` | Manifest checks — extend this when a new class of mistake bites |
 | `tools/realm.ts` | Applies add-ons to a world and writes a `.mcworld` for Realms |
 | `tools/lib/world.ts` | Reading/writing Bedrock world folders and their pack lists |
+| `tools/lib/realms/` | Client for the undocumented Realms service (auth, REST, types) |
 | `tools/template/` | Skeleton for `pnpm new`, with `{{PLACEHOLDER}}` tokens |
 | `shared/env.d.ts` | Ambient globals the script runtime provides (`console`) |
 
@@ -155,6 +160,33 @@ re-applying updates the entry instead of duplicating it.
 `.mcworld`. Only `--in-place` touches the user's world folder. Keep it that way
 — the destructive counterpart on the Realm side (*Replace World*) is
 irreversible without a backup.
+
+## The Realms API layer
+
+`tools/lib/realms/` talks to the undocumented Bedrock Realms service at
+`pocket.realms.minecraft.net`. Endpoints and headers were taken from
+PrismarineJS/prismarine-realms, the reference implementation — check there
+before adding a call, and do not invent endpoints.
+
+**There is no upload endpoint.** The service exposes no way to replace a
+Realm's world content; `PUT /worlds/{id}/backups` only restores a backup Realms
+itself made. Never add an `uploadWorld()`, and never imply in docs or output
+that the round trip can be automated. The upload is manual, permanently.
+
+Three things constrain changes here:
+
+- **It cannot be tested against the real service.** CI has no Microsoft account,
+  and `xboxlive.com` / `pocket.realms.minecraft.net` are firewalled in the dev
+  container. `tools/lib/realms/client.test.ts` and `tools/realm.test.ts` drive a
+  stand-in HTTP server instead; `REALMS_API_HOST` and `REALMS_AUTHORIZATION`
+  exist for that. Extend those tests rather than assuming a change works.
+- **prismarine-auth is CommonJS** and assembles `module.exports` with inline
+  `require()` calls, which Node's CJS-to-ESM lexer cannot see. `import
+  { Authflow } from 'prismarine-auth'` type-checks and then throws at runtime,
+  so `auth.ts` goes through `createRequire`. Do not "tidy" that back to a named
+  import.
+- **`.realms-auth/` holds live Xbox tokens.** It is git-ignored; keep it that
+  way, and never log token contents.
 
 ## Gotchas
 
