@@ -1,0 +1,5 @@
+{
+  "$schema": "../../tools/schemas/addon.schema.json",
+  "name": "X-Ray Helmet",
+  "description": "A craftable helmet that senses valuable ores while you mine."
+}

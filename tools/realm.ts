@@ -123,7 +123,20 @@ function applyPack(worldRoot: string, pack: Pack): { replaced: boolean } {
     fail(`${rel(pack.manifestPath)} is missing header.uuid or header.version.`);
   }
 
-  const dest = path.join(worldRoot, packFolder(pack.kind), pack.outName);
+  // Realms renames pack folders when it processes an upload (e.g. to "0"),
+  // so removing only our own outName is not enough: a re-applied pack would
+  // end up in the world twice under two folder names, and the upload
+  // service's archiving step rejects a world that carries one uuid twice.
+  const packsDir = path.join(worldRoot, packFolder(pack.kind));
+  if (exists(packsDir)) {
+    for (const entry of fs.readdirSync(packsDir, { withFileTypes: true })) {
+      if (entry.isDirectory() && hasUuid(path.join(packsDir, entry.name), uuid)) {
+        rmrf(path.join(packsDir, entry.name));
+      }
+    }
+  }
+
+  const dest = path.join(packsDir, pack.outName);
   rmrf(dest);
   copyDir(pack.outDir, dest);
 
@@ -692,11 +705,24 @@ async function uploadWorldFile(args: ParsedArgs, selector: string, file: string)
   }
   log.info('');
 
-  if (result.status >= 200 && result.status < 300) {
+  // A 201 only means the archive arrived; the event stream carries the real
+  // outcome. ARCHIVING_FAILED has been observed live (2026-09-01) when the
+  // uploaded world held the same pack uuid under two folders — the world is
+  // NOT swapped in that case.
+  const streamFailed = /event:(VALIDATION|ARCHIVING)_FAILED/.test(result.body ?? '');
+
+  if (result.status >= 200 && result.status < 300 && !streamFailed) {
     log.done('The upload host accepted the archive.');
     log.info('Rejoin the Realm and verify the world actually changed and the packs are');
     log.info('active. If the world is unchanged, an uncaptured follow-up step exists —');
     log.info('send this output back to Claude Code.');
+  } else if (streamFailed) {
+    log.error('The upload host accepted the archive but the world swap FAILED');
+    log.error('(see the event stream above) — the Realm still has its old world.');
+    log.info('A known cause is the same pack uuid present under two folders in the');
+    log.info('world (Realms renames pack folders on upload, e.g. to "0"); re-baking');
+    log.info('with current tooling dedupes that. Otherwise send this output back to');
+    log.info('Claude Code.');
   } else {
     log.error('The upload host rejected the archive. Nothing else was tried.');
     log.info('Send this output back to Claude Code; meanwhile Replace World in the');

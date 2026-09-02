@@ -1,0 +1,22 @@
+{
+  "format_version": "1.10.0",
+  "render_controllers": {
+    "controller.render.steveo_ore_marker": {
+      "arrays": {
+        "textures": {
+          "array.skins": [
+            "texture.diamond",
+            "texture.ancient_debris",
+            "texture.emerald",
+            "texture.gold",
+            "texture.lapis",
+            "texture.redstone"
+          ]
+        }
+      },
+      "geometry": "geometry.default",
+      "materials": [{ "*": "material.default" }],
+      "textures": ["array.skins[query.variant]"]
+    }
+  }
+}

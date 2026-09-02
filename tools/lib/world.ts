@@ -79,16 +79,37 @@ export function readWorldName(worldDir: string): string {
   return path.basename(worldDir);
 }
 
+/**
+ * Normalizes a pack entry's version. The game writes a JSON array, but a world
+ * that has been through Realms comes back with the array re-encoded as a
+ * string (`"version": "[1,0,0]"`), and dropping those entries made `--list`
+ * report an applied pack as absent.
+ */
+function normalizeVersion(value: unknown): number[] | null {
+  if (Array.isArray(value) && value.every((n) => typeof n === 'number')) return value;
+  if (typeof value === 'string') {
+    try {
+      const parsed: unknown = JSON.parse(value);
+      if (Array.isArray(parsed) && parsed.every((n) => typeof n === 'number')) return parsed;
+    } catch {
+      // fall through to null
+    }
+  }
+  return null;
+}
+
 /** Reads one of the world's pack lists, treating a missing file as empty. */
 export function readPackList(worldDir: string, kind: PackKind): WorldPackEntry[] {
   const file = path.join(worldDir, packListFile(kind));
   if (!fs.existsSync(file)) return [];
   const parsed = readJson<unknown>(file);
   if (!Array.isArray(parsed)) return [];
-  return parsed.filter((entry): entry is WorldPackEntry => {
-    if (typeof entry !== 'object' || entry === null) return false;
-    const candidate = entry as Partial<WorldPackEntry>;
-    return typeof candidate.pack_id === 'string' && Array.isArray(candidate.version);
+  return parsed.flatMap((entry): WorldPackEntry[] => {
+    if (typeof entry !== 'object' || entry === null) return [];
+    const candidate = entry as { pack_id?: unknown; version?: unknown };
+    if (typeof candidate.pack_id !== 'string') return [];
+    const version = normalizeVersion(candidate.version);
+    return version === null ? [] : [{ pack_id: candidate.pack_id, version }];
   });
 }
 

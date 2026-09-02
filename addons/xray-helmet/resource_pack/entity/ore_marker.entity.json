@@ -1,0 +1,29 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "steveo:ore_marker",
+      "materials": {
+        "default": "steveo_ore_glow"
+      },
+      "textures": {
+        "diamond": "textures/entity/ore_marker_diamond",
+        "ancient_debris": "textures/entity/ore_marker_ancient_debris",
+        "emerald": "textures/entity/ore_marker_emerald",
+        "gold": "textures/entity/ore_marker_gold",
+        "lapis": "textures/entity/ore_marker_lapis",
+        "redstone": "textures/entity/ore_marker_redstone"
+      },
+      "geometry": {
+        "default": "geometry.steveo_ore_marker"
+      },
+      "animations": {
+        "float": "animation.steveo_ore_marker.float"
+      },
+      "scripts": {
+        "animate": ["float"]
+      },
+      "render_controllers": ["controller.render.steveo_ore_marker"]
+    }
+  }
+}

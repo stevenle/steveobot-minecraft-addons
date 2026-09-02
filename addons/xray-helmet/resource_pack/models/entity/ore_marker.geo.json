@@ -1,0 +1,41 @@
+{
+  "format_version": "1.16.0",
+  "minecraft:geometry": [
+    {
+      "description": {
+        "identifier": "geometry.steveo_ore_marker",
+        "texture_width": 16,
+        "texture_height": 16,
+        "visible_bounds_width": 2,
+        "visible_bounds_height": 2,
+        "visible_bounds_offset": [0, 0.5, 0]
+      },
+      "bones": [
+        {
+          "name": "spin",
+          "pivot": [0, 8, 0]
+        },
+        {
+          "name": "gem",
+          "parent": "spin",
+          "pivot": [0, 8, 0],
+          "rotation": [45, 0, 45],
+          "cubes": [
+            {
+              "origin": [-2.5, 5.5, -2.5],
+              "size": [5, 5, 5],
+              "uv": {
+                "north": { "uv": [0, 0], "uv_size": [16, 16] },
+                "south": { "uv": [0, 0], "uv_size": [16, 16] },
+                "east": { "uv": [0, 0], "uv_size": [16, 16] },
+                "west": { "uv": [0, 0], "uv_size": [16, 16] },
+                "up": { "uv": [0, 0], "uv_size": [16, 16] },
+                "down": { "uv": [0, 0], "uv_size": [16, 16] }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

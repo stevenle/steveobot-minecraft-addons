@@ -1,0 +1,38 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "X-Ray Helmet BP",
+    "description": "A craftable helmet that senses valuable ores while you mine.",
+    "uuid": "976f46f8-cbbf-4685-8d9c-080e940f3e61",
+    "version": [1, 3, 0],
+    "min_engine_version": [1, 26, 40]
+  },
+  "modules": [
+    {
+      "type": "data",
+      "uuid": "27551816-8c01-4eb0-ac84-1af87f347649",
+      "version": [1, 3, 0]
+    },
+    {
+      "type": "script",
+      "language": "javascript",
+      "entry": "scripts/main.js",
+      "uuid": "0d9469f1-2f72-424d-b80e-5debfc064169",
+      "version": [1, 3, 0]
+    }
+  ],
+  "dependencies": [
+    {
+      "uuid": "d1b83f17-86e6-43f9-a844-fa9a43229a1a",
+      "version": [1, 3, 0]
+    },
+    {
+      "module_name": "@minecraft/server",
+      "version": "2.9.0"
+    }
+  ],
+  "metadata": {
+    "authors": ["Steven Le"],
+    "license": "MIT"
+  }
+}
