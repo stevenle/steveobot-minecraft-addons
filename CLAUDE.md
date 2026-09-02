@@ -168,10 +168,22 @@ irreversible without a backup.
 PrismarineJS/prismarine-realms, the reference implementation — check there
 before adding a call, and do not invent endpoints.
 
-**There is no upload endpoint.** The service exposes no way to replace a
-Realm's world content; `PUT /worlds/{id}/backups` only restores a backup Realms
-itself made. Never add an `uploadWorld()`, and never imply in docs or output
-that the round trip can be automated. The upload is manual, permanently.
+**No upload endpoint is known.** No open-source client implements one, and
+`PUT /worlds/{id}/backups` only restores a backup Realms itself made. That is
+strong evidence, not proof — so the position is "unproven", not "impossible".
+
+`--probe-upload` exists to settle it empirically against a real Realm. It tries
+a list of candidate routes and reports exactly what comes back. Two rules:
+
+- **Do not implement an upload flow on a guess.** Uploading means inventing a
+  multi-step protocol against a live Realm, where a half-right guess writes to
+  someone's world. Implement it only from a real captured response.
+- **Probe GET before PUT** for any new candidate. A 404 says the path is absent;
+  a 405 proves it exists without invoking it. Calling a real upload endpoint may
+  close the Realm and disconnect players, as the Java equivalent does.
+
+Until that lands, uploading is manual via *Replace World*, and docs and CLI
+output must not imply otherwise.
 
 Three things constrain changes here:
 

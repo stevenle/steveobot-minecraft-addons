@@ -26,18 +26,37 @@ const REALM = { id: 99, name: 'Steveo Test Realm', state: 'OPEN', activeSlot: 2,
 
 interface Harness {
   host: string;
+  /** Every request seen, as "METHOD /path". */
   requests: string[];
+  setProbeRoute: (
+    methodAndUrl: string,
+    response: { status: number; json?: unknown; body?: string },
+  ) => void;
+  clearProbeRoutes: () => void;
   close: () => Promise<void>;
 }
 
 /** Serves a minimal Realms API plus the world archive it points at. */
 async function startRealmsStub(worldArchive: Buffer): Promise<Harness> {
   const requests: string[] = [];
+  const probeRoutes = new Map<string, { status: number; json?: unknown; body?: string }>();
   let host = '';
 
   const server = http.createServer((req, res) => {
     const url = req.url ?? '';
-    requests.push(url);
+    requests.push(`${req.method} ${url}`);
+
+    const probe = probeRoutes.get(`${req.method} ${url}`);
+    if (probe) {
+      if (probe.json !== undefined) {
+        res.writeHead(probe.status, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(probe.json));
+      } else {
+        res.writeHead(probe.status, { 'Content-Type': 'text/plain' });
+        res.end(probe.body ?? '');
+      }
+      return;
+    }
 
     if (url === '/worlds') {
       res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -60,6 +79,7 @@ async function startRealmsStub(worldArchive: Buffer): Promise<Harness> {
       res.end(worldArchive);
       return;
     }
+    // Anything unmapped is absent, which is what the probe expects to see.
     res.writeHead(404).end('not found');
   });
 
@@ -69,6 +89,8 @@ async function startRealmsStub(worldArchive: Buffer): Promise<Harness> {
   return {
     host,
     requests,
+    setProbeRoute: (methodAndUrl, response) => probeRoutes.set(methodAndUrl, response),
+    clearProbeRoutes: () => probeRoutes.clear(),
     close: () => new Promise<void>((resolve) => server.close(() => resolve())),
   };
 }
@@ -153,19 +175,19 @@ describe('realm.ts against a stand-in Realms service', () => {
     stub.requests.length = 0;
     await cli(['hello-world', '--realm', '99', '--out', path.join(outDir, 'a.mcworld')]);
     assert.ok(
-      stub.requests.some((u) => u === `/archive/download/world/99/${REALM.activeSlot}/latest`),
+      stub.requests.some((u) => u === `GET /archive/download/world/99/${REALM.activeSlot}/latest`),
       `expected active slot ${REALM.activeSlot}, saw ${JSON.stringify(stub.requests)}`,
     );
 
     stub.requests.length = 0;
     await cli(['hello-world', '--realm', '99', '--slot', '1', '--out', path.join(outDir, 'b.mcworld')]);
-    assert.ok(stub.requests.some((u) => u === '/archive/download/world/99/1/latest'));
+    assert.ok(stub.requests.some((u) => u === 'GET /archive/download/world/99/1/latest'));
   });
 
   it('resolves a Realm by name as well as by id', async () => {
     stub.requests.length = 0;
     await cli(['hello-world', '--realm', 'steveo', '--out', path.join(outDir, 'c.mcworld')]);
-    assert.ok(stub.requests.some((u) => u.startsWith('/archive/download/world/99/')));
+    assert.ok(stub.requests.some((u) => u.startsWith('GET /archive/download/world/99/')));
   });
 
   it('fails clearly when no Realm matches', async () => {
@@ -206,5 +228,101 @@ describe('realm.ts against a stand-in Realms service', () => {
     } finally {
       await new Promise<void>((resolve) => forbidden.close(() => resolve()));
     }
+  });
+
+  describe('--probe-upload', () => {
+    it('sends nothing without --yes', async () => {
+      stub.requests.length = 0;
+      const { stdout, stderr } = await cli(['--realm', '99', '--probe-upload']);
+
+      assert.match(stdout, /Dry run/);
+      // The side-effect warning is a warning, so it belongs on stderr.
+      assert.match(stderr, /may close the Realm/);
+      const probeRequests = stub.requests.filter((r) => r.includes('upload'));
+      assert.deepEqual(probeRequests, [], 'a dry run must not touch any candidate route');
+    });
+
+    it('reports every candidate absent when they all 404', async () => {
+      stub.clearProbeRoutes();
+      const { stdout } = await cli(['--realm', '99', '--probe-upload', '--yes']);
+
+      assert.match(stdout, /404 absent/);
+      assert.match(stdout, /Every candidate returned 404/);
+      assert.match(stdout, /Replace World/);
+    });
+
+    it('probes GET before PUT so a 405 can prove a path exists', async () => {
+      stub.clearProbeRoutes();
+      stub.requests.length = 0;
+      await cli(['--realm', '99', '--probe-upload', '--yes']);
+
+      const upload = stub.requests.filter((r) => r.endsWith('/worlds/99/backups/upload'));
+      assert.deepEqual(upload, [
+        'GET /worlds/99/backups/upload',
+        'PUT /worlds/99/backups/upload',
+      ]);
+    });
+
+    it('flags a 405 as proof the path exists', async () => {
+      stub.clearProbeRoutes();
+      stub.setProbeRoute('GET /worlds/99/backups/upload', { status: 405, body: 'nope' });
+      const { stdout } = await cli(['--realm', '99', '--probe-upload', '--yes']);
+
+      assert.match(stdout, /405 path EXISTS/);
+      assert.match(stdout, /returned something other than 404/);
+    });
+
+    it('surfaces the body and recognises upload info when a route responds', async () => {
+      stub.clearProbeRoutes();
+      stub.setProbeRoute('PUT /worlds/99/backups/upload', {
+        status: 200,
+        json: {
+          worldClosed: true,
+          token: 'upload-token',
+          uploadEndpoint: 'https://blob.example/upload',
+          port: 443,
+        },
+      });
+      const { stdout } = await cli(['--realm', '99', '--probe-upload', '--yes']);
+
+      assert.match(stdout, /200 RESPONDED/);
+      assert.match(stdout, /uploadEndpoint/);
+      assert.match(stdout, /Looks like upload info/);
+      // The operator needs the raw body to implement the next step.
+      assert.match(stdout, /blob\.example/);
+    });
+
+    it('accepts extra candidate routes via --probe-path', async () => {
+      stub.clearProbeRoutes();
+      stub.requests.length = 0;
+      await cli([
+        '--realm',
+        '99',
+        '--probe-upload',
+        '--yes',
+        '--probe-path',
+        'POST:/worlds/{id}/custom/{slot}',
+      ]);
+
+      assert.ok(stub.requests.includes('POST /worlds/99/custom/2'));
+    });
+
+    it('rejects a malformed --probe-path', async () => {
+      const err = await cli(['--realm', '99', '--probe-upload', '--yes', '--probe-path', 'garbage']).then(
+        () => null,
+        (e: { stdout?: string; stderr?: string }) => e,
+      );
+      assert.ok(err, 'expected a non-zero exit');
+      assert.match(`${err.stdout ?? ''}${err.stderr ?? ''}`, /probe-path entries look like/);
+    });
+
+    it('requires --realm', async () => {
+      const err = await cli(['--probe-upload', '--yes']).then(
+        () => null,
+        (e: { stdout?: string; stderr?: string }) => e,
+      );
+      assert.ok(err, 'expected a non-zero exit');
+      assert.match(`${err.stdout ?? ''}${err.stderr ?? ''}`, /needs --realm/);
+    });
   });
 });

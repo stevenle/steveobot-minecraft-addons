@@ -14,7 +14,7 @@ import fs from 'node:fs';
 import { pipeline } from 'node:stream/promises';
 import { Readable } from 'node:stream';
 
-import type { RealmSummary, WorldDownload } from './types.ts';
+import type { ProbeResult, RealmSummary, WorldDownload } from './types.ts';
 
 export const REALMS_HOST = 'https://pocket.realms.minecraft.net';
 
@@ -129,6 +129,48 @@ export class RealmsClient {
       throw new Error('Realms returned no download link for this world.');
     }
     return { downloadUrl, token: data.token, size: data.size };
+  }
+
+  /**
+   * Sends a single request to an arbitrary route and reports what came back,
+   * without throwing on a non-2xx. This exists to establish whether an endpoint
+   * the service has never documented is actually there.
+   *
+   * Note the useful asymmetry: 404 means the route does not exist, while 405
+   * means it does but rejects this method — so a GET can prove a path exists
+   * without invoking whatever a PUT to it would do.
+   */
+  async probe(method: string, route: string, body?: string): Promise<ProbeResult> {
+    const url = `${this.#host}${route}`;
+    const init: RequestInit = { method, headers: this.#headers() };
+    if (body !== undefined) {
+      init.body = body;
+      init.headers = { ...this.#headers(), 'Content-Type': 'application/json' };
+    }
+
+    try {
+      const response = await this.#fetch(url, init);
+      const text = await response.text();
+      return {
+        method,
+        route,
+        status: response.status,
+        statusText: response.statusText,
+        contentType: response.headers.get('content-type') ?? undefined,
+        body: text.length > 2000 ? `${text.slice(0, 2000)}... (truncated)` : text,
+        networkError: undefined,
+      };
+    } catch (err) {
+      return {
+        method,
+        route,
+        status: 0,
+        statusText: '',
+        contentType: undefined,
+        body: '',
+        networkError: err instanceof Error ? err.message : String(err),
+      };
+    }
   }
 
   /** Streams a world archive to `destPath`. Returns the bytes written. */

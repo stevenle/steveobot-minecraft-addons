@@ -18,6 +18,7 @@
  *   node tools/realm.ts --world <path> --list
  *   node tools/realm.ts --login
  *   node tools/realm.ts --list-realms
+ *   node tools/realm.ts --realm <id> --probe-upload [--yes]
  *
  * `--world` accepts a `.mcworld` file (what "Download World" gives you) or an
  * unpacked world folder (what lives in com.mojang/minecraftWorlds/<id>).
@@ -36,7 +37,7 @@ import { color, fail, log } from './lib/log.ts';
 import { realmDir, rel } from './lib/paths.ts';
 import { authorizeRealms, DEFAULT_CACHE_DIR } from './lib/realms/auth.ts';
 import { RealmsApiError, RealmsClient } from './lib/realms/client.ts';
-import type { RealmSummary } from './lib/realms/types.ts';
+import type { ProbeResult, RealmSummary } from './lib/realms/types.ts';
 import {
   findWorldRoot,
   packFolder,
@@ -311,6 +312,143 @@ async function downloadRealmWorld(args: ParsedArgs, selector: string): Promise<s
   return dest;
 }
 
+/**
+ * Candidate routes for a world upload, which the Realms service has never
+ * documented and which no open-source client implements.
+ *
+ * `PUT /worlds/{id}/backups/upload` is the shape Minecraft's *Java* Realms
+ * client uses (it returns an upload endpoint plus a token); whether Bedrock
+ * exposes an equivalent is exactly what this probe is for. The rest mirror the
+ * Bedrock download route.
+ *
+ * GET comes before PUT for each path on purpose: 404 means the path is absent,
+ * while 405 proves it exists without invoking it.
+ */
+const UPLOAD_PROBE_ROUTES: ReadonlyArray<{ method: string; route: string }> = [
+  { method: 'GET', route: '/worlds/{id}/backups/upload' },
+  { method: 'PUT', route: '/worlds/{id}/backups/upload' },
+  { method: 'GET', route: '/archive/upload/world/{id}/{slot}' },
+  { method: 'PUT', route: '/archive/upload/world/{id}/{slot}' },
+  { method: 'PUT', route: '/worlds/{id}/slot/{slot}/upload' },
+];
+
+/** Fields that would carry a pre-signed upload target, if one comes back. */
+const UPLOAD_URL_HINTS = ['uploadEndpoint', 'uploadUrl', 'uploadLink', 'url', 'token', 'port'];
+
+function expandRoute(route: string, realmId: number, slot: number): string {
+  return route.replaceAll('{id}', String(realmId)).replaceAll('{slot}', String(slot));
+}
+
+/** Reads extra candidates from `--probe-path "PUT:/worlds/{id}/x,GET:/y"`. */
+function customProbeRoutes(args: ParsedArgs): Array<{ method: string; route: string }> {
+  const raw = stringFlag(args, 'probe-path');
+  if (raw === undefined) return [];
+
+  return raw.split(',').map((entry) => {
+    const [method, ...rest] = entry.trim().split(':');
+    const route = rest.join(':');
+    if (!method || !route.startsWith('/')) {
+      fail(`--probe-path entries look like "PUT:/worlds/{id}/backups/upload" (got "${entry.trim()}")`);
+    }
+    return { method: method.toUpperCase(), route };
+  });
+}
+
+function classifyProbe(result: ProbeResult): { label: string; interesting: boolean } {
+  if (result.networkError !== undefined) return { label: color.red('network error'), interesting: false };
+  if (result.status === 404) return { label: color.dim('404 absent'), interesting: false };
+  if (result.status === 405) {
+    return { label: color.yellow('405 path EXISTS, wrong method'), interesting: true };
+  }
+  if (result.status >= 200 && result.status < 300) {
+    return { label: color.green(`${result.status} RESPONDED`), interesting: true };
+  }
+  if (result.status === 401 || result.status === 403) {
+    return { label: color.yellow(`${result.status} auth/permission`), interesting: true };
+  }
+  return { label: `${result.status} ${result.statusText}`, interesting: true };
+}
+
+/**
+ * Probes for a world-upload endpoint and reports exactly what the service says.
+ *
+ * This deliberately stops at discovery. Uploading would mean inventing the rest
+ * of a protocol nobody has documented, and a half-right guess writes to a live
+ * Realm, so the remaining steps get implemented once a real response shows what
+ * they should be.
+ */
+async function probeUpload(args: ParsedArgs, selector: string): Promise<void> {
+  const client = await connect(args);
+
+  let realms: RealmSummary[];
+  try {
+    realms = await client.listRealms();
+  } catch (err) {
+    explainApiError(err);
+  }
+  const realm = resolveRealm(realms, selector);
+  const slot = resolveSlot(args, realm);
+
+  const routes = [...UPLOAD_PROBE_ROUTES, ...customProbeRoutes(args)];
+
+  log.step(`Probing ${routes.length} candidate upload route(s) on ${color.bold(realm.name)}`);
+  for (const { method, route } of routes) {
+    log.info(color.dim(`  ${method.padEnd(4)} ${expandRoute(route, realm.id, slot)}`));
+  }
+  log.info('');
+  log.warn('These routes are guesses. If one exists, calling it may close the Realm and');
+  log.warn('disconnect players, the way the Java equivalent does. Nothing is uploaded.');
+
+  if (!boolFlag(args, 'yes')) {
+    log.info('');
+    log.info('Dry run. Re-run with --yes to actually send these requests.');
+    return;
+  }
+
+  log.info('');
+  const results: ProbeResult[] = [];
+  for (const { method, route } of routes) {
+    const expanded = expandRoute(route, realm.id, slot);
+    const result = await client.probe(method, expanded);
+    results.push(result);
+    const { label } = classifyProbe(result);
+    log.info(`  ${method.padEnd(4)} ${expanded}  ->  ${label}`);
+  }
+
+  const interesting = results.filter((r) => classifyProbe(r).interesting);
+
+  log.info('');
+  if (interesting.length === 0) {
+    log.done('Every candidate returned 404. No upload endpoint at any of these paths.');
+    log.info('That matches prismarine-authored clients, which implement no upload at all.');
+    log.info('Replace World in the client stays the only way to put a world back.');
+    return;
+  }
+
+  log.step(`${interesting.length} route(s) returned something other than 404:`);
+  for (const result of interesting) {
+    log.info('');
+    log.info(`  ${color.bold(`${result.method} ${result.route}`)}`);
+    log.info(`    status: ${result.status} ${result.statusText}`);
+    if (result.contentType !== undefined) log.info(`    content-type: ${result.contentType}`);
+    if (result.networkError !== undefined) log.info(`    network error: ${result.networkError}`);
+    if (result.body) {
+      log.info('    body:');
+      for (const line of result.body.split('\n')) log.info(`      ${line}`);
+      const hits = UPLOAD_URL_HINTS.filter((k) => result.body.includes(`"${k}"`));
+      if (hits.length > 0) {
+        log.info('');
+        log.done(`    Looks like upload info: found ${hits.join(', ')}`);
+      }
+    }
+  }
+
+  log.info('');
+  log.info('Paste this output into the repo issue or back to Claude Code: the upload');
+  log.info('flow can be implemented once the real response shape is known, rather than');
+  log.info('guessed at against a live Realm.');
+}
+
 async function main(): Promise<void> {
   const args = parseArgs();
 
@@ -333,6 +471,15 @@ async function main(): Promise<void> {
   }
 
   const realmSelector = stringFlag(args, 'realm');
+
+  if (boolFlag(args, 'probe-upload')) {
+    if (realmSelector === undefined) {
+      fail('--probe-upload needs --realm <id|name> to know which Realm to probe.');
+    }
+    await probeUpload(args, realmSelector);
+    return;
+  }
+
   const source = realmSelector !== undefined
     ? await downloadRealmWorld(args, realmSelector)
     : stringFlag(args, 'world');

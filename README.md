@@ -243,12 +243,45 @@ Two caveats you should weigh before using this:
   withdraw it without notice, and driving it with a non-Microsoft client is at
   odds with the Minecraft usage guidelines. Enforcement against personal tools
   appears rare, but the risk to your account is not zero.
-- **It only saves the download.** The service has *no endpoint for replacing
-  world content*, so the upload back is still the manual *Replace World* step.
-  Anything advertising a programmatic Realm upload is not using a real API.
+- **It only saves the download.** No known endpoint replaces a Realm's world
+  content, so the upload back is still the manual *Replace World* step. No
+  open-source client implements one; that is strong evidence rather than proof,
+  which is what `--probe-upload` below is for.
 
 If you would rather not touch it, `--world` does the same job from a world you
 exported yourself, and nothing else in the repo depends on the API.
+
+#### Probing for an upload endpoint
+
+Whether Bedrock Realms has a world-upload endpoint is an open question. The
+Java Realms client uses `PUT /worlds/{id}/backups/upload`, which returns an
+upload target plus a token; nothing public shows a Bedrock equivalent, and no
+open-source client implements one. `--probe-upload` tests that against your own
+Realm and reports exactly what the service says:
+
+```bash
+pnpm realm --realm "My Realm" --probe-upload          # dry run: prints the plan
+pnpm realm --realm "My Realm" --probe-upload --yes    # actually send the probes
+```
+
+It tries each candidate with `GET` before `PUT`, because a 404 means the path is
+absent while a **405 proves it exists** without invoking whatever a `PUT` would
+do. Add your own candidates with
+`--probe-path "PUT:/worlds/{id}/something,GET:/other"` — `{id}` and `{slot}` are
+substituted.
+
+Two things to be clear about before running it:
+
+- **Nothing is uploaded.** The probe only asks whether the routes exist and
+  prints the responses.
+- **A real upload endpoint may close the Realm** and disconnect players, the way
+  the Java one does. That is why `--yes` is required and the dry run is the
+  default.
+
+If a route does respond, the probe prints the raw body and flags fields that
+look like upload info. That response is what an actual upload flow should be
+built from — implementing one by guessing at the remaining steps would mean
+writing to a live Realm on speculation, which is not worth the risk.
 
 `--world` also accepts an unpacked world folder, e.g. one under
 `com.mojang/minecraftWorlds/<id>`:

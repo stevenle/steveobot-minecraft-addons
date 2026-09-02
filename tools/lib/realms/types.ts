@@ -32,3 +32,16 @@ export interface WorldDownload {
   /** Archive size in bytes, when reported. */
   size: number | undefined;
 }
+
+/** Result of poking an endpoint whose existence is unknown. */
+export interface ProbeResult {
+  method: string;
+  route: string;
+  status: number;
+  statusText: string;
+  contentType: string | undefined;
+  /** Response body, truncated. */
+  body: string;
+  /** Set when the request never completed (DNS, TLS, connection). */
+  networkError: string | undefined;
+}
