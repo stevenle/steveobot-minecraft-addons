@@ -1,0 +1,9 @@
+{
+  "resource_pack_name": "xray-helmet",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "steveo_xray_helmet": {
+      "textures": "textures/items/xray_helmet"
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "steveo:xray_helmet_recipe"
+    },
+    "tags": ["crafting_table"],
+    "pattern": ["IRI", "IGI"],
+    "key": {
+      "I": { "item": "minecraft:iron_ingot" },
+      "R": { "item": "minecraft:redstone" },
+      "G": { "item": "minecraft:gold_ingot" }
+    },
+    "unlock": [
+      { "item": "minecraft:gold_ingot" },
+      { "item": "minecraft:redstone" }
+    ],
+    "result": {
+      "item": "steveo:xray_helmet"
+    }
+  }
+}

@@ -1,0 +1,10 @@
+## Strings for the X-Ray Helmet add-on.
+## Client-side translations live in the resource pack; the behavior pack
+## references them by key with RawMessage { translate: ... }.
+
+item.steveo:xray_helmet.name=X-Ray Helmet
+
+xray_helmet.equipped=The helmet hums softly. Head below ground and nearby gems will glow through the stone.
+
+xray_helmet.debug.markers=Spawned one test marker of each color in front of you (they fade after ~6s). No glowing boxes = the resource pack is not rendering markers.
+xray_helmet.debug.scan=Scan found %s ore block(s) in range. You are at Y=%s; the helmet only scans below Y=%s.

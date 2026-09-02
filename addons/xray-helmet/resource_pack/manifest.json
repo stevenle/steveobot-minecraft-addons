@@ -1,0 +1,21 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "X-Ray Helmet RP",
+    "description": "A craftable helmet that senses valuable ores while you mine.",
+    "uuid": "d1b83f17-86e6-43f9-a844-fa9a43229a1a",
+    "version": [1, 0, 0],
+    "min_engine_version": [1, 26, 40]
+  },
+  "modules": [
+    {
+      "type": "resources",
+      "uuid": "318f1b07-e62c-4224-91ca-65dcb308b9b9",
+      "version": [1, 0, 0]
+    }
+  ],
+  "metadata": {
+    "authors": ["Steven Le"],
+    "license": "MIT"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "materials": {
+    "version": "1.0.0",
+
+    "steveo_ore_glow:entity_emissive_alpha": {
+      "depthFunc": "Always",
+      "+states": ["Blending"],
+      "blendSrc": "SourceAlpha",
+      "blendDst": "OneMinusSrcAlpha"
+    }
+  }
+}
