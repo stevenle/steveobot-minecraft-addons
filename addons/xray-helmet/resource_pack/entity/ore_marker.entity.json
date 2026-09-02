@@ -17,6 +17,12 @@
       "geometry": {
         "default": "geometry.steveo_ore_marker"
       },
+      "animations": {
+        "float": "animation.steveo_ore_marker.float"
+      },
+      "scripts": {
+        "animate": ["float"]
+      },
       "render_controllers": ["controller.render.steveo_ore_marker"]
     }
   }

@@ -58,11 +58,21 @@ define that key in `en_US.lang`.
 
 ## Rendering tricks that work (and their limits)
 
-- Through-wall "glow" = a marker entity whose custom material inherits a
+- Through-wall "glow" = a marker **entity** whose custom material inherits a
   vanilla one and sets `"depthFunc": "Always"` (`resource_pack/materials/entity.material`).
   Add `"+states": ["Blending"]` + `blendSrc`/`blendDst` for translucency, and
   keep texture alpha above ~128 so an alpha-test fallback still shows it.
-  Custom `.material` files are unofficial; have a degraded-mode plan.
+  Verified in-game on a Realm. There is **no** `depth_test` field in particle
+  or entity JSON; the material is the only lever.
+- **Custom particle materials did not render at all** on the same Realm
+  (`materials/particles.material` + `player.spawnParticle` with a molang
+  tint): nothing appeared, even in open air. Root cause unverified (material
+  ignored vs. tint not applied under additive blending). Do not reach for
+  particles for through-wall effects until that is proven; use the entity.
+- Make marker entities pretty with a client-side animation instead of more
+  geometry: nested bones (`spin` parent, tilted `gem` child), then a looping
+  animation on the parent driving `rotation`/`position`/`scale` from
+  `query.life_time`. Zero script cost.
 - A cube can reuse one 16×16 texture on every face with per-face UV
   (`"uv": { "north": { "uv": [0,0], "uv_size": [16,16] }, ... }`, geometry
   format ≥ 1.16.0).
