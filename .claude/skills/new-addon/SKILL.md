@@ -64,11 +64,13 @@ define that key in `en_US.lang`.
   keep texture alpha above ~128 so an alpha-test fallback still shows it.
   Verified in-game on a Realm. There is **no** `depth_test` field in particle
   or entity JSON; the material is the only lever.
-- **Custom particle materials did not render at all** on the same Realm
-  (`materials/particles.material` + `player.spawnParticle` with a molang
-  tint): nothing appeared, even in open air. Root cause unverified (material
-  ignored vs. tint not applied under additive blending). Do not reach for
-  particles for through-wall effects until that is proven; use the entity.
+- **Custom particle materials do not render on a Realm** (verified
+  2026-09-01 with a freshly bumped resource pack): `materials/particles.material`
+  inheriting `particles_add` with `depthFunc: Always`, driven by
+  `player.spawnParticle` with a `variable.color` tint, produced nothing at
+  all, even in open air via the debug command. Entity materials in
+  `materials/entity.material` DO work. Use marker entities for through-wall
+  effects; do not retry particles without a new lead.
 - Make marker entities pretty with a client-side animation instead of more
   geometry: nested bones (`spin` parent, tilted `gem` child), then a looping
   animation on the parent driving `rotation`/`position`/`scale` from

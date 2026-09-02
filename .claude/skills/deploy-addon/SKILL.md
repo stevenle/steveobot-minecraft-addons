@@ -31,6 +31,18 @@ The tool downloads the *current* live world each time, so re-deploying never
 loses in-game progress. The pre-upload bake is written to `dist/_realm/*.mcworld`
 and doubles as a restore point.
 
+### Bump the resource pack version on EVERY resource-pack change
+
+Clients cache a Realm's resource pack by **uuid + version** and silently
+reuse it on rejoin. Re-uploading an RP at the same version means players
+keep seeing the old textures, models, materials, and particles — while the
+behavior pack (server-side) updates fine, which makes it look like the
+script works but rendering "does not". Before each Realm upload that
+touches `resource_pack/`, bump `header.version` and the module version in
+the RP manifest, and the BP's dependency version to match (`pnpm validate`
+enforces the match). Observed 2026-09-01: three RP-only redeploys in a row
+appeared to "not work" until the version was bumped.
+
 ### The event stream is the verdict, not the HTTP status
 
 A `201` means only that the archive arrived. `VALIDATION_SUCCEEDED` →
