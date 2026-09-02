@@ -313,23 +313,74 @@ async function downloadRealmWorld(args: ParsedArgs, selector: string): Promise<s
 }
 
 /**
- * Candidate routes for a world upload, which the Realms service has never
- * documented and which no open-source client implements.
+ * Routes probed when looking for a world upload, run as a controlled
+ * experiment rather than a pile of guesses.
  *
- * `PUT /worlds/{id}/backups/upload` is the shape Minecraft's *Java* Realms
- * client uses (it returns an upload endpoint plus a token); whether Bedrock
- * exposes an equivalent is exactly what this probe is for. The rest mirror the
- * Bedrock download route.
+ * Two controls make an all-404 result mean something:
  *
- * GET comes before PUT for each path on purpose: 404 means the path is absent,
- * while 405 proves it exists without invoking it.
+ * - A known-good Bedrock route. If it fails, our auth or headers are being
+ *   rejected and nothing else in the run can be interpreted.
+ * - The *Java* Realms download route. Every public description of a Realms
+ *   upload, including `PUT /worlds/{id}/backups/upload`, comes from the Java
+ *   API. If this host answers Java-shaped paths then that upload path is
+ *   plausible here; if it 404s while the positive control passes, the host
+ *   simply does not serve them.
+ *
+ * GET is tried before PUT on each candidate: 404 says the path is absent, 405
+ * proves it exists without invoking whatever a PUT would do.
  */
-const UPLOAD_PROBE_ROUTES: ReadonlyArray<{ method: string; route: string }> = [
-  { method: 'GET', route: '/worlds/{id}/backups/upload' },
-  { method: 'PUT', route: '/worlds/{id}/backups/upload' },
-  { method: 'GET', route: '/archive/upload/world/{id}/{slot}' },
-  { method: 'PUT', route: '/archive/upload/world/{id}/{slot}' },
-  { method: 'PUT', route: '/worlds/{id}/slot/{slot}/upload' },
+type ProbeKind = 'control-positive' | 'control-java' | 'candidate';
+
+interface ProbeRoute {
+  method: string;
+  route: string;
+  kind: ProbeKind;
+  note: string;
+}
+
+const PROBE_ROUTES: ReadonlyArray<ProbeRoute> = [
+  {
+    method: 'GET',
+    route: '/archive/download/world/{id}/{slot}/latest',
+    kind: 'control-positive',
+    note: 'known-good Bedrock route; proves auth and headers are accepted',
+  },
+  {
+    method: 'GET',
+    route: '/worlds/{id}/slot/{slot}/download',
+    kind: 'control-java',
+    note: 'the JAVA download route; shows whether this host serves Java-shaped paths',
+  },
+  {
+    method: 'GET',
+    route: '/worlds/{id}/backups/upload',
+    kind: 'candidate',
+    note: 'the widely reported path (Java API shape), existence check',
+  },
+  {
+    method: 'PUT',
+    route: '/worlds/{id}/backups/upload',
+    kind: 'candidate',
+    note: 'the widely reported path (Java API shape)',
+  },
+  {
+    method: 'GET',
+    route: '/archive/upload/world/{id}/{slot}',
+    kind: 'candidate',
+    note: 'mirror of the Bedrock download route',
+  },
+  {
+    method: 'PUT',
+    route: '/archive/upload/world/{id}/{slot}',
+    kind: 'candidate',
+    note: 'mirror of the Bedrock download route',
+  },
+  {
+    method: 'PUT',
+    route: '/worlds/{id}/slot/{slot}/upload',
+    kind: 'candidate',
+    note: 'slot-specific variant',
+  },
 ];
 
 /** Fields that would carry a pre-signed upload target, if one comes back. */
@@ -340,7 +391,7 @@ function expandRoute(route: string, realmId: number, slot: number): string {
 }
 
 /** Reads extra candidates from `--probe-path "PUT:/worlds/{id}/x,GET:/y"`. */
-function customProbeRoutes(args: ParsedArgs): Array<{ method: string; route: string }> {
+function customProbeRoutes(args: ParsedArgs): ProbeRoute[] {
   const raw = stringFlag(args, 'probe-path');
   if (raw === undefined) return [];
 
@@ -350,7 +401,7 @@ function customProbeRoutes(args: ParsedArgs): Array<{ method: string; route: str
     if (!method || !route.startsWith('/')) {
       fail(`--probe-path entries look like "PUT:/worlds/{id}/backups/upload" (got "${entry.trim()}")`);
     }
-    return { method: method.toUpperCase(), route };
+    return { method: method.toUpperCase(), route, kind: 'candidate' as const, note: 'custom' };
   });
 }
 
@@ -389,15 +440,19 @@ async function probeUpload(args: ParsedArgs, selector: string): Promise<void> {
   const realm = resolveRealm(realms, selector);
   const slot = resolveSlot(args, realm);
 
-  const routes = [...UPLOAD_PROBE_ROUTES, ...customProbeRoutes(args)];
+  const routes: ProbeRoute[] = [...PROBE_ROUTES, ...customProbeRoutes(args)];
 
-  log.step(`Probing ${routes.length} candidate upload route(s) on ${color.bold(realm.name)}`);
-  for (const { method, route } of routes) {
-    log.info(color.dim(`  ${method.padEnd(4)} ${expandRoute(route, realm.id, slot)}`));
+  log.step(`Probing ${routes.length} route(s) on ${color.bold(realm.name)}`);
+  for (const route of routes) {
+    const tag = route.kind === 'candidate' ? '' : color.yellow(' [control]');
+    log.info(
+      `  ${route.method.padEnd(4)} ${expandRoute(route.route, realm.id, slot)}${tag}` +
+        color.dim(`  ${route.note}`),
+    );
   }
   log.info('');
-  log.warn('These routes are guesses. If one exists, calling it may close the Realm and');
-  log.warn('disconnect players, the way the Java equivalent does. Nothing is uploaded.');
+  log.warn('Candidate routes are guesses. If one exists, calling it may close the Realm');
+  log.warn('and disconnect players, the way the Java equivalent does. Nothing is uploaded.');
 
   if (!boolFlag(args, 'yes')) {
     log.info('');
@@ -406,27 +461,57 @@ async function probeUpload(args: ParsedArgs, selector: string): Promise<void> {
   }
 
   log.info('');
-  const results: ProbeResult[] = [];
-  for (const { method, route } of routes) {
-    const expanded = expandRoute(route, realm.id, slot);
-    const result = await client.probe(method, expanded);
-    results.push(result);
-    const { label } = classifyProbe(result);
-    log.info(`  ${method.padEnd(4)} ${expanded}  ->  ${label}`);
+  const runs: Array<{ route: ProbeRoute; result: ProbeResult }> = [];
+  for (const route of routes) {
+    const expanded = expandRoute(route.route, realm.id, slot);
+    const result = await client.probe(route.method, expanded);
+    runs.push({ route, result });
+    log.info(`  ${route.method.padEnd(4)} ${expanded}  ->  ${classifyProbe(result).label}`);
   }
 
-  const interesting = results.filter((r) => classifyProbe(r).interesting);
+  const ok2xx = (r: ProbeResult): boolean => r.status >= 200 && r.status < 300;
+  const exists = (r: ProbeResult): boolean => ok2xx(r) || r.status === 405;
+
+  const positive = runs.find((r) => r.route.kind === 'control-positive');
+  const java = runs.find((r) => r.route.kind === 'control-java');
+  const candidates = runs.filter((r) => r.route.kind === 'candidate');
+  const responded = candidates.filter((r) => classifyProbe(r.result).interesting);
 
   log.info('');
-  if (interesting.length === 0) {
-    log.done('Every candidate returned 404. No upload endpoint at any of these paths.');
-    log.info('That matches prismarine-authored clients, which implement no upload at all.');
-    log.info('Replace World in the client stays the only way to put a world back.');
+  log.step('Reading the controls');
+
+  if (positive === undefined || !ok2xx(positive.result)) {
+    log.error('  The known-good Bedrock route did not succeed.');
+    log.info('  Auth, headers, or Realm selection is wrong, so nothing else here is');
+    log.info('  meaningful. Fix that first: try `pnpm realm --list-realms`.');
+    return;
+  }
+  log.done('  Known-good Bedrock route answered, so auth and headers are accepted.');
+
+  const javaServed = java !== undefined && exists(java.result);
+  if (javaServed) {
+    log.warn('  This host ALSO answers the Java-shaped download route.');
+    log.info('  A Java-shaped upload path is therefore plausible here.');
+  } else {
+    log.done('  The Java-shaped download route is absent, as expected for Bedrock.');
+    log.info('  Published upload descriptions come from the Java API, so their paths');
+    log.info('  are unlikely to exist on this host.');
+  }
+
+  log.info('');
+  if (responded.length === 0) {
+    log.done('No candidate upload route responded; every one returned 404.');
+    log.info(
+      javaServed
+        ? 'Java-shaped routes do exist here, so a differently named upload path may still.'
+        : 'Combined with the controls, this is good evidence there is no upload endpoint.',
+    );
+    log.info('Replace World in the client stays the way to put a world back.');
     return;
   }
 
-  log.step(`${interesting.length} route(s) returned something other than 404:`);
-  for (const result of interesting) {
+  log.step(`${responded.length} candidate route(s) returned something other than 404:`);
+  for (const { result } of responded) {
     log.info('');
     log.info(`  ${color.bold(`${result.method} ${result.route}`)}`);
     log.info(`    status: ${result.status} ${result.statusText}`);
@@ -444,9 +529,8 @@ async function probeUpload(args: ParsedArgs, selector: string): Promise<void> {
   }
 
   log.info('');
-  log.info('Paste this output into the repo issue or back to Claude Code: the upload');
-  log.info('flow can be implemented once the real response shape is known, rather than');
-  log.info('guessed at against a live Realm.');
+  log.info('Send this output back to Claude Code: the upload flow can be implemented');
+  log.info('from a real response, rather than guessed at against a live Realm.');
 }
 
 async function main(): Promise<void> {

@@ -256,8 +256,17 @@ exported yourself, and nothing else in the repo depends on the API.
 Whether Bedrock Realms has a world-upload endpoint is an open question. The
 Java Realms client uses `PUT /worlds/{id}/backups/upload`, which returns an
 upload target plus a token; nothing public shows a Bedrock equivalent, and no
-open-source client implements one. `--probe-upload` tests that against your own
-Realm and reports exactly what the service says:
+open-source client implements one.
+
+Be careful with write-ups that describe a full Bedrock upload pipeline: the ones
+circulating quote the Java download route (`/worlds/{id}/slot/{slot}/download`)
+rather than Bedrock's (`/archive/download/world/{id}/{slot}/{backupId}`), and
+hedge the archive format as "`.tar.gz` or `.mcworld`" when `.tar.gz` is Java's
+and `.mcworld` is Bedrock's. That is the Java flow with a Bedrock hostname on
+it, not a captured Bedrock one.
+
+`--probe-upload` settles it against your own Realm and reports exactly what the
+service says:
 
 ```bash
 pnpm realm --realm "My Realm" --probe-upload          # dry run: prints the plan
@@ -269,6 +278,17 @@ absent while a **405 proves it exists** without invoking whatever a `PUT` would
 do. Add your own candidates with
 `--probe-path "PUT:/worlds/{id}/something,GET:/other"` — `{id}` and `{slot}` are
 substituted.
+
+Two control routes run alongside the candidates so an all-404 result actually
+means something:
+
+- **A known-good Bedrock route.** If it fails, the requests are being rejected
+  outright and the run reports itself inconclusive rather than concluding there
+  is no upload endpoint.
+- **The Java Realms download route** (`/worlds/{id}/slot/{slot}/download`).
+  Every public description of a Realms upload traces back to the Java API, so
+  this shows whether the Bedrock host serves Java-shaped paths at all. If it
+  does not, a Java-shaped upload path almost certainly is not there either.
 
 Two things to be clear about before running it:
 

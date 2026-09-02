@@ -247,8 +247,50 @@ describe('realm.ts against a stand-in Realms service', () => {
       const { stdout } = await cli(['--realm', '99', '--probe-upload', '--yes']);
 
       assert.match(stdout, /404 absent/);
-      assert.match(stdout, /Every candidate returned 404/);
+      assert.match(stdout, /No candidate upload route responded/);
       assert.match(stdout, /Replace World/);
+    });
+
+    it('uses the known-good Bedrock route as a positive control', async () => {
+      stub.clearProbeRoutes();
+      const { stdout } = await cli(['--realm', '99', '--probe-upload', '--yes']);
+      assert.match(stdout, /auth and headers are accepted/);
+      assert.match(stdout, /good evidence there is no upload endpoint/);
+    });
+
+    it('refuses to interpret the run when the positive control fails', async () => {
+      stub.clearProbeRoutes();
+      // Break only the known-good route; everything else still 404s.
+      stub.setProbeRoute('GET /archive/download/world/99/2/latest', { status: 401, body: 'nope' });
+      const { stdout, stderr } = await cli(['--realm', '99', '--probe-upload', '--yes']);
+
+      const out = stdout + stderr;
+      assert.match(out, /known-good Bedrock route did not succeed/);
+      assert.match(out, /nothing else here is/);
+      // It must not go on to draw a conclusion from meaningless 404s.
+      assert.doesNotMatch(out, /good evidence there is no upload endpoint/);
+      stub.clearProbeRoutes();
+    });
+
+    it('flags when the host also answers Java-shaped routes', async () => {
+      stub.clearProbeRoutes();
+      stub.setProbeRoute('GET /worlds/99/slot/2/download', {
+        status: 200,
+        json: { downloadLink: 'http://example/x' },
+      });
+      const { stdout, stderr } = await cli(['--realm', '99', '--probe-upload', '--yes']);
+      const out = stdout + stderr;
+
+      assert.match(out, /ALSO answers the Java-shaped download route/);
+      assert.match(out, /plausible here/);
+      stub.clearProbeRoutes();
+    });
+
+    it('notes the Java route being absent as expected for Bedrock', async () => {
+      stub.clearProbeRoutes();
+      const { stdout } = await cli(['--realm', '99', '--probe-upload', '--yes']);
+      assert.match(stdout, /Java-shaped download route is absent/);
+      assert.match(stdout, /come from the Java API/);
     });
 
     it('probes GET before PUT so a 405 can prove a path exists', async () => {

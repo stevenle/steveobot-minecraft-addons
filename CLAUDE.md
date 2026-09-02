@@ -181,6 +181,16 @@ a list of candidate routes and reports exactly what comes back. Two rules:
 - **Probe GET before PUT** for any new candidate. A 404 says the path is absent;
   a 405 proves it exists without invoking it. Calling a real upload endpoint may
   close the Realm and disconnect players, as the Java equivalent does.
+- **Keep the controls.** The probe runs a known-good Bedrock route (if it fails,
+  the run is inconclusive, not evidence of absence) and the Java download route
+  (which shows whether this host serves Java-shaped paths at all). Without them
+  a wall of 404s proves nothing.
+
+Descriptions of a Bedrock upload pipeline are usually the **Java** flow
+relabelled — the tell is `/worlds/{id}/slot/{slot}/download` for the download
+step, which is Java's route, where Bedrock uses
+`/archive/download/world/{id}/{slot}/{backupId}`. Check that before believing
+one.
 
 Until that lands, uploading is manual via *Replace World*, and docs and CLI
 output must not imply otherwise.
