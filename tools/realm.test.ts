@@ -171,6 +171,115 @@ describe('realm.ts against a stand-in Realms service', () => {
     assert.ok(bp.some((e) => e.pack_id === '2bdba555-b0e4-4044-af7f-f9fe3cca6a20'));
   });
 
+  it('refuses to upload without --yes and sends nothing', async () => {
+    stub.clearProbeRoutes();
+    stub.requests.length = 0;
+    const out = path.join(outDir, 'dry-upload.mcworld');
+    const { stdout } = await cli(['hello-world', '--realm', '99', '--upload', '--out', out]);
+
+    assert.match(stdout, /Dry run/);
+    assert.ok(
+      !stub.requests.some((r) => r.includes('/archive/upload/')),
+      'a dry run must not even fetch an upload target',
+    );
+    assert.ok(fs.existsSync(out), 'the baked world should still be written');
+  });
+
+  it('uploads the baked world with --upload --yes and reports the response', async () => {
+    stub.clearProbeRoutes();
+    stub.requests.length = 0;
+    stub.setProbeRoute(`GET /archive/upload/world/99/${REALM.activeSlot}`, {
+      status: 200,
+      json: { uploadUrl: `${stub.host}/upload-sink`, token: 'up-token' },
+    });
+    stub.setProbeRoute('POST /upload-sink', { status: 200, json: { ok: true } });
+
+    const out = path.join(outDir, 'uploaded.mcworld');
+    const { stdout } = await cli(['hello-world', '--realm', '99', '--upload', '--yes', '--out', out]);
+
+    assert.ok(stub.requests.includes('POST /upload-sink'), 'the archive must be POSTed');
+    assert.match(stdout, /200/);
+    assert.match(stdout, /accepted the archive/);
+    assert.match(stdout, /verify the world actually changed/);
+  });
+
+  it('reports an upload rejection verbatim and does not retry', async () => {
+    stub.clearProbeRoutes();
+    stub.requests.length = 0;
+    stub.setProbeRoute(`GET /archive/upload/world/99/${REALM.activeSlot}`, {
+      status: 200,
+      json: { uploadUrl: `${stub.host}/upload-sink`, token: 'up-token' },
+    });
+    stub.setProbeRoute('POST /upload-sink', { status: 403, body: 'HTTP 403 Forbidden' });
+
+    const out = path.join(outDir, 'rejected.mcworld');
+    const { stdout, stderr } = await cli(['hello-world', '--realm', '99', '--upload', '--yes', '--out', out]);
+
+    assert.match(stdout, /403/);
+    // log.error writes to stderr.
+    assert.match(stderr, /rejected the archive/);
+    assert.equal(
+      stub.requests.filter((r) => r === 'POST /upload-sink').length,
+      1,
+      'a rejection must not be retried',
+    );
+  });
+
+  it('with --close, closes before minting the upload session and reopens after', async () => {
+    stub.clearProbeRoutes();
+    stub.requests.length = 0;
+    stub.setProbeRoute('PUT /worlds/99/close', { status: 200, body: 'true' });
+    stub.setProbeRoute('PUT /worlds/99/open', { status: 200, body: 'true' });
+    stub.setProbeRoute(`GET /archive/upload/world/99/${REALM.activeSlot}`, {
+      status: 200,
+      json: { uploadUrl: `${stub.host}/upload-sink`, token: 'up-token' },
+    });
+    stub.setProbeRoute('POST /upload-sink', { status: 200, json: { ok: true } });
+
+    const out = path.join(outDir, 'closed-upload.mcworld');
+    await cli(['hello-world', '--realm', '99', '--upload', '--close', '--yes', '--out', out]);
+
+    const order = stub.requests.filter((r) =>
+      ['PUT /worlds/99/close', 'PUT /worlds/99/open', `GET /archive/upload/world/99/${REALM.activeSlot}`, 'POST /upload-sink'].includes(r),
+    );
+    assert.deepEqual(order, [
+      'PUT /worlds/99/close',
+      `GET /archive/upload/world/99/${REALM.activeSlot}`,
+      'POST /upload-sink',
+      'PUT /worlds/99/open',
+    ]);
+  });
+
+  it('reopens the Realm even when the upload session is refused, and explains the 403', async () => {
+    stub.clearProbeRoutes();
+    stub.requests.length = 0;
+    stub.setProbeRoute('PUT /worlds/99/close', { status: 200, body: 'true' });
+    stub.setProbeRoute('PUT /worlds/99/open', { status: 200, body: 'true' });
+    stub.setProbeRoute(`GET /archive/upload/world/99/${REALM.activeSlot}`, {
+      status: 403,
+      body: '{"errorCode":403, "errorMsg":"Could not set upload state"}',
+    });
+
+    const out = path.join(outDir, 'refused-upload.mcworld');
+    const err = (await cli(['hello-world', '--realm', '99', '--upload', '--close', '--yes', '--out', out]).then(
+      () => null,
+      (e: unknown) => e,
+    )) as { stdout: string; stderr: string } | null;
+
+    assert.ok(err, 'the CLI should exit non-zero');
+    // The explanation goes to stdout via log.info; errors go to stderr.
+    assert.match(err.stdout, /refused to start an upload\s+session/);
+    assert.match(err.stdout, /not an auth failure/);
+    assert.ok(
+      !err.stderr.includes('Delete .realms-auth/'),
+      'must not give the generic bad-credentials advice',
+    );
+    assert.ok(
+      stub.requests.includes('PUT /worlds/99/open'),
+      'the Realm must be reopened even on failure',
+    );
+  });
+
   it('pulls the Realm active slot by default and honours --slot', async () => {
     stub.requests.length = 0;
     await cli(['hello-world', '--realm', '99', '--out', path.join(outDir, 'a.mcworld')]);
@@ -332,6 +441,36 @@ describe('realm.ts against a stand-in Realms service', () => {
       assert.match(stdout, /Looks like upload info/);
       // The operator needs the raw body to implement the next step.
       assert.match(stdout, /blob\.example/);
+    });
+
+    it('moves to stage 2 with safe methods when a route returns an upload target', async () => {
+      stub.clearProbeRoutes();
+      stub.requests.length = 0;
+      // A JWT whose payload carries the claims the real service was seen to
+      // issue; the signature is irrelevant because we only display claims.
+      const claims = Buffer.from(
+        JSON.stringify({ upload_id: 'abc123', region: 'TEST_REGION', exp: 1788319777 }),
+      ).toString('base64url');
+      stub.setProbeRoute('GET /archive/upload/world/99/2', {
+        status: 200,
+        json: { uploadUrl: `${stub.host}/upload-host`, token: `h.${claims}.s` },
+      });
+      stub.setProbeRoute('GET /upload-host', { status: 405, body: 'use POST' });
+      const { stdout } = await cli(['--realm', '99', '--probe-upload', '--yes']);
+
+      assert.match(stdout, /Stage 2/);
+      assert.match(stdout, /upload_id=abc123/);
+      assert.match(stdout, /region=TEST_REGION/);
+      for (const method of ['OPTIONS', 'HEAD', 'GET']) {
+        assert.ok(
+          stub.requests.includes(`${method} /upload-host`),
+          `stage 2 should ${method} the upload host`,
+        );
+      }
+      assert.ok(
+        !stub.requests.some((r) => (r.startsWith('PUT') || r.startsWith('POST')) && r.includes('/upload-host')),
+        'stage 2 must never write to the upload host',
+      );
     });
 
     it('accepts extra candidate routes via --probe-path', async () => {

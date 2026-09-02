@@ -20,6 +20,7 @@ interface RecordedRequest {
   method: string;
   url: string;
   headers: http.IncomingHttpHeaders;
+  body: Buffer;
 }
 
 interface Stub {
@@ -27,6 +28,7 @@ interface Stub {
   json?: unknown;
   body?: Buffer | string;
   contentType?: string;
+  allow?: string;
 }
 
 interface StubServer {
@@ -42,23 +44,34 @@ async function startStubServer(): Promise<StubServer> {
   const responses = new Map<string, Stub[]>();
 
   const server = http.createServer((req, res) => {
-    requests.push({ method: req.method ?? '', url: req.url ?? '', headers: req.headers });
-    const pending = responses.get(req.url ?? '');
-    // Queued stubs are consumed in order; a single stub is reused.
-    const stub = pending && pending.length > 1 ? pending.shift() : pending?.[0];
+    const chunks: Buffer[] = [];
+    req.on('data', (chunk: Buffer) => chunks.push(chunk));
+    req.on('end', () => {
+      requests.push({
+        method: req.method ?? '',
+        url: req.url ?? '',
+        headers: req.headers,
+        body: Buffer.concat(chunks),
+      });
+      const pending = responses.get(req.url ?? '');
+      // Queued stubs are consumed in order; a single stub is reused.
+      const stub = pending && pending.length > 1 ? pending.shift() : pending?.[0];
 
-    if (stub === undefined) {
-      res.writeHead(404, { 'Content-Type': 'text/plain' });
-      res.end('no stub');
-      return;
-    }
-    if (stub.json !== undefined) {
-      res.writeHead(stub.status ?? 200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(stub.json));
-      return;
-    }
-    res.writeHead(stub.status ?? 200, { 'Content-Type': stub.contentType ?? 'text/plain' });
-    res.end(stub.body ?? '');
+      if (stub === undefined) {
+        res.writeHead(404, { 'Content-Type': 'text/plain' });
+        res.end('no stub');
+        return;
+      }
+      if (stub.json !== undefined) {
+        res.writeHead(stub.status ?? 200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(stub.json));
+        return;
+      }
+      const headers: Record<string, string> = { 'Content-Type': stub.contentType ?? 'text/plain' };
+      if (stub.allow !== undefined) headers['Allow'] = stub.allow;
+      res.writeHead(stub.status ?? 200, headers);
+      res.end(stub.body ?? '');
+    });
   });
 
   await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
@@ -235,6 +248,133 @@ describe('RealmsClient', () => {
         'backup-id-1',
       );
       assert.equal(server.requests[0]?.url, '/archive/download/world/42/1/backup-id-1');
+    } finally {
+      await server.close();
+    }
+  });
+
+  it('fetches an upload target and rejects a response missing one', async () => {
+    const server = await startStubServer();
+    try {
+      const client = new RealmsClient({ authorization: AUTH, host: server.host });
+
+      server.queue('/archive/upload/world/42/2', {
+        json: { uploadUrl: 'http://upload.example/worlds', token: 'jwt-token' },
+      });
+      const info = await client.getWorldUploadInfo(42, 2);
+      assert.equal(info.uploadUrl, 'http://upload.example/worlds');
+      assert.equal(info.token, 'jwt-token');
+      assert.equal(server.requests[0]?.url, '/archive/upload/world/42/2');
+
+      server.queue('/archive/upload/world/42/3', { json: { uploadUrl: 'http://x' } });
+      await assert.rejects(() => client.getWorldUploadInfo(42, 3), /no upload target/i);
+    } finally {
+      await server.close();
+    }
+  });
+
+  it('probes absolute URLs with a bearer token in place of Realms headers', async () => {
+    const server = await startStubServer();
+    try {
+      server.queue('/upload-host', { status: 405, body: 'nope' });
+      const client = new RealmsClient({ authorization: AUTH, host: 'http://unused.invalid' });
+      const result = await client.probe('OPTIONS', `${server.host}/upload-host`, {
+        bearer: 'jwt-token',
+      });
+
+      assert.equal(result.status, 405);
+      const request = server.requests[0];
+      assert.ok(request);
+      assert.equal(request.headers['authorization'], 'Bearer jwt-token');
+      assert.equal(request.headers['client-version'], undefined, 'Realms headers must not leak');
+    } finally {
+      await server.close();
+    }
+  });
+
+  it('captures the Allow header a probe gets back', async () => {
+    const server = await startStubServer();
+    try {
+      server.queue('/probe-me', { status: 405, body: '', allow: 'POST, PUT' });
+      const client = new RealmsClient({ authorization: AUTH, host: server.host });
+      const result = await client.probe('GET', '/probe-me');
+      assert.equal(result.allow, 'POST, PUT');
+    } finally {
+      await server.close();
+    }
+  });
+
+  it('closes and reopens a Realm via the prismarine-realms state routes', async () => {
+    const server = await startStubServer();
+    try {
+      const client = new RealmsClient({ authorization: AUTH, host: server.host });
+      // The real endpoints answer an empty or bare-boolean body; both must be
+      // tolerated.
+      server.queue('/worlds/42/close', { body: '' });
+      server.queue('/worlds/42/open', { body: 'true' });
+
+      await client.closeRealm(42);
+      await client.openRealm(42);
+
+      assert.equal(server.requests[0]?.method, 'PUT');
+      assert.equal(server.requests[0]?.url, '/worlds/42/close');
+      assert.equal(server.requests[1]?.method, 'PUT');
+      assert.equal(server.requests[1]?.url, '/worlds/42/open');
+    } finally {
+      await server.close();
+    }
+  });
+
+  it('surfaces a refused state change as a RealmsApiError', async () => {
+    const server = await startStubServer();
+    try {
+      server.queue('/worlds/42/close', { status: 403, body: 'Forbidden' });
+      await assert.rejects(
+        () => new RealmsClient({ authorization: AUTH, host: server.host }).closeRealm(42),
+        RealmsApiError,
+      );
+    } finally {
+      await server.close();
+    }
+  });
+
+  it('POSTs a world archive with the bearer token and mcworld content type', async () => {
+    const server = await startStubServer();
+    try {
+      const client = new RealmsClient({ authorization: AUTH, host: 'http://unused.invalid' });
+      const archive = Buffer.from('pretend mcworld bytes');
+
+      server.queue('/upload-sink', { json: { ok: true } });
+      const result = await client.uploadWorldArchive(
+        { uploadUrl: `${server.host}/upload-sink`, token: 'up-token' },
+        archive,
+      );
+      assert.equal(result.status, 200);
+
+      const request = server.requests[0];
+      assert.ok(request);
+      assert.equal(request.method, 'POST');
+      assert.equal(request.headers['authorization'], 'Bearer up-token');
+      assert.equal(request.headers['content-type'], 'application/x-mcworld');
+      assert.deepEqual(request.body, archive, 'the archive must arrive byte-for-byte');
+    } finally {
+      await server.close();
+    }
+  });
+
+  it('reports an upload rejection instead of throwing', async () => {
+    const server = await startStubServer();
+    try {
+      server.queue('/upload-sink', { status: 403, body: 'HTTP 403 Forbidden' });
+      const result = await new RealmsClient({
+        authorization: AUTH,
+        host: server.host,
+      }).uploadWorldArchive(
+        { uploadUrl: `${server.host}/upload-sink`, token: 'up-token' },
+        Buffer.from('bytes'),
+      );
+      assert.equal(result.status, 403);
+      assert.match(result.body, /Forbidden/);
     } finally {
       await server.close();
     }

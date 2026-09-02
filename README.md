@@ -194,10 +194,11 @@ and upload that world to a Realm, or import the world on a device that can.
 ### Realms
 
 Realms has **no public API for installing packs**, so nothing can push an add-on
-to a Realm directly. The supported route is the client's *Replace World* flow:
-you upload a world that already has the packs applied. `pnpm realm` builds that
-world for you, so the manual part is one upload instead of a pile of file
-juggling.
+to a Realm directly. The route is replacing the world with one that already has
+the packs applied. `pnpm realm` builds that world for you, and can either hand
+it to you for the client's manual *Replace World* flow (below) or upload it
+itself over the captured Realms upload flow — see [Uploading straight back to
+the Realm](#uploading-straight-back-to-the-realm).
 
 ```bash
 # From a world downloaded off the Realm (Realm settings -> Download World)
@@ -243,20 +244,45 @@ Two caveats you should weigh before using this:
   withdraw it without notice, and driving it with a non-Microsoft client is at
   odds with the Minecraft usage guidelines. Enforcement against personal tools
   appears rare, but the risk to your account is not zero.
-- **It only saves the download.** No known endpoint replaces a Realm's world
-  content, so the upload back is still the manual *Replace World* step. No
-  open-source client implements one; that is strong evidence rather than proof,
-  which is what `--probe-upload` below is for.
+- **Uploading back rides the same undocumented API.** `--upload` drives an
+  upload flow reconstructed from live probe captures and verified end-to-end
+  (2026-09-01): world replaced, packs active. It is still Mojang's private
+  protocol, so it can break without notice — always back up first.
 
 If you would rather not touch it, `--world` does the same job from a world you
 exported yourself, and nothing else in the repo depends on the API.
 
+#### Uploading straight back to the Realm
+
+Bedrock Realms turns out to have a two-stage upload flow, captured live and
+verified end-to-end (2026-09): `GET /archive/upload/world/{id}/{slot}` answers
+with an upload host URL plus a short-lived token scoped to the world and slot,
+and the upload host accepts `POST` with the archive as
+`application/x-mcworld`, answering `201 Created` and a `text/event-stream` of
+validation and archiving events. That is what `--upload` drives:
+
+```bash
+pnpm realm hello-world --realm "My Realm" --upload                 # dry run
+pnpm realm hello-world --realm "My Realm" --upload --close --yes   # upload
+```
+
+It replaces the slot's world on the live Realm, so back up first.
+
+`--close` closes the Realm for the upload (disconnecting players) and reopens
+it after — the close/open routes are prismarine-realms' `changeRealmState`,
+and the Java flow closes before uploading the same way. Without it, minting
+the upload session can be refused with a 403 `"Could not set upload state"`;
+that is not an auth failure — close first, or wait out the previous session's
+token (~1h). The reopen right after upload can itself be refused while the
+service is still swapping the world in; if the CLI says so, open the Realm
+from the client's Realm settings.
+
 #### Probing for an upload endpoint
 
-Whether Bedrock Realms has a world-upload endpoint is an open question. The
-Java Realms client uses `PUT /worlds/{id}/backups/upload`, which returns an
-upload target plus a token; nothing public shows a Bedrock equivalent, and no
-open-source client implements one.
+The flow above was found empirically with `--probe-upload`, which remains the
+tool for verifying it or discovering changes. For background, the Java Realms
+client uses `PUT /worlds/{id}/backups/upload`; no open-source client
+implements a Bedrock upload.
 
 Be careful with write-ups that describe a full Bedrock upload pipeline: the ones
 circulating quote the Java download route (`/worlds/{id}/slot/{slot}/download`)
@@ -298,10 +324,13 @@ Two things to be clear about before running it:
   the Java one does. That is why `--yes` is required and the dry run is the
   default.
 
-If a route does respond, the probe prints the raw body and flags fields that
-look like upload info. That response is what an actual upload flow should be
-built from — implementing one by guessing at the remaining steps would mean
-writing to a live Realm on speculation, which is not worth the risk.
+If a route responds with an upload target, the probe prints the raw body and
+moves to stage 2: it asks the upload host itself what it accepts, using only
+safe methods (`OPTIONS`/`HEAD`/`GET`, no body) with the returned token. The
+goal is an `Allow` header or an error message that names the expected request.
+Those captured responses are what an actual upload flow should be built from —
+implementing one by guessing at the remaining steps would mean writing to a
+live Realm on speculation, which is not worth the risk.
 
 `--world` also accepts an unpacked world folder, e.g. one under
 `com.mojang/minecraftWorlds/<id>`:

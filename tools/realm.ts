@@ -9,12 +9,16 @@
  *
  * The world can come from a file you exported yourself, or be pulled straight
  * off a live Realm over the undocumented Realms service (see lib/realms/).
- * Either way the upload back is manual: the service has no endpoint for
- * replacing world content.
+ * The world can go back two ways: manually via the client's Replace World, or
+ * with `--upload`, which drives the captured upload flow (target + token, then
+ * a POST of the archive). The flow is undocumented and reconstructed from
+ * live probe captures, so `--upload` is gated behind --yes and reports the
+ * host's response verbatim.
  *
  * Usage:
  *   node tools/realm.ts <slug...> --world <path> [--out <file>] [--in-place]
  *   node tools/realm.ts <slug...> --realm <id|name> [--out <file>]
+ *   node tools/realm.ts <slug...> --realm <id|name> --upload [--close] [--yes]
  *   node tools/realm.ts --world <path> --list
  *   node tools/realm.ts --login
  *   node tools/realm.ts --list-realms
@@ -516,6 +520,7 @@ async function probeUpload(args: ParsedArgs, selector: string): Promise<void> {
     log.info(`  ${color.bold(`${result.method} ${result.route}`)}`);
     log.info(`    status: ${result.status} ${result.statusText}`);
     if (result.contentType !== undefined) log.info(`    content-type: ${result.contentType}`);
+    if (result.allow !== undefined) log.info(`    allow: ${result.allow}`);
     if (result.networkError !== undefined) log.info(`    network error: ${result.networkError}`);
     if (result.body) {
       log.info('    body:');
@@ -528,9 +533,200 @@ async function probeUpload(args: ParsedArgs, selector: string): Promise<void> {
     }
   }
 
+  // Stage 2: a candidate answered with an upload target, so probe the upload
+  // host itself the same way — safe methods only, no body — reusing the token
+  // already in hand rather than minting another.
+  const discovery = candidates.find(
+    (r) => r.route.method === 'GET' && ok2xx(r.result) && r.result.body.includes('"uploadUrl"'),
+  );
+  if (discovery !== undefined) {
+    await probeUploadHost(client, discovery.result.body);
+  }
+
   log.info('');
   log.info('Send this output back to Claude Code: the upload flow can be implemented');
   log.info('from a real response, rather than guessed at against a live Realm.');
+}
+
+/** Decodes a JWT's claims for display. No verification — we are the audience. */
+function jwtClaims(token: string): Record<string, unknown> | undefined {
+  const payload = token.split('.')[1];
+  if (payload === undefined) return undefined;
+  try {
+    return JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')) as Record<
+      string,
+      unknown
+    >;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Stage 2 of the probe: asks the upload host what it accepts, without sending
+ * a byte of world data. OPTIONS/HEAD/GET are safe by definition; the goal is
+ * an `Allow` header or an error body that names the request the host expects,
+ * so the real upload can be written from evidence like stage 1 was.
+ */
+async function probeUploadHost(client: RealmsClient, discoveryBody: string): Promise<void> {
+  let info: { uploadUrl?: string; token?: string };
+  try {
+    info = JSON.parse(discoveryBody) as { uploadUrl?: string; token?: string };
+  } catch {
+    return;
+  }
+  if (info.uploadUrl === undefined || info.token === undefined) return;
+
+  log.info('');
+  log.step('Stage 2: probing the upload host (safe methods, no body, bearer token)');
+  const claims = jwtClaims(info.token);
+  if (claims !== undefined) {
+    const exp =
+      typeof claims['exp'] === 'number' ? new Date(claims['exp'] * 1000).toISOString() : '?';
+    log.info(
+      color.dim(
+        `  token: upload_id=${String(claims['upload_id'] ?? '?')} ` +
+          `region=${String(claims['region'] ?? '?')} expires=${exp}`,
+      ),
+    );
+  }
+
+  for (const method of ['OPTIONS', 'HEAD', 'GET']) {
+    const result = await client.probe(method, info.uploadUrl, { bearer: info.token });
+    log.info(`  ${method.padEnd(7)} ${info.uploadUrl}  ->  ${classifyProbe(result).label}`);
+    if (result.allow !== undefined) log.info(`    allow: ${result.allow}`);
+    if (result.contentType !== undefined) log.info(`    content-type: ${result.contentType}`);
+    if (result.networkError !== undefined) log.info(`    network error: ${result.networkError}`);
+    if (result.body) {
+      log.info('    body:');
+      for (const line of result.body.split('\n')) log.info(`      ${line}`);
+    }
+  }
+}
+
+/**
+ * Sends a baked `.mcworld` back to a Realm slot over the captured upload flow:
+ * `GET /archive/upload/world/{id}/{slot}` for a target and token, then a POST
+ * of the archive as `application/x-mcworld`. Every piece of that shape comes
+ * from live `--probe-upload` captures (2026-09-01) — see CLAUDE.md.
+ *
+ * Replacing a Realm's world is irreversible without a backup, so this is
+ * gated behind --yes, and a non-2xx from the host is reported verbatim rather
+ * than retried or papered over.
+ */
+async function uploadWorldFile(args: ParsedArgs, selector: string, file: string): Promise<void> {
+  const client = await connect(args);
+
+  let realms: RealmSummary[];
+  try {
+    realms = await client.listRealms();
+  } catch (err) {
+    explainApiError(err);
+  }
+  const realm = resolveRealm(realms, selector);
+  const slot = resolveSlot(args, realm);
+  const size = fs.statSync(file).size;
+
+  log.info('');
+  log.step(
+    `Uploading ${rel(file)} ${color.dim(`(${(size / 1024 / 1024).toFixed(1)} MB)`)} to ` +
+      `${color.bold(realm.name)} slot ${slot}`,
+  );
+  const close = boolFlag(args, 'close');
+  log.warn('This replaces that slot\'s world on the live Realm and may close it,');
+  log.warn('disconnecting players. Back up first: Realm settings -> Download World.');
+  if (close) {
+    log.warn('--close: the Realm will be closed for the upload and reopened after.');
+  }
+
+  if (!boolFlag(args, 'yes')) {
+    log.info('');
+    log.info('Dry run. Re-run with --yes to actually upload.');
+    return;
+  }
+
+  // Any exit path below must reopen a Realm we closed, so failures are stashed
+  // rather than thrown past the reopen (fail() exits without running finally).
+  let closed = false;
+  let failure: unknown;
+  let uploadUrl = '';
+  let result: ProbeResult | undefined;
+
+  try {
+    if (close) {
+      log.step(`Closing ${color.bold(realm.name)}`);
+      await client.closeRealm(realm.id);
+      closed = true;
+    }
+    const info = await client.getWorldUploadInfo(realm.id, slot);
+    uploadUrl = info.uploadUrl;
+    result = await client.uploadWorldArchive(info, fs.readFileSync(file));
+  } catch (err) {
+    failure = err;
+  }
+
+  if (closed) {
+    log.step(`Reopening ${color.bold(realm.name)}`);
+    try {
+      await client.openRealm(realm.id);
+      log.done('Reopened.');
+    } catch (err) {
+      // Seen live right after ARCHIVING_SUCCEEDED — the service likely refuses
+      // to open while it is still swapping the world in. Report the actual
+      // response so the pattern can be confirmed and handled.
+      log.error('Could not reopen the Realm — open it from the client\'s Realm settings.');
+      log.info(`  ${err instanceof Error ? err.message : String(err)}`);
+    }
+  }
+
+  if (failure !== undefined || result === undefined) {
+    explainUploadError(failure);
+  }
+
+  log.info('');
+  log.info(`  POST ${uploadUrl}  ->  ${result.status} ${result.statusText}`);
+  if (result.contentType !== undefined) log.info(`    content-type: ${result.contentType}`);
+  if (result.body) {
+    log.info('    body:');
+    for (const line of result.body.split('\n')) log.info(`      ${line}`);
+  }
+  log.info('');
+
+  if (result.status >= 200 && result.status < 300) {
+    log.done('The upload host accepted the archive.');
+    log.info('Rejoin the Realm and verify the world actually changed and the packs are');
+    log.info('active. If the world is unchanged, an uncaptured follow-up step exists —');
+    log.info('send this output back to Claude Code.');
+  } else {
+    log.error('The upload host rejected the archive. Nothing else was tried.');
+    log.info('Send this output back to Claude Code; meanwhile Replace World in the');
+    log.info('client remains the reliable route.');
+  }
+}
+
+/**
+ * Explains an upload failure. The "Could not set upload state" 403 gets its
+ * own reading because the generic 403 advice (bad credentials) is wrong for
+ * it: the same account minted upload sessions moments earlier. It is the
+ * service refusing to start an upload session.
+ */
+function explainUploadError(err: unknown): never {
+  if (
+    err instanceof RealmsApiError &&
+    err.status === 403 &&
+    err.body.includes('Could not set upload state')
+  ) {
+    log.error(err.message);
+    log.info('');
+    log.info('"Could not set upload state" means the service refused to start an upload');
+    log.info('session — it is not an auth failure. Plausible causes, in order:');
+    log.info('  - a previous session is still pending: each --probe-upload or --upload');
+    log.info('    mints one, and they appear to expire with their token (~1h). Wait for');
+    log.info('    the last token\'s expiry and retry.');
+    log.info('  - the Realm needs to be closed first, as on Java: retry with --close.');
+    fail('Upload not started.');
+  }
+  explainApiError(err);
 }
 
 async function main(): Promise<void> {
@@ -633,6 +829,15 @@ async function main(): Promise<void> {
     const size = fs.statSync(outFile).size;
     log.info('');
     log.done(`${color.bold(rel(outFile))} ${color.dim(`(${(size / 1024 / 1024).toFixed(1)} MB)`)}`);
+
+    if (boolFlag(args, 'upload')) {
+      if (realmSelector === undefined) {
+        fail('--upload needs --realm <id|name>: the upload target is a Realm slot.');
+      }
+      await uploadWorldFile(args, realmSelector, outFile);
+      return;
+    }
+
     log.info('');
     log.info('To put this on your Realm:');
     log.info('  1. Back up first: Realm settings -> Download World.');

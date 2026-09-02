@@ -2,10 +2,10 @@
  * Minimal typed client for the undocumented Bedrock Realms service.
  *
  * Only the endpoints this repo needs are implemented: listing the Realms an
- * account can see, and downloading a Realm's current world. There is
- * deliberately no upload method — the service exposes no endpoint for
- * replacing world content, so anything claiming to do so would be a lie. The
- * world still has to go back via the client's "Replace World".
+ * account can see, downloading a Realm's current world, and the two-stage
+ * upload flow — fetch an upload target for a slot, then POST the archive to
+ * it. Both stages were built from responses captured live on 2026-09-01, not
+ * from guesses; see `--probe-upload` in tools/realm.ts for how.
  *
  * Endpoints and headers verified against PrismarineJS/prismarine-realms, the
  * reference open-source implementation.
@@ -14,7 +14,7 @@ import fs from 'node:fs';
 import { pipeline } from 'node:stream/promises';
 import { Readable } from 'node:stream';
 
-import type { ProbeResult, RealmSummary, WorldDownload } from './types.ts';
+import type { ProbeResult, RealmSummary, WorldDownload, WorldUploadInfo } from './types.ts';
 
 export const REALMS_HOST = 'https://pocket.realms.minecraft.net';
 
@@ -104,6 +104,42 @@ export class RealmsClient {
     }
   }
 
+  /**
+   * PUTs to a route and tolerates an empty or non-JSON body, which is what the
+   * state-change endpoints answer with. No retry: unlike the GETs, a repeated
+   * state change is a second action, not a second attempt.
+   */
+  async #put<T>(route: string): Promise<T | undefined> {
+    const url = `${this.#host}${route}`;
+    const response = await this.#fetch(url, { method: 'PUT', headers: this.#headers() });
+    if (!response.ok) {
+      throw new RealmsApiError(response.status, response.statusText, await response.text(), url);
+    }
+    const text = await response.text();
+    try {
+      return text === '' ? undefined : (JSON.parse(text) as T);
+    } catch {
+      return undefined;
+    }
+  }
+
+  /**
+   * Closes the Realm, disconnecting players, via `PUT /worlds/{id}/close` —
+   * prismarine-realms' `changeRealmState`, shared by its Bedrock client. The
+   * upload flow offers this because a third upload-session request answered
+   * 403 "Could not set upload state" (observed live, 2026-09-01), and the
+   * Java flow closes the Realm before uploading; whether closing is what
+   * clears that refusal is still unconfirmed.
+   */
+  async closeRealm(realmId: number): Promise<void> {
+    await this.#put(`/worlds/${realmId}/close`);
+  }
+
+  /** Reopens the Realm; the counterpart of `closeRealm`. */
+  async openRealm(realmId: number): Promise<void> {
+    await this.#put(`/worlds/${realmId}/open`);
+  }
+
   /** Realms the signed-in account owns or has joined. */
   async listRealms(): Promise<RealmSummary[]> {
     const data = await this.#get<{ servers?: RealmSummary[] }>('/worlds');
@@ -132,6 +168,58 @@ export class RealmsClient {
   }
 
   /**
+   * Gets a time-limited upload target for a Realm's world slot.
+   *
+   * This is stage 1 of the upload flow and the only part captured from the
+   * live service: it answers with the upload host's URL and a short-lived JWT
+   * scoped to the world and slot. Nothing is uploaded here, and the client has
+   * no method that does — the stage-2 protocol for sending bytes to
+   * `uploadUrl` is unknown, so this exists for `--probe-upload` discovery and
+   * as the base for a real upload once that protocol is captured too.
+   */
+  async getWorldUploadInfo(realmId: number, slotId: number): Promise<WorldUploadInfo> {
+    const data = await this.#get<{ uploadUrl?: string; token?: string }>(
+      `/archive/upload/world/${realmId}/${slotId}`,
+    );
+    if (data.uploadUrl === undefined || data.token === undefined) {
+      throw new Error('Realms returned no upload target for this world.');
+    }
+    return { uploadUrl: data.uploadUrl, token: data.token };
+  }
+
+  /**
+   * POSTs a `.mcworld` archive to the upload host — stage 2 of the upload
+   * flow, implemented from captured evidence rather than guesswork: OPTIONS on
+   * `uploadUrl` answered `Allow: HEAD, POST, GET, OPTIONS`, and the route
+   * serves `application/x-mcworld`, both captured live on 2026-09-01.
+   *
+   * The response to a successful POST has never been observed, so this does
+   * not throw on a non-2xx: it reports whatever came back and leaves judgement
+   * to the caller, exactly like `probe`.
+   */
+  async uploadWorldArchive(info: WorldUploadInfo, archive: Uint8Array): Promise<ProbeResult> {
+    const response = await this.#fetch(info.uploadUrl, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${info.token}`,
+        'Content-Type': 'application/x-mcworld',
+      },
+      body: archive,
+    });
+    const text = await response.text();
+    return {
+      method: 'POST',
+      route: info.uploadUrl,
+      status: response.status,
+      statusText: response.statusText,
+      contentType: response.headers.get('content-type') ?? undefined,
+      allow: response.headers.get('allow') ?? undefined,
+      body: text.length > 2000 ? `${text.slice(0, 2000)}... (truncated)` : text,
+      networkError: undefined,
+    };
+  }
+
+  /**
    * Sends a single request to an arbitrary route and reports what came back,
    * without throwing on a non-2xx. This exists to establish whether an endpoint
    * the service has never documented is actually there.
@@ -139,13 +227,23 @@ export class RealmsClient {
    * Note the useful asymmetry: 404 means the route does not exist, while 405
    * means it does but rejects this method — so a GET can prove a path exists
    * without invoking whatever a PUT to it would do.
+   *
+   * `route` may be an absolute URL for probing a host other than the Realms
+   * API (the upload service, say); `bearer` then replaces the Realms headers,
+   * matching how the download host is authenticated.
    */
-  async probe(method: string, route: string, body?: string): Promise<ProbeResult> {
-    const url = `${this.#host}${route}`;
-    const init: RequestInit = { method, headers: this.#headers() };
-    if (body !== undefined) {
-      init.body = body;
-      init.headers = { ...this.#headers(), 'Content-Type': 'application/json' };
+  async probe(
+    method: string,
+    route: string,
+    options: { body?: string; bearer?: string } = {},
+  ): Promise<ProbeResult> {
+    const url = /^https?:\/\//.test(route) ? route : `${this.#host}${route}`;
+    const headers: Record<string, string> =
+      options.bearer !== undefined ? { Authorization: `Bearer ${options.bearer}` } : this.#headers();
+    const init: RequestInit = { method, headers };
+    if (options.body !== undefined) {
+      init.body = options.body;
+      init.headers = { ...headers, 'Content-Type': 'application/json' };
     }
 
     try {
@@ -157,6 +255,7 @@ export class RealmsClient {
         status: response.status,
         statusText: response.statusText,
         contentType: response.headers.get('content-type') ?? undefined,
+        allow: response.headers.get('allow') ?? undefined,
         body: text.length > 2000 ? `${text.slice(0, 2000)}... (truncated)` : text,
         networkError: undefined,
       };
@@ -167,6 +266,7 @@ export class RealmsClient {
         status: 0,
         statusText: '',
         contentType: undefined,
+        allow: undefined,
         body: '',
         networkError: err instanceof Error ? err.message : String(err),
       };

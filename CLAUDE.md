@@ -144,10 +144,13 @@ pack from the in-game list entirely.
 
 ## Realms
 
-Realms has no public API for installing packs. Do not add code that tries to
-talk to one, and do not tell the user a Realm can be deployed to directly — the
-only supported route is uploading a world that already has the packs applied,
-via the client's *Replace World*. `tools/realm.ts` produces that world.
+Realms has no public API for installing packs. The route is replacing the
+world with one that already has the packs applied — via the client's *Replace
+World*, or via `pnpm realm <slug> --realm <id> --upload --close --yes`, which
+drives the captured (undocumented) upload flow; see "The Realms API layer"
+below. `tools/realm.ts` produces the world either way. The upload flow was
+verified end-to-end on 2026-09-01 (world replaced, packs active), but it
+remains Mojang's private protocol and can break without notice.
 
 Applying a pack to a world means two things, and both are required: the pack
 folder under `behavior_packs/` or `resource_packs/`, **and** an entry in
@@ -168,12 +171,35 @@ irreversible without a backup.
 PrismarineJS/prismarine-realms, the reference implementation — check there
 before adding a call, and do not invent endpoints.
 
-**No upload endpoint is known.** No open-source client implements one, and
-`PUT /worlds/{id}/backups` only restores a backup Realms itself made. That is
-strong evidence, not proof — so the position is "unproven", not "impossible".
+**The upload flow is implemented from captured evidence** (live probes,
+2026-09-01), not guesses. Stage 1: `GET /archive/upload/world/{id}/{slot}`
+answers `{ uploadUrl, token }` — the upload host is
+`bedrock.contentlegacy.realms.minecraft-services.net` and the token is a JWT
+scoped to the world and slot, expiring in about an hour
+(`getWorldUploadInfo()`). Stage 2: OPTIONS on `uploadUrl` answered
+`Allow: HEAD, POST, GET, OPTIONS` and the route serves
+`application/x-mcworld`, so `uploadWorldArchive()` POSTs the archive with the
+Bearer token and that content type. A successful POST (observed live,
+2026-09-01, with `--close`) answers `201 Created` and a `text/event-stream`
+body: `VALIDATION_PROGRESS` events (with a `cancelURL`), then
+`VALIDATION_SUCCEEDED`, `ARCHIVING_STARTED`, `ARCHIVING_SUCCEEDED`. `--upload`
+reports the stream verbatim and tells the user to verify in-game. Do not add
+retries or extra follow-up calls beyond what a captured response shows; the
+rules below still bind.
 
-`--probe-upload` exists to settle it empirically against a real Realm. It tries
-a list of candidate routes and reports exactly what comes back. Two rules:
+Stage 1 is stateful: the third session request answered 403 `"Could not set
+upload state"` (observed live, same day) after two probe runs had each minted
+a session while the Realm was open. Retrying with `--close` — `PUT
+/worlds/{id}/close` / `/open` (prismarine-realms' `changeRealmState`) —
+succeeded, though whether the fix was the close or the earlier sessions
+expiring is unconfirmed. The reopen right after `ARCHIVING_SUCCEEDED` failed
+(the service likely refuses to open mid-swap); the CLI prints the reopen
+error and tells the user to open the Realm from the client.
+
+`--probe-upload` is the discovery tool. It tries candidate routes on the
+Realms API, and when one hands back an upload target it goes on to probe the
+upload host itself with safe methods only (OPTIONS/HEAD/GET, no body). The
+rules:
 
 - **Do not implement an upload flow on a guess.** Uploading means inventing a
   multi-step protocol against a live Realm, where a half-right guess writes to
@@ -192,8 +218,9 @@ step, which is Java's route, where Bedrock uses
 `/archive/download/world/{id}/{slot}/{backupId}`. Check that before believing
 one.
 
-Until that lands, uploading is manual via *Replace World*, and docs and CLI
-output must not imply otherwise.
+`--upload` was verified in-game on 2026-09-01: the world was replaced and the
+packs were active. *Replace World* in the client remains the fallback when the
+service changes or a run fails.
 
 Three things constrain changes here:
 

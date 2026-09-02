@@ -33,6 +33,18 @@ export interface WorldDownload {
   size: number | undefined;
 }
 
+/**
+ * Response of `GET /archive/upload/world/{realmId}/{slot}` — stage 1 of the
+ * upload flow, captured against the live service on 2026-09-01. The protocol
+ * for sending world bytes to `uploadUrl` (stage 2) is still uncaptured.
+ */
+export interface WorldUploadInfo {
+  /** Base URL of the upload service, a different host from the Realms API. */
+  uploadUrl: string;
+  /** Short-lived JWT scoped to this world and slot. Never log it. */
+  token: string;
+}
+
 /** Result of poking an endpoint whose existence is unknown. */
 export interface ProbeResult {
   method: string;
@@ -40,6 +52,8 @@ export interface ProbeResult {
   status: number;
   statusText: string;
   contentType: string | undefined;
+  /** `Allow` header, the payoff of a 405: the methods the route does accept. */
+  allow: string | undefined;
   /** Response body, truncated. */
   body: string;
   /** Set when the request never completed (DNS, TLS, connection). */
