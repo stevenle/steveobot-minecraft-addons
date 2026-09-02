@@ -101,14 +101,26 @@ function makeWorldArchive(): Buffer {
   zip.addFile('level.dat', Buffer.from('pretend level.dat'));
   zip.addFile('levelname.txt', Buffer.from('Steveo Test Realm'));
   zip.addFile('db/000003.log', Buffer.from('pretend chunk data'));
-  // A pack the Realm already had, which must survive untouched.
+  // A pack the Realm already had, which must survive untouched, plus a copy
+  // of hello-world's BP the way Realms hands it back after an upload: folder
+  // renamed to "0" and the entry's version re-encoded as a string. Re-applying
+  // must replace both, not duplicate them.
   zip.addFile(
     'world_behavior_packs.json',
-    Buffer.from(JSON.stringify([{ pack_id: '11111111-2222-3333-4444-555555555555', version: [2, 1, 0] }])),
+    Buffer.from(
+      JSON.stringify([
+        { pack_id: '11111111-2222-3333-4444-555555555555', version: [2, 1, 0] },
+        { pack_id: '2bdba555-b0e4-4044-af7f-f9fe3cca6a20', version: '[1,0,0]' },
+      ]),
+    ),
   );
   zip.addFile(
     'behavior_packs/legacy_pack/manifest.json',
     Buffer.from(JSON.stringify({ header: { uuid: '11111111-2222-3333-4444-555555555555' } })),
+  );
+  zip.addFile(
+    'behavior_packs/0/manifest.json',
+    Buffer.from(JSON.stringify({ header: { uuid: '2bdba555-b0e4-4044-af7f-f9fe3cca6a20' } })),
   );
   return zip.toBuffer();
 }
@@ -162,13 +174,18 @@ describe('realm.ts against a stand-in Realms service', () => {
     assert.ok(entries.includes('resource_packs/hello-world_rp/manifest.json'));
     // The Realm's existing pack was not clobbered.
     assert.ok(entries.includes('behavior_packs/legacy_pack/manifest.json'));
+    // Realms' renamed copy of our pack ("0") was swept out — one uuid in two
+    // folders makes the upload service's archiving step fail.
+    assert.ok(!entries.includes('behavior_packs/0/manifest.json'));
 
     const bp = JSON.parse(new AdmZip(out).readAsText('world_behavior_packs.json')) as Array<{
       pack_id: string;
+      version: unknown;
     }>;
-    assert.equal(bp.length, 2, 'existing pack plus ours');
+    assert.equal(bp.length, 2, 'existing pack plus ours, no duplicate for the re-apply');
     assert.ok(bp.some((e) => e.pack_id === '11111111-2222-3333-4444-555555555555'));
-    assert.ok(bp.some((e) => e.pack_id === '2bdba555-b0e4-4044-af7f-f9fe3cca6a20'));
+    const ours = bp.find((e) => e.pack_id === '2bdba555-b0e4-4044-af7f-f9fe3cca6a20');
+    assert.deepEqual(ours?.version, [1, 0, 0], 'string version from Realms is normalized');
   });
 
   it('refuses to upload without --yes and sends nothing', async () => {
@@ -201,6 +218,27 @@ describe('realm.ts against a stand-in Realms service', () => {
     assert.match(stdout, /200/);
     assert.match(stdout, /accepted the archive/);
     assert.match(stdout, /verify the world actually changed/);
+  });
+
+  it('flags a 2xx upload whose event stream reports the swap failed', async () => {
+    stub.clearProbeRoutes();
+    stub.requests.length = 0;
+    stub.setProbeRoute(`GET /archive/upload/world/99/${REALM.activeSlot}`, {
+      status: 200,
+      json: { uploadUrl: `${stub.host}/upload-sink`, token: 'up-token' },
+    });
+    stub.setProbeRoute('POST /upload-sink', {
+      status: 201,
+      body: 'event:VALIDATION_SUCCEEDED\n\nevent:ARCHIVING_STARTED\n\nevent:ARCHIVING_FAILED\n\n',
+    });
+
+    const out = path.join(outDir, 'swap-failed.mcworld');
+    const { stdout, stderr } = await cli(['hello-world', '--realm', '99', '--upload', '--yes', '--out', out]);
+
+    assert.match(stdout, /201/);
+    // A 201 with ARCHIVING_FAILED in the stream must not read as success.
+    assert.doesNotMatch(stdout, /accepted the archive\./);
+    assert.match(stderr, /world swap FAILED/);
   });
 
   it('reports an upload rejection verbatim and does not retry', async () => {
