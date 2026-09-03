@@ -1,0 +1,15 @@
+{
+  "format_version": "1.10.0",
+  "render_controllers": {
+    "controller.render.steveo_king_charles": {
+      "arrays": {
+        "textures": {
+          "array.coats": ["texture.blenheim", "texture.tricolor", "texture.black_tan", "texture.ruby"]
+        }
+      },
+      "geometry": "geometry.default",
+      "materials": [{ "*": "material.default" }],
+      "textures": ["array.coats[query.variant]"]
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "King Charles BP",
+    "description": "A Cavalier King Charles Spaniel pet that shadows its human, stays close to home, and heals you when fed well.",
+    "uuid": "e8b26e42-ad65-4d54-a375-7aa232681c0e",
+    "version": [1, 0, 0],
+    "min_engine_version": [1, 26, 40]
+  },
+  "modules": [
+    {
+      "type": "data",
+      "uuid": "613643ae-df48-4743-b628-5ef93a7e684b",
+      "version": [1, 0, 0]
+    },
+    {
+      "type": "script",
+      "language": "javascript",
+      "entry": "scripts/main.js",
+      "uuid": "4ec35a89-4ebb-4f4d-a0ba-b0e5942d47f8",
+      "version": [1, 0, 0]
+    }
+  ],
+  "dependencies": [
+    {
+      "uuid": "f77d6958-1b88-49e2-9521-4a362c17fa35",
+      "version": [1, 0, 0]
+    },
+    {
+      "module_name": "@minecraft/server",
+      "version": "2.9.0"
+    }
+  ],
+  "metadata": {
+    "authors": ["Steven Le"],
+    "license": "MIT"
+  }
+}

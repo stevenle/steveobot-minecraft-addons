@@ -1,0 +1,36 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "steveo:king_charles",
+      "materials": { "default": "entity_alphatest" },
+      "textures": {
+        "blenheim": "textures/entity/king_charles/blenheim",
+        "tricolor": "textures/entity/king_charles/tricolor",
+        "black_tan": "textures/entity/king_charles/black_tan",
+        "ruby": "textures/entity/king_charles/ruby"
+      },
+      "geometry": { "default": "geometry.steveo_king_charles" },
+      "animations": {
+        "look_at_target": "animation.steveo_king_charles.look_at_target",
+        "walk": "animation.steveo_king_charles.walk",
+        "wag": "animation.steveo_king_charles.wag",
+        "sit": "animation.steveo_king_charles.sit",
+        "beg": "animation.steveo_king_charles.beg",
+        "sick": "animation.steveo_king_charles.sick"
+      },
+      "scripts": {
+        "animate": [
+          "look_at_target",
+          "wag",
+          { "walk": "!query.is_sitting" },
+          { "sit": "query.is_sitting" },
+          { "beg": "query.is_interested" },
+          { "sick": "query.mark_variant == 1" }
+        ]
+      },
+      "render_controllers": ["controller.render.steveo_king_charles"],
+      "spawn_egg": { "base_color": "#F4EDE0", "overlay_color": "#A2471F" }
+    }
+  }
+}
