@@ -20,4 +20,11 @@ king_charles.debug.spawned=Spawned one spaniel of each coat in front of you (ble
 king_charles.debug.tamed=Tamed %s nearby spaniel(s) to you.
 king_charles.debug.status=Your spaniels: %s
 king_charles.debug.none=You do not own any loaded spaniels. Try "/scriptevent steveo:dog spawn" then "/scriptevent steveo:dog tame".
-king_charles.debug.help=Usage: /scriptevent steveo:dog <spawn|tame|status>
+king_charles.debug.help=Usage: /scriptevent steveo:dog <spawn|tame|status|crown>
+
+item.steveo:dog_crown.name=Spaniel Crown
+
+king_charles.crowned=%s wears the crown. All hail!
+king_charles.already_crowned=%s already wears a crown.
+king_charles.uncrowned=You take the crown back from %s.
+king_charles.debug.crown=A Spaniel Crown has been placed in your inventory. Use it on a spaniel to crown it; sneak and interact to take it back.

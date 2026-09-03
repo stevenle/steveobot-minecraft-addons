@@ -116,6 +116,14 @@
       },
       "steveo:dead": {
         "minecraft:instant_despawn": {}
+      },
+      "steveo:crowned": {
+        "minecraft:skin_id": {
+          "value": 1
+        },
+        "minecraft:loot": {
+          "table": "loot_tables/entities/dog_crown.json"
+        }
       }
     },
     "components": {
@@ -412,6 +420,20 @@
         "add": {
           "component_groups": [
             "steveo:dead"
+          ]
+        }
+      },
+      "steveo:crown_on": {
+        "add": {
+          "component_groups": [
+            "steveo:crowned"
+          ]
+        }
+      },
+      "steveo:crown_off": {
+        "remove": {
+          "component_groups": [
+            "steveo:crowned"
           ]
         }
       }

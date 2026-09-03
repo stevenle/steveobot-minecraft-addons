@@ -4,12 +4,31 @@
     "controller.render.steveo_king_charles": {
       "arrays": {
         "textures": {
-          "array.coats": ["texture.blenheim", "texture.tricolor", "texture.black_tan", "texture.ruby"]
+          "array.coats": [
+            "texture.blenheim",
+            "texture.tricolor",
+            "texture.black_tan",
+            "texture.ruby"
+          ]
         }
       },
       "geometry": "geometry.default",
-      "materials": [{ "*": "material.default" }],
-      "textures": ["array.coats[query.variant]"]
+      "materials": [
+        {
+          "*": "material.default"
+        }
+      ],
+      "textures": [
+        "array.coats[query.variant]"
+      ],
+      "part_visibility": [
+        {
+          "*": true
+        },
+        {
+          "crown": "query.skin_id == 1"
+        }
+      ]
     }
   }
 }

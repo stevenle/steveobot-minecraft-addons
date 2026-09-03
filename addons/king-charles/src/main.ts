@@ -21,8 +21,12 @@
  *   feeder is its human, fully restores the feeder's hearts. Feeding any dog
  *   rotten food makes it sick: the `steveo:sick` group starts a 30 second
  *   timer whose `steveo:die` event the script answers with `kill()`.
- * - **Debug.** `/scriptevent steveo:dog spawn|tame|status` exercises all of the
- *   above from chat, which is the only console a Realm has.
+ * - **Crown.** Using a `steveo:dog_crown` item on a dog swaps in the
+ *   `steveo:crowned` group, whose skin id shows the crown bone in the model
+ *   and whose loot table drops the crown again on death. Sneak-interacting
+ *   with an empty hand takes it back.
+ * - **Debug.** `/scriptevent steveo:dog spawn|tame|status|crown` exercises all
+ *   of the above from chat, which is the only console a Realm has.
  */
 import {
   EquipmentSlot,
@@ -32,6 +36,7 @@ import {
   world,
   type Dimension,
   type Entity,
+  ItemStack,
   type RawMessage,
   type Vector3,
 } from '@minecraft/server';
@@ -43,6 +48,7 @@ const log = createLogger('king-charles');
 const TAG = `${Format.gray}[King Charles]${Format.reset} `;
 
 const DOG_ID = 'steveo:king_charles';
+const CROWN_ID = 'steveo:dog_crown';
 const TAMED_FAMILY = 'steveo_king_charles_tamed';
 const HOME_PROPERTY = 'steveo:home';
 const HOMEBOUND_TAG = 'steveo:homebound';
@@ -125,6 +131,23 @@ function ownerOf(dog: Entity): Player | undefined {
 
 function isSick(dog: Entity): boolean {
   return dog.getComponent('minecraft:mark_variant')?.value === 1;
+}
+
+function isCrowned(dog: Entity): boolean {
+  return dog.getComponent('minecraft:skin_id')?.value === 1;
+}
+
+function playSound(dimension: Dimension, soundId: string, at: Vector3): void {
+  try {
+    dimension.playSound(soundId, at);
+  } catch {
+    // sound is cosmetic
+  }
+}
+
+function giveItem(player: Player, item: ItemStack): void {
+  const leftover = player.getComponent('minecraft:inventory')?.container?.addItem(item);
+  if (leftover) player.dimension.spawnItem(leftover, player.location);
 }
 
 function isVector3(value: unknown): value is Vector3 {
@@ -340,11 +363,7 @@ function feedGood(player: Player, dog: Entity): void {
   takeOneFromHand(player);
   dog.getComponent('minecraft:health')?.resetToMaxValue();
   hearts(dog.dimension, dog.location, 5);
-  try {
-    dog.dimension.playSound('random.eat', dog.location);
-  } catch {
-    // sound is cosmetic
-  }
+  playSound(dog.dimension, 'random.eat', dog.location);
 
   if (ownerOf(dog)?.id === player.id) {
     player.getComponent('minecraft:health')?.resetToMaxValue();
@@ -361,19 +380,54 @@ function feedBad(player: Player, dog: Entity): void {
   if (isSick(dog)) return; // already dying
   dog.triggerEvent('steveo:get_sick');
   dog.addEffect('poison', 30 * 20, { amplifier: 0, showParticles: true });
-  try {
-    dog.dimension.playSound('mob.wolf.whine', dog.location);
-  } catch {
-    // sound is cosmetic
-  }
+  playSound(dog.dimension, 'mob.wolf.whine', dog.location);
   const owner = ownerOf(dog);
   say(player, 'king_charles.sick', dog);
   if (owner && owner.id !== player.id) say(owner, 'king_charles.sick', dog);
 }
 
+// ---------------------------------------------------------------------------
+// The crown
+
+function putCrown(player: Player, dog: Entity): void {
+  if (!dog.isValid || !player.isValid) return;
+  if (isCrowned(dog)) {
+    say(player, 'king_charles.already_crowned', dog);
+    return;
+  }
+  takeOneFromHand(player);
+  dog.triggerEvent('steveo:crown_on');
+  playSound(dog.dimension, 'armor.equip_gold', dog.location);
+  hearts(dog.dimension, dog.location, 3);
+  say(player, 'king_charles.crowned', dog);
+}
+
+function takeCrown(player: Player, dog: Entity): void {
+  if (!dog.isValid || !player.isValid || !isCrowned(dog)) return;
+  dog.triggerEvent('steveo:crown_off');
+  giveItem(player, new ItemStack(CROWN_ID, 1));
+  playSound(dog.dimension, 'armor.equip_gold', dog.location);
+  say(player, 'king_charles.uncrowned', dog);
+}
+
 world.beforeEvents.playerInteractWithEntity.subscribe((event) => {
   const { target, player, itemStack } = event;
-  if (target.typeId !== DOG_ID || !itemStack) return;
+  if (target.typeId !== DOG_ID) return;
+
+  if (itemStack?.typeId === CROWN_ID) {
+    event.cancel = true;
+    system.run(() => putCrown(player, target));
+    return;
+  }
+  // Sneak + empty hand on a crowned dog takes the crown back instead of
+  // toggling sit.
+  if (!itemStack) {
+    if (player.isSneaking && isCrowned(target)) {
+      event.cancel = true;
+      system.run(() => takeCrown(player, target));
+    }
+    return;
+  }
 
   const good = GOOD_FOOD.has(itemStack.typeId);
   const bad = BAD_FOOD.has(itemStack.typeId);
@@ -409,15 +463,16 @@ world.afterEvents.dataDrivenEntityTrigger.subscribe(
 );
 
 // ---------------------------------------------------------------------------
-// Debug: /scriptevent steveo:dog <spawn|tame|status>
+// Debug: /scriptevent steveo:dog <spawn|tame|status|crown>
 
 function describeDog(dog: Entity, player: Player): string {
   const name = dog.nameTag || 'spaniel';
   const home = readHome(dog);
   const state = isSick(dog) ? 'sick' : dog.hasTag(HOMEBOUND_TAG) ? 'homebound' : 'following';
+  const crown = isCrowned(dog) ? ', crowned' : '';
   const homeText = home ? `bed@${home.x},${home.y},${home.z} (${distance(dog.location, home).toFixed(0)}m)` : 'no bed';
   const dist = distance(dog.location, player.location).toFixed(0);
-  return `${name}: ${state}, ${homeText}, ${dist}m from you`;
+  return `${name}: ${state}${crown}, ${homeText}, ${dist}m from you`;
 }
 
 function debugSpawn(player: Player): void {
@@ -498,6 +553,10 @@ system.afterEvents.scriptEventReceive.subscribe(
         break;
       case 'status':
         debugStatus(player);
+        break;
+      case 'crown':
+        giveItem(player, new ItemStack(CROWN_ID, 1));
+        player.sendMessage({ rawtext: [{ text: TAG }, { translate: 'king_charles.debug.crown' }] });
         break;
       default:
         player.sendMessage({ rawtext: [{ text: TAG }, { translate: 'king_charles.debug.help' }] });
