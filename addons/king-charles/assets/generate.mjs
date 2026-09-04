@@ -158,13 +158,12 @@ function coatColor(coat, part, x, y, z, n) {
   }
 
   if (coat === 'black_tan') {
-    // Black with tan points: muzzle, cheeks, chest, lower legs, ear feathers, under tail.
+    // Black with tan points: muzzle, cheeks, chest, lower legs, under tail. Ears stay black.
     if (part === 'snout' && !(n === 'up' || (n === 'north' && y === 7))) return c.tan;
     if (part === 'head' && (n === 'east' || n === 'west') && y <= 7 && z <= -8) return c.tan;
     if (part === 'body' && n === 'north') return c.tan;
     if (part === 'body' && n === 'down' && z <= -2) return c.tan;
     if (part.startsWith('leg') && y <= 1) return c.tan;
-    if (part.startsWith('ear') && y <= 6) return c.tan;
     if (part === 'tail' && n === 'down') return c.tan;
     return c.base;
   }

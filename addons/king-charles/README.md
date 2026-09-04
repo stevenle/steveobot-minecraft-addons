@@ -20,7 +20,7 @@ follow a held piece around.
 |---|---|---|
 | Blenheim | White with chestnut patches, chestnut ears, a lozenge spot on the head | 40% |
 | Tricolor | White with black patches and tan cheeks and eyebrows | 25% |
-| Black and tan | Black with tan muzzle, chest, eyebrows, lower legs, and ear feathers | 15% |
+| Black and tan | Black with tan muzzle, chest, eyebrows, and lower legs | 15% |
 | Ruby | Solid rich red | 20% |
 
 ## How it behaves
