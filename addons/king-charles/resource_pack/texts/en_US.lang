@@ -1,0 +1,30 @@
+## Strings for the King Charles add-on.
+## Client-side translations live in the resource pack; the behavior pack
+## references them by key with RawMessage { translate: ... }.
+
+entity.steveo:king_charles.name=Cavalier King Charles Spaniel
+item.spawn_egg.entity.steveo:king_charles.name=Spawn Cavalier King Charles Spaniel
+
+king_charles.default_name=Your spaniel
+
+king_charles.fed=%s gobbles up the treat and showers you with love. Your hearts are full!
+king_charles.fed_other=%s wags happily, but only heals its own human.
+king_charles.sick=%s ate something rotten and looks terribly sick...
+king_charles.died=%s died of a bad tummy. Only ever feed cooked meat or fish.
+king_charles.stays.mine=%s refuses to follow you underground and waits by the bed.
+king_charles.stays.far=%s will not stray this far from home and trots back to the bed.
+king_charles.stays.lost=%s is nowhere near a bed and looks confused. It will wait here for you.
+king_charles.returns=%s comes bounding back to your side.
+
+king_charles.debug.spawned=Spawned one spaniel of each coat in front of you (blenheim, tricolor, black and tan, ruby).
+king_charles.debug.tamed=Tamed %s nearby spaniel(s) to you.
+king_charles.debug.status=Your spaniels: %s
+king_charles.debug.none=You do not own any loaded spaniels. Try "/scriptevent steveo:dog spawn" then "/scriptevent steveo:dog tame".
+king_charles.debug.help=Usage: /scriptevent steveo:dog <spawn|tame|status|crown>
+
+item.steveo:dog_crown.name=Spaniel Crown
+
+king_charles.crowned=%s wears the crown. All hail!
+king_charles.already_crowned=%s already wears a crown.
+king_charles.uncrowned=You take the crown back from %s.
+king_charles.debug.crown=A Spaniel Crown has been placed in your inventory. Use it on a spaniel to crown it; sneak and interact to take it back.

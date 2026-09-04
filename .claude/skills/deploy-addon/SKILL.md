@@ -72,6 +72,11 @@ missing operations as flags there instead.
 
 - `pnpm realm --realm <id> --list` shows what the live world has applied and
   whether each listed pack's folder is actually present.
+- Pack icons do not show in the client's *Edit World* screen for packs applied
+  to a Realm — every add-on, behavior and resource tab alike (observed
+  2026-09-02 with icons that are byte-for-byte the same format as the
+  template's). It is not an icon-file problem; do not regenerate icons to
+  chase it. Icons only prove out on a locally imported `.mcaddon`.
 - On a Realm there is **no content log**: script errors are invisible. Use the
   add-on's `/scriptevent steveo:*` debug command in-game to isolate behavior
   pack vs resource pack failures.

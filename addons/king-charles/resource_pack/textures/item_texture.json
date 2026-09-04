@@ -1,0 +1,9 @@
+{
+  "resource_pack_name": "king-charles",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "steveo_dog_crown": {
+      "textures": "textures/items/dog_crown"
+    }
+  }
+}

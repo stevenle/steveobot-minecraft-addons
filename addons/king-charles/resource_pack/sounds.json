@@ -1,0 +1,16 @@
+{
+  "entity_sounds": {
+    "entities": {
+      "steveo:king_charles": {
+        "volume": 0.8,
+        "pitch": [1.3, 1.6],
+        "events": {
+          "ambient": "mob.wolf.panting",
+          "hurt": "mob.wolf.hurt",
+          "death": "mob.wolf.death",
+          "whine": "mob.wolf.whine"
+        }
+      }
+    }
+  }
+}

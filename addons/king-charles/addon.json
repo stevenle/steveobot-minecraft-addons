@@ -1,0 +1,5 @@
+{
+  "$schema": "../../tools/schemas/addon.schema.json",
+  "name": "King Charles",
+  "description": "A Cavalier King Charles Spaniel pet that shadows its human, stays close to home, and heals you when fed well."
+}

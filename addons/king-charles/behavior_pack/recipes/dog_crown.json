@@ -1,0 +1,21 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "steveo:dog_crown_recipe"
+    },
+    "tags": ["crafting_table"],
+    "pattern": ["G G", "GEG", "GGG"],
+    "key": {
+      "G": { "item": "minecraft:gold_ingot" },
+      "E": { "item": "minecraft:emerald" }
+    },
+    "unlock": [
+      { "item": "minecraft:gold_ingot" },
+      { "item": "minecraft:emerald" }
+    ],
+    "result": {
+      "item": "steveo:dog_crown"
+    }
+  }
+}
