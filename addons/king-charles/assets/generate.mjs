@@ -113,7 +113,7 @@ const TAN = hex('#C07A36');
 const EYE = hex('#17110E');
 const GOLD = hex('#E8B93C');
 const GOLD_DARK = hex('#B8862A');
-const GEM = hex('#C42B3A');
+const GEM = hex('#2FBF5A');
 const NOSE = hex('#141010');
 
 const coats = {
