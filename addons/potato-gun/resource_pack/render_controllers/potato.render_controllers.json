@@ -1,0 +1,15 @@
+{
+  "format_version": "1.10.0",
+  "render_controllers": {
+    "controller.render.steveo_potato": {
+      "arrays": {
+        "textures": {
+          "array.skins": ["texture.plain", "texture.explosive"]
+        }
+      },
+      "geometry": "geometry.default",
+      "materials": [{ "*": "material.default" }],
+      "textures": ["array.skins[query.variant]"]
+    }
+  }
+}

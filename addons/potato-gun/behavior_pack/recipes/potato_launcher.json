@@ -1,0 +1,23 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "steveo:potato_launcher_recipe"
+    },
+    "tags": ["crafting_table"],
+    "pattern": ["III", "FRP", "III"],
+    "key": {
+      "I": { "item": "minecraft:iron_ingot" },
+      "F": { "item": "minecraft:firework_rocket" },
+      "R": { "item": "minecraft:redstone" },
+      "P": { "item": "minecraft:potato" }
+    },
+    "unlock": [
+      { "item": "minecraft:iron_ingot" },
+      { "item": "minecraft:firework_rocket" }
+    ],
+    "result": {
+      "item": "steveo:potato_launcher"
+    }
+  }
+}

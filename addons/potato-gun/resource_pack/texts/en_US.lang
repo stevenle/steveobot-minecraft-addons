@@ -1,0 +1,22 @@
+## Strings for the Potato Gun add-on.
+## Client-side translations live in the resource pack; the behavior pack
+## references them by key with RawMessage { translate: ... }.
+
+item.steveo:potato_crossbow.name=Potato Crossbow
+item.steveo:potato_crossbow_explosive.name=Explosive Potato Crossbow
+item.steveo:potato_launcher.name=Potato Launcher
+item.steveo:potato_launcher_explosive.name=Explosive Potato Launcher
+item.steveo:explosive_enchantment.name=Explosive Enchantment
+entity.steveo:potato.name=Potato
+
+potato_gun.lore.explosive=Explosive
+potato_gun.hint.crossbow=Use to fire a potato. It never runs out.
+potato_gun.hint.launcher=Use to launch a potato. Slow, straight, and it hits hard.
+potato_gun.hint.enchantment=Combine with a Potato Crossbow or Potato Launcher at a crafting table to make its potatoes explode.
+
+potato_gun.debug.given=Both guns, both explosive guns, and an Explosive Enchantment are in your inventory.
+potato_gun.debug.status=Potatoes in flight: %s. Block damage from explosions: %s.
+potato_gun.debug.status.on=on
+potato_gun.debug.status.off=off (mobGriefing is false)
+potato_gun.debug.demo=Fired a demo potato from your view without a gun. If you cannot see it fly, the resource pack is not rendering.
+potato_gun.debug.help=Usage: /scriptevent steveo:potato <give|status|demo>

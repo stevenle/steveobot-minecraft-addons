@@ -1,0 +1,35 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "steveo:potato",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "plain": "textures/entity/potato",
+        "explosive": "textures/entity/potato_explosive"
+      },
+      "geometry": {
+        "default": "geometry.steveo_potato"
+      },
+      "particle_effects": {
+        "smoke": "minecraft:basic_smoke_particle",
+        "flame": "minecraft:basic_flame_particle"
+      },
+      "animations": {
+        "spin": "animation.steveo_potato.spin",
+        "fuse_trail": "animation.steveo_potato.fuse_trail",
+        "rocket_trail": "animation.steveo_potato.rocket_trail"
+      },
+      "scripts": {
+        "animate": [
+          "spin",
+          { "fuse_trail": "query.variant == 1" },
+          { "rocket_trail": "query.mark_variant == 1" }
+        ]
+      },
+      "render_controllers": ["controller.render.steveo_potato"]
+    }
+  }
+}

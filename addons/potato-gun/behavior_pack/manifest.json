@@ -1,0 +1,38 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Potato Gun BP",
+    "description": "Two potato-firing weapons, a crossbow and a rocket launcher, plus an Explosive enchantment that makes the potatoes go boom.",
+    "uuid": "939814f8-cf44-4e26-9e04-65c4116fe77c",
+    "version": [1, 0, 0],
+    "min_engine_version": [1, 26, 40]
+  },
+  "modules": [
+    {
+      "type": "data",
+      "uuid": "54fc9829-874b-49e4-b14e-534be9070072",
+      "version": [1, 0, 0]
+    },
+    {
+      "type": "script",
+      "language": "javascript",
+      "entry": "scripts/main.js",
+      "uuid": "f3a2aa1f-47b5-4ac3-9983-cf9a5ced03f0",
+      "version": [1, 0, 0]
+    }
+  ],
+  "dependencies": [
+    {
+      "uuid": "ef899e1f-3639-4d16-947a-fca5691e9ffa",
+      "version": [1, 0, 0]
+    },
+    {
+      "module_name": "@minecraft/server",
+      "version": "2.9.0"
+    }
+  ],
+  "metadata": {
+    "authors": ["Steven Le"],
+    "license": "MIT"
+  }
+}

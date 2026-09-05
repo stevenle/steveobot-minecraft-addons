@@ -1,0 +1,17 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:recipe_shapeless": {
+    "description": {
+      "identifier": "steveo:potato_crossbow_recipe"
+    },
+    "tags": ["crafting_table"],
+    "ingredients": [
+      { "item": "minecraft:crossbow" },
+      { "item": "minecraft:potato" }
+    ],
+    "unlock": [{ "item": "minecraft:crossbow" }],
+    "result": {
+      "item": "steveo:potato_crossbow"
+    }
+  }
+}
