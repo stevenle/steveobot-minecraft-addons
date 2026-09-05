@@ -90,6 +90,14 @@ const ORES: ReadonlyArray<{ label: string; blocks: readonly string[] }> = [
       'minecraft:lit_deepslate_redstone_ore',
     ],
   },
+  {
+    label: 'iron',
+    blocks: ['minecraft:iron_ore', 'minecraft:deepslate_iron_ore'],
+  },
+  {
+    label: 'coal',
+    blocks: ['minecraft:coal_ore', 'minecraft:deepslate_coal_ore'],
+  },
 ];
 
 /** blockTypeId -> index into ORES, for O(1) lookups in the scan loop. */

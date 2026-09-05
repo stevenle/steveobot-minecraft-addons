@@ -2,8 +2,8 @@
 
 A craftable helmet that makes valuable ores glow through solid stone while
 you mine. Put it on, head underground, and nearby diamonds, ancient debris,
-emeralds, gold, lapis, and redstone light up as colored crystals you can
-see through the rock.
+emeralds, gold, lapis, redstone, iron, and coal light up as colored crystals
+you can see through the rock.
 
 ## Crafting
 
@@ -39,9 +39,12 @@ walls:
 | Gold | Gold ore, deepslate gold ore, nether gold ore |
 | Lapis | Lapis ore, deepslate lapis ore |
 | Redstone | Redstone ore, deepslate redstone ore, lit or not |
+| Iron | Iron ore, deepslate iron ore |
+| Coal | Coal ore, deepslate coal ore |
 
 **At most 16 ores glow at once.** In an ore-rich cave the most valuable ones
-win, in the order of the table above, and closer ones beat farther ones.
+win, in the order of the table above, and closer ones beat farther ones. Iron
+and coal sit at the bottom of that order, so they never crowd out a diamond.
 
 **The glow follows the ore, not you.** A crystal disappears about six seconds
 after its ore leaves your scan range, the moment you mine the block, or as

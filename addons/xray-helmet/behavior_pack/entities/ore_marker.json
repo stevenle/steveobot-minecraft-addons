@@ -13,6 +13,8 @@
       "steveo:v_gold": { "minecraft:variant": { "value": 3 } },
       "steveo:v_lapis": { "minecraft:variant": { "value": 4 } },
       "steveo:v_redstone": { "minecraft:variant": { "value": 5 } },
+      "steveo:v_iron": { "minecraft:variant": { "value": 6 } },
+      "steveo:v_coal": { "minecraft:variant": { "value": 7 } },
       "steveo:fuse": {
         "minecraft:timer": {
           "time": 6,
@@ -43,6 +45,8 @@
       "steveo:gold": { "add": { "component_groups": ["steveo:fuse", "steveo:v_gold"] } },
       "steveo:lapis": { "add": { "component_groups": ["steveo:fuse", "steveo:v_lapis"] } },
       "steveo:redstone": { "add": { "component_groups": ["steveo:fuse", "steveo:v_redstone"] } },
+      "steveo:iron": { "add": { "component_groups": ["steveo:fuse", "steveo:v_iron"] } },
+      "steveo:coal": { "add": { "component_groups": ["steveo:fuse", "steveo:v_coal"] } },
       "steveo:refresh": {
         "sequence": [
           { "remove": { "component_groups": ["steveo:fuse"] } },

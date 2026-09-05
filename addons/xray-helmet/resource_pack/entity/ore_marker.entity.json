@@ -12,7 +12,9 @@
         "emerald": "textures/entity/ore_marker_emerald",
         "gold": "textures/entity/ore_marker_gold",
         "lapis": "textures/entity/ore_marker_lapis",
-        "redstone": "textures/entity/ore_marker_redstone"
+        "redstone": "textures/entity/ore_marker_redstone",
+        "iron": "textures/entity/ore_marker_iron",
+        "coal": "textures/entity/ore_marker_coal"
       },
       "geometry": {
         "default": "geometry.steveo_ore_marker"

@@ -10,7 +10,9 @@
             "texture.emerald",
             "texture.gold",
             "texture.lapis",
-            "texture.redstone"
+            "texture.redstone",
+            "texture.iron",
+            "texture.coal"
           ]
         }
       },
