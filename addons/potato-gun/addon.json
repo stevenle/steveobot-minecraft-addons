@@ -1,0 +1,5 @@
+{
+  "$schema": "../../tools/schemas/addon.schema.json",
+  "name": "Potato Gun",
+  "description": "Two potato-firing weapons, a crossbow and a rocket launcher, plus an Explosive enchantment that makes the potatoes go boom."
+}

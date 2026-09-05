@@ -1,0 +1,11 @@
+{
+  "resource_pack_name": "potato-gun",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "steveo_potato_crossbow": { "textures": "textures/items/potato_crossbow" },
+    "steveo_potato_crossbow_explosive": { "textures": "textures/items/potato_crossbow_explosive" },
+    "steveo_potato_launcher": { "textures": "textures/items/potato_launcher" },
+    "steveo_potato_launcher_explosive": { "textures": "textures/items/potato_launcher_explosive" },
+    "steveo_explosive_enchantment": { "textures": "textures/items/explosive_enchantment" }
+  }
+}

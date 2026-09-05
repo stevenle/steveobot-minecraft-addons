@@ -1,0 +1,27 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.steveo_potato.spin": {
+      "loop": true,
+      "bones": {
+        "potato": {
+          "rotation": ["query.life_time * 620", "query.life_time * 260", 0]
+        }
+      }
+    },
+    "animation.steveo_potato.fuse_trail": {
+      "loop": true,
+      "animation_length": 0.1,
+      "particle_effects": {
+        "0.0": { "effect": "smoke", "locator": "root" }
+      }
+    },
+    "animation.steveo_potato.rocket_trail": {
+      "loop": true,
+      "animation_length": 0.05,
+      "particle_effects": {
+        "0.0": { "effect": "flame", "locator": "root" }
+      }
+    }
+  }
+}
