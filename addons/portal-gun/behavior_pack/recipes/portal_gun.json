@@ -1,0 +1,23 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "steveo:portal_gun_recipe"
+    },
+    "tags": ["crafting_table"],
+    "pattern": ["IIO", "IR ", "I  "],
+    "key": {
+      "I": { "item": "minecraft:iron_ingot" },
+      "O": { "item": "minecraft:obsidian" },
+      "R": { "item": "minecraft:redstone" }
+    },
+    "unlock": [
+      { "item": "minecraft:iron_ingot" },
+      { "item": "minecraft:obsidian" },
+      { "item": "minecraft:redstone" }
+    ],
+    "result": {
+      "item": "steveo:portal_gun"
+    }
+  }
+}

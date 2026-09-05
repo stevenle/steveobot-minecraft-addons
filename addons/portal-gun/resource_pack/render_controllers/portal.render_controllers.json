@@ -1,0 +1,19 @@
+{
+  "format_version": "1.10.0",
+  "render_controllers": {
+    "controller.render.steveo_portal": {
+      "arrays": {
+        "textures": {
+          "array.skins": ["texture.blue", "texture.orange"]
+        }
+      },
+      "geometry": "geometry.default",
+      "materials": [{ "*": "material.default" }],
+      "textures": ["array.skins[query.variant]"],
+      "part_visibility": [
+        { "wall": "query.mark_variant < 2" },
+        { "flat": "query.mark_variant >= 2" }
+      ]
+    }
+  }
+}

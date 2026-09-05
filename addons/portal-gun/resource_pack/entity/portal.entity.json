@@ -1,0 +1,26 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "steveo:portal",
+      "materials": {
+        "default": "steveo_portal"
+      },
+      "textures": {
+        "blue": "textures/entity/portal_blue",
+        "orange": "textures/entity/portal_orange"
+      },
+      "geometry": {
+        "default": "geometry.steveo_portal"
+      },
+      "animations": {
+        "orient": "animation.steveo_portal.orient",
+        "swirl": "animation.steveo_portal.swirl"
+      },
+      "scripts": {
+        "animate": ["orient", "swirl"]
+      },
+      "render_controllers": ["controller.render.steveo_portal"]
+    }
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "format_version": "1.16.0",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "steveo:portal",
+      "is_spawnable": false,
+      "is_summonable": true
+    },
+    "component_groups": {
+      "steveo:c_blue": { "minecraft:variant": { "value": 0 } },
+      "steveo:c_orange": { "minecraft:variant": { "value": 1 } },
+      "steveo:o_wall_z": { "minecraft:mark_variant": { "value": 0 } },
+      "steveo:o_wall_x": { "minecraft:mark_variant": { "value": 1 } },
+      "steveo:o_floor": { "minecraft:mark_variant": { "value": 2 } },
+      "steveo:o_ceiling": { "minecraft:mark_variant": { "value": 3 } },
+      "steveo:fuse": {
+        "minecraft:timer": {
+          "time": 30,
+          "looping": false,
+          "time_down_event": { "event": "steveo:despawn" }
+        }
+      },
+      "steveo:gone": {
+        "minecraft:instant_despawn": {}
+      }
+    },
+    "components": {
+      "minecraft:type_family": { "family": ["steveo_portal", "inanimate"] },
+      "minecraft:collision_box": { "width": 0.01, "height": 0.01 },
+      "minecraft:physics": { "has_gravity": false, "has_collision": false },
+      "minecraft:pushable": { "is_pushable": false, "is_pushable_by_piston": false },
+      "minecraft:knockback_resistance": { "value": 1.0 },
+      "minecraft:fire_immune": {},
+      "minecraft:damage_sensor": {
+        "triggers": [{ "cause": "all", "deals_damage": false }]
+      }
+    },
+    "events": {
+      "minecraft:entity_spawned": { "add": { "component_groups": ["steveo:fuse"] } },
+      "steveo:blue": { "add": { "component_groups": ["steveo:fuse", "steveo:c_blue"] } },
+      "steveo:orange": { "add": { "component_groups": ["steveo:fuse", "steveo:c_orange"] } },
+      "steveo:wall_z": { "add": { "component_groups": ["steveo:o_wall_z"] } },
+      "steveo:wall_x": { "add": { "component_groups": ["steveo:o_wall_x"] } },
+      "steveo:floor": { "add": { "component_groups": ["steveo:o_floor"] } },
+      "steveo:ceiling": { "add": { "component_groups": ["steveo:o_ceiling"] } },
+      "steveo:refresh": {
+        "sequence": [
+          { "remove": { "component_groups": ["steveo:fuse"] } },
+          { "add": { "component_groups": ["steveo:fuse"] } }
+        ]
+      },
+      "steveo:despawn": { "add": { "component_groups": ["steveo:gone"] } }
+    }
+  }
+}

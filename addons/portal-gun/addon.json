@@ -1,0 +1,5 @@
+{
+  "$schema": "../../tools/schemas/addon.schema.json",
+  "name": "Portal Gun",
+  "description": "A craftable, unbreakable portal gun. Fire a blue and an orange portal; walk into one and come out the other."
+}
