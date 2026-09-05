@@ -1,0 +1,11 @@
+{
+  "materials": {
+    "version": "1.0.0",
+
+    "steveo_portal:entity_emissive_alpha": {
+      "+states": ["Blending", "DisableCulling"],
+      "blendSrc": "SourceAlpha",
+      "blendDst": "OneMinusSrcAlpha"
+    }
+  }
+}

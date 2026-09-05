@@ -1,0 +1,22 @@
+## Strings for the Portal Gun add-on.
+## Client-side translations live in the resource pack; the behavior pack
+## references them by key with RawMessage { translate: ... }.
+
+item.steveo:portal_gun.name=Portal Gun
+entity.steveo:portal.name=Portal
+
+portal_gun.hint=Use: fire a blue portal. Sneak + use: fire an orange portal.
+portal_gun.placed.blue=Blue portal placed
+portal_gun.placed.orange=Orange portal placed
+portal_gun.linked=Portals linked! Walk into one to come out the other.
+portal_gun.miss=Nothing in range to put a portal on
+portal_gun.blocked=No room for a portal there
+portal_gun.overlap=There is already a portal there
+
+portal_gun.debug.given=A Portal Gun has been placed in your inventory.
+portal_gun.debug.cleared=Removed %s of your portals.
+portal_gun.debug.status=Your portals:
+portal_gun.debug.status.none= none
+portal_gun.debug.status.one= [%s %s portal at %s in %s%s]
+portal_gun.debug.demo=Spawned a demo blue and orange portal in front of you. They fade after 30 seconds and do not teleport. If you cannot see them, the resource pack is not rendering.
+portal_gun.debug.help=Usage: /scriptevent steveo:portal <give|clear|status|demo>

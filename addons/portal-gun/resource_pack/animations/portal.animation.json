@@ -1,0 +1,33 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.steveo_portal.orient": {
+      "loop": true,
+      "bones": {
+        "root": {
+          "rotation": [0, "query.mark_variant == 1 ? 90 : 0", 0]
+        }
+      }
+    },
+    "animation.steveo_portal.swirl": {
+      "loop": true,
+      "bones": {
+        "wall": {
+          "scale": [
+            "1.0 + 0.05 * math.sin(query.life_time * 180)",
+            "1.0 + 0.03 * math.sin(query.life_time * 180 + 90)",
+            1
+          ]
+        },
+        "flat": {
+          "rotation": [0, "query.life_time * 45", 0],
+          "scale": [
+            "1.0 + 0.05 * math.sin(query.life_time * 180)",
+            1,
+            "1.0 + 0.05 * math.sin(query.life_time * 180)"
+          ]
+        }
+      }
+    }
+  }
+}
