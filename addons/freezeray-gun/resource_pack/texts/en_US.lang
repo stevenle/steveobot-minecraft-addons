@@ -1,0 +1,19 @@
+## Strings for the Freeze Ray Gun add-on.
+## Client-side translations live in the resource pack; the behavior pack
+## references them by key with RawMessage { translate: ... }.
+
+item.steveo:freezeray_gun.name=Freeze Ray Gun
+
+freezeray_gun.hint=Use to fire. The ray freezes the first mob it hits for 8 to 20 seconds. It has no effect on players.
+freezeray_gun.frozen=%s frozen for %s s
+freezeray_gun.refrozen=%s frozen again, %s s left
+freezeray_gun.countdown=%s frozen: %s s
+freezeray_gun.miss=Nothing to freeze.
+freezeray_gun.player=The freeze ray has no effect on players.
+
+freezeray_gun.debug.given=A Freeze Ray Gun is in your inventory.
+freezeray_gun.debug.status=Frozen mobs: %s. Your cooldown: %s ticks left.
+freezeray_gun.debug.thawed=Thawed %s mobs.
+freezeray_gun.debug.demo=Froze the nearest mob without the gun. If you see no frost particles on it, the resource pack is not rendering.
+freezeray_gun.debug.demo.none=No mob within 8 blocks to freeze.
+freezeray_gun.debug.help=Usage: /scriptevent steveo:freeze <give|status|thaw|demo>

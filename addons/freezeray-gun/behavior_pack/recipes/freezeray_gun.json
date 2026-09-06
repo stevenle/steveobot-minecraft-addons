@@ -1,0 +1,24 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "steveo:freezeray_gun_recipe"
+    },
+    "tags": ["crafting_table"],
+    "pattern": ["IIP", "SRB", "S  "],
+    "key": {
+      "I": { "item": "minecraft:iron_ingot" },
+      "P": { "item": "minecraft:packed_ice" },
+      "S": { "item": "minecraft:stick" },
+      "R": { "item": "minecraft:redstone" },
+      "B": { "item": "minecraft:blue_ice" }
+    },
+    "unlock": [
+      { "item": "minecraft:iron_ingot" },
+      { "item": "minecraft:blue_ice" }
+    ],
+    "result": {
+      "item": "steveo:freezeray_gun"
+    }
+  }
+}

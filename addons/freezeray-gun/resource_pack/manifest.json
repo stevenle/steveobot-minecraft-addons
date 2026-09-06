@@ -1,0 +1,21 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Freeze Ray Gun RP",
+    "description": "A freeze ray that locks a mob in place for a random few seconds so you can escape or finish it off. Short cooldown, and it cannot freeze players.",
+    "uuid": "9c3169f8-fa01-4c36-ac4e-7cecab894256",
+    "version": [1, 0, 0],
+    "min_engine_version": [1, 26, 40]
+  },
+  "modules": [
+    {
+      "type": "resources",
+      "uuid": "36c8324b-07f3-4efc-8d23-3787bb1899fe",
+      "version": [1, 0, 0]
+    }
+  ],
+  "metadata": {
+    "authors": ["Steven Le"],
+    "license": "MIT"
+  }
+}
