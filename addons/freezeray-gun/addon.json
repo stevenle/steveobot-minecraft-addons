@@ -1,0 +1,5 @@
+{
+  "$schema": "../../tools/schemas/addon.schema.json",
+  "name": "Freeze Ray Gun",
+  "description": "A freeze ray that locks a mob in place for a random few seconds so you can escape or finish it off. Short cooldown, and it cannot freeze players."
+}

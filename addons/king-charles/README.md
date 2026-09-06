@@ -32,8 +32,8 @@ again to release it. When it is at your side it occasionally shows a heart.
 
 **It will not leave home.** A tamed spaniel adopts the nearest bed within
 12 blocks as its home and remembers it. It follows you up to 32 blocks from
-that bed. Past that it stops, trots or teleports back to the bed, and tells
-you in chat. It comes bounding back as soon as you return within range. If
+that bed. Past that it quietly stops and trots or teleports back to the
+bed. It comes bounding back as soon as you return within range. If
 it has never seen a bed it simply follows you anywhere, and adopts the first
 bed it finds.
 
