@@ -2,8 +2,11 @@
   "resource_pack_name": "portal-gun",
   "texture_name": "atlas.items",
   "texture_data": {
-    "steveo_portal_gun": {
-      "textures": "textures/items/portal_gun"
+    "steveo_portal_gun_blue": {
+      "textures": "textures/items/portal_gun_blue"
+    },
+    "steveo_portal_gun_orange": {
+      "textures": "textures/items/portal_gun_orange"
     }
   }
 }

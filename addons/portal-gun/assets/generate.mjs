@@ -1,4 +1,4 @@
-// Generates the portal textures, the gun icon, and the pack icons for this add-on.
+// Generates the portal textures, the gun icons, and the pack icons for this add-on.
 // Run from the repo root:  node addons/portal-gun/assets/generate.mjs addons/portal-gun
 // It overwrites the generated files under resource_pack/ and behavior_pack/;
 // the generated output is what gets committed, this script is for regenerating it.
@@ -89,19 +89,20 @@ function paintPortal(name) {
   return c.png();
 }
 
-// ---------- Gun icon: 16×16 ----------
-function paintGunIcon() {
+// ---------- Gun icons: 16×16, one per active color ----------
+// The core and the muzzle glow in whichever color the gun will fire next.
+function paintGunIcon(color) {
   const rows = [
     '................',
     '................',
     '......WWWWWWW...',
-    '....WWWWWWWWWWB.',
-    '...WWWWGGGWWWWBB',
-    '..WWWWGGGGGWWWWB',
-    '..WWWWWGGGWWWWW.',
-    '...WWWWWWWWWWWO.',
-    '....DDDDWWWWWOO.',
-    '.....DDDDDWWWO..',
+    '....WWWWWWWWWWA.',
+    '...WWWWLLLWWWWAa',
+    '..WWWWLLLLLWWWWA',
+    '..WWWWWLLLWWWWW.',
+    '...WWWWWWWWWWWA.',
+    '....DDDDWWWWWAa.',
+    '.....DDDDDWWWA..',
     '......DDDDD.....',
     '......DDDD......',
     '.......DDD......',
@@ -109,9 +110,10 @@ function paintGunIcon() {
     '................',
     '................',
   ];
+  const pal = PALETTES[color];
   const colors = {
-    W: hex('#E9EDF2'), D: hex('#3B4048'), G: hex('#8C97A6'),
-    B: PALETTES.blue.ring, O: PALETTES.orange.ring,
+    W: hex('#E9EDF2'), D: hex('#3B4048'),
+    L: pal.ring, A: pal.ring, a: pal.edge,
   };
   const c = canvas(16, 16);
   for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) {
@@ -142,8 +144,9 @@ fs.mkdirSync(path.join(rp, 'textures', 'entity'), { recursive: true });
 fs.mkdirSync(path.join(rp, 'textures', 'items'), { recursive: true });
 fs.writeFileSync(path.join(rp, 'textures', 'entity', 'portal_blue.png'), paintPortal('blue'));
 fs.writeFileSync(path.join(rp, 'textures', 'entity', 'portal_orange.png'), paintPortal('orange'));
-fs.writeFileSync(path.join(rp, 'textures', 'items', 'portal_gun.png'), paintGunIcon());
+fs.writeFileSync(path.join(rp, 'textures', 'items', 'portal_gun_blue.png'), paintGunIcon('blue'));
+fs.writeFileSync(path.join(rp, 'textures', 'items', 'portal_gun_orange.png'), paintGunIcon('orange'));
 const icon = paintPackIcon();
 fs.writeFileSync(path.join(rp, 'pack_icon.png'), icon);
 fs.writeFileSync(path.join(out, 'behavior_pack', 'pack_icon.png'), icon);
-console.log('wrote portal textures, gun icon, and pack icons to', out);
+console.log('wrote portal textures, gun icons, and pack icons to', out);

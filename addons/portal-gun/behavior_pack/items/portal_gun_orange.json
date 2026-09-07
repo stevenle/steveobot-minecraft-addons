@@ -2,15 +2,15 @@
   "format_version": "1.21.40",
   "minecraft:item": {
     "description": {
-      "identifier": "steveo:portal_gun",
+      "identifier": "steveo:portal_gun_orange",
       "menu_category": {
         "category": "equipment"
       }
     },
     "components": {
-      "minecraft:icon": "steveo_portal_gun_blue",
+      "minecraft:icon": "steveo_portal_gun_orange",
       "minecraft:display_name": {
-        "value": "item.steveo:portal_gun.name"
+        "value": "item.steveo:portal_gun_orange.name"
       },
       "minecraft:max_stack_size": 1,
       "minecraft:hand_equipped": true,

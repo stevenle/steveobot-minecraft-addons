@@ -2,10 +2,13 @@
 ## Client-side translations live in the resource pack; the behavior pack
 ## references them by key with RawMessage { translate: ... }.
 
-item.steveo:portal_gun.name=Portal Gun
+item.steveo:portal_gun.name=Portal Gun (Blue)
+item.steveo:portal_gun_orange.name=Portal Gun (Orange)
 entity.steveo:portal.name=Portal
 
-portal_gun.hint=Use: fire a blue portal. Sneak + use: fire an orange portal.
+portal_gun.hint=Use: fire a portal. Attack (swing): switch between blue and orange. The gun's glow shows which is loaded.
+portal_gun.selected.blue=Blue portal loaded
+portal_gun.selected.orange=Orange portal loaded
 portal_gun.placed.blue=Blue portal placed
 portal_gun.placed.orange=Orange portal placed
 portal_gun.linked=Portals linked! Walk into one to come out the other.

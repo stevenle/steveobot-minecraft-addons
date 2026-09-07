@@ -4,9 +4,15 @@
  * Using the gun raycasts along the player's view and places a portal on the
  * block face it hits: a 1×2 portal on walls, a 1×1 portal on floors and
  * ceilings. Each player owns one blue and one orange portal; firing a color
- * again moves that portal. A portal is a `steveo:portal` marker entity that
- * the resource pack renders as a glowing oval, oriented by `mark_variant` and
- * colored by `variant`.
+ * again moves that portal.
+ *
+ * The gun is two item variants, one per color, with matching icons so the
+ * item in hand shows which portal it will fire. Attacking (swinging the gun,
+ * even at air) swaps the held item for the other variant. The gun never
+ * breaks blocks, so the attack button is safe to use as a toggle.
+ *
+ * A portal is a `steveo:portal` marker entity that the resource pack renders
+ * as a glowing oval, oriented by `mark_variant` and colored by `variant`.
  *
  * Every tick the script looks for entities inside a linked pair's portals and
  * teleports them to the other end, facing out of it, with their speed
@@ -23,6 +29,7 @@
  */
 import {
   Direction,
+  EntitySwingSource,
   EquipmentSlot,
   ItemStack,
   Player,
@@ -42,7 +49,11 @@ import { Format } from '@shared/chat';
 const log = createLogger('portal-gun');
 const PREFIX: RawMessage = { text: `${Format.gray}[Portal Gun]${Format.reset} ` };
 
-const GUN_ID = 'steveo:portal_gun';
+/** One item variant per color; the icon and name tell the player what is loaded. */
+const GUN_IDS: Record<Color, string> = {
+  blue: 'steveo:portal_gun',
+  orange: 'steveo:portal_gun_orange',
+};
 const PORTAL_ID = 'steveo:portal';
 /** Dynamic property on each portal entity holding its serialized PortalData. */
 const PORTAL_PROP = 'steveo:portal';
@@ -57,6 +68,8 @@ const FUSE_SECONDS = 30;
 const REFRESH_INTERVAL_TICKS = 100;
 /** How often to check who is holding the gun, for the one-time hint. */
 const HOLD_CHECK_TICKS = 10;
+/** Ticks between color toggles, so one press cannot flip twice. */
+const TOGGLE_COOLDOWN_TICKS = 4;
 /** Ticks after a traversal before the same entity may traverse again. */
 const TRAVERSE_COOLDOWN_TICKS = 5;
 /** Cap on exit speed, in blocks per tick (terminal velocity is about 3.9). */
@@ -111,6 +124,16 @@ const hinted = new Set<string>();
 
 /** Last tick each player fired, to fold duplicate use events into one shot. */
 const lastShot = new Map<string, number>();
+
+/** Last tick each player toggled colors. */
+const lastToggle = new Map<string, number>();
+
+/** The color a gun item fires, or undefined if the item is not a gun. */
+function colorOfGun(typeId: string | undefined): Color | undefined {
+  if (typeId === GUN_IDS.blue) return 'blue';
+  if (typeId === GUN_IDS.orange) return 'orange';
+  return undefined;
+}
 
 // ---------- vectors ----------
 
@@ -447,16 +470,46 @@ function fire(player: Player, color: Color): void {
   actionBar(player, pair[other] ? 'portal_gun.linked' : `portal_gun.placed.${color}`);
 }
 
-function handleUse(player: Player): void {
+function handleUse(player: Player, color: Color): void {
   const tick = system.currentTick;
   if (lastShot.get(player.id) === tick) return; // itemUse + block interaction, same click
   lastShot.set(player.id, tick);
 
-  fire(player, player.isSneaking ? 'orange' : 'blue');
+  fire(player, color);
   try {
     player.startItemCooldown(COOLDOWN_CATEGORY, COOLDOWN_TICKS);
   } catch {
     // Cooldown is only there to swallow double clicks.
+  }
+}
+
+/** Swaps the held gun for the other color's variant, keeping any custom name or lore. */
+function toggleColor(player: Player, held: ItemStack, from: Color): void {
+  const tick = system.currentTick;
+  const last = lastToggle.get(player.id);
+  if (last !== undefined && tick - last < TOGGLE_COOLDOWN_TICKS) return;
+  lastToggle.set(player.id, tick);
+
+  const to: Color = from === 'blue' ? 'orange' : 'blue';
+  const next = new ItemStack(GUN_IDS[to], 1);
+  if (held.nameTag !== undefined) next.nameTag = held.nameTag;
+  next.setLore(held.getLore());
+  next.keepOnDeath = held.keepOnDeath;
+  next.lockMode = held.lockMode;
+
+  const equippable = player.getComponent('minecraft:equippable');
+  try {
+    equippable?.setEquipment(EquipmentSlot.Mainhand, next);
+  } catch (err) {
+    log.error(`failed to switch ${player.name}'s gun to ${to}`, err);
+    return;
+  }
+
+  actionBar(player, `portal_gun.selected.${to}`);
+  try {
+    player.dimension.playSound('random.click', player.location, { volume: 0.5, pitch: to === 'blue' ? 1.3 : 0.8 });
+  } catch {
+    // Sound is decoration.
   }
 }
 
@@ -575,7 +628,7 @@ system.runInterval(() => {
   for (const player of world.getAllPlayers()) {
     if (hinted.has(player.id)) continue;
     const held = player.getComponent('minecraft:equippable')?.getEquipment(EquipmentSlot.Mainhand);
-    if (held?.typeId !== GUN_ID) continue;
+    if (!colorOfGun(held?.typeId)) continue;
     hinted.add(player.id);
     player.sendMessage({ rawtext: [PREFIX, { translate: 'portal_gun.hint' }] });
   }
@@ -584,14 +637,30 @@ system.runInterval(() => {
 // ---------- events ----------
 
 world.afterEvents.itemUse.subscribe((event) => {
-  if (event.itemStack.typeId !== GUN_ID) return;
-  handleUse(event.source);
+  const color = colorOfGun(event.itemStack.typeId);
+  if (color) handleUse(event.source, color);
 });
 
 // Using the gun on a block fires this instead of (or as well as) itemUse.
 world.afterEvents.playerInteractWithBlock.subscribe((event) => {
-  if (event.itemStack?.typeId !== GUN_ID || !event.isFirstEvent) return;
-  handleUse(event.player);
+  if (!event.isFirstEvent) return;
+  const color = colorOfGun(event.itemStack?.typeId);
+  if (color) handleUse(event.player, color);
+});
+
+// Attacking with the gun (a swing, even at nothing) switches colors.
+world.afterEvents.playerSwingStart.subscribe(
+  (event) => {
+    const held = event.heldItemStack;
+    const color = colorOfGun(held?.typeId);
+    if (held && color) toggleColor(event.player, held, color);
+  },
+  { swingSource: EntitySwingSource.Attack },
+);
+
+// The gun is not a pickaxe: attacking a block with it must not break the block.
+world.beforeEvents.playerBreakBlock.subscribe((event) => {
+  if (colorOfGun(event.itemStack?.typeId)) event.cancel = true;
 });
 
 world.afterEvents.entityLoad.subscribe((event) => adopt(event.entity));
@@ -599,6 +668,7 @@ world.afterEvents.entityLoad.subscribe((event) => adopt(event.entity));
 world.afterEvents.playerLeave.subscribe((event) => {
   hinted.delete(event.playerId);
   lastShot.delete(event.playerId);
+  lastToggle.delete(event.playerId);
 });
 
 // Adopt portals that are already loaded when the script starts.
@@ -669,7 +739,7 @@ system.afterEvents.scriptEventReceive.subscribe(
     const say = (message: RawMessage) => player.sendMessage(message);
     switch (event.message.trim()) {
       case 'give': {
-        player.getComponent('minecraft:inventory')?.container.addItem(new ItemStack(GUN_ID, 1));
+        player.getComponent('minecraft:inventory')?.container.addItem(new ItemStack(GUN_IDS.blue, 1));
         say({ rawtext: [PREFIX, { translate: 'portal_gun.debug.given' }] });
         break;
       }

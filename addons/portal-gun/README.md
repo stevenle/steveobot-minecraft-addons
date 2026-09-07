@@ -24,8 +24,15 @@ Hold the gun and aim at a block within 64 blocks.
 
 | Input | Effect |
 |---|---|
-| **Use** (right-click / tap) | Fires the **blue** portal |
-| **Sneak + use** | Fires the **orange** portal |
+| **Use** (right-click / tap) | Fires the loaded portal |
+| **Attack** (left-click / swing, even at air) | Switches between **blue** and **orange** |
+
+The gun shows which color is loaded: its core and muzzle glow blue or
+orange, and its name reads *Portal Gun (Blue)* or *Portal Gun (Orange)*.
+The action bar confirms each switch. Under the hood the gun is two item
+variants that the script swaps in your hand, keeping any custom name or lore.
+Attacking with the gun never breaks blocks, in Survival or Creative, so the
+attack button is safe to press anywhere.
 
 Firing a color again moves that portal. Each player owns one pair, and any
 player, mob, or item can travel through anyone's pair. A portal on a wall is
@@ -71,6 +78,9 @@ Messages from the add-on are prefixed `[Portal Gun]`.
   RP version in its manifest and re-upload (Realm clients cache old packs).
 - **Portals visible but no teleport**: run `status` and check both ends say
   loaded. A pair only works while both chunks are loaded.
+- **Attack does not switch colors**: the swing event needs script API 2.9
+  or newer (see the version triple). On touch, attack is a tap on a block or
+  mob; a tap on empty space does not swing.
 - **Portal placed oddly on a short wall**: expected; it slid down to fit.
 - **Pack icons missing in the Realm's Edit World screen**: expected on
   Realms for every add-on; not a bug in this pack.
@@ -79,7 +89,7 @@ Messages from the add-on are prefixed `[Portal Gun]`.
 
 | Path | Role |
 |---|---|
-| `behavior_pack/items/portal_gun.json`, `recipes/portal_gun.json` | The gun item (no durability) and its recipe |
+| `behavior_pack/items/portal_gun.json`, `items/portal_gun_orange.json`, `recipes/portal_gun.json` | The gun's blue and orange variants (no durability) and its recipe |
 | `behavior_pack/entities/portal.json` | The portal marker: color and orientation component groups, 30 s self-destruct fuse |
 | `src/main.ts` | Raycast placement, per-player portal registry, traversal with momentum, persistence, chat commands |
 | `resource_pack/entity/portal.entity.json` | Client entity: textures, material, animations |
@@ -88,8 +98,9 @@ Messages from the add-on are prefixed `[Portal Gun]`.
 | `resource_pack/animations/portal.animation.json` | Rotates walls to face the right axis; pulses and spins the ovals |
 | `resource_pack/materials/entity.material` | Emissive, alpha-blended, double-sided material |
 | `resource_pack/textures/entity/portal_*.png` | Wall oval and floor disc per color |
+| `resource_pack/textures/items/portal_gun_*.png` | Gun icon per loaded color |
 | `resource_pack/texts/en_US.lang` | Every player-facing string |
 
-The portal textures, gun icon, and pack icon are generated pixel art;
+The portal textures, gun icons, and pack icon are generated pixel art;
 `assets/generate.mjs` regenerates them (run it from the repo root with the
 add-on folder as its argument).
