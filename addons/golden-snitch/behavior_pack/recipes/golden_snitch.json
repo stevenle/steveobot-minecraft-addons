@@ -1,0 +1,20 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "steveo:golden_snitch_recipe"
+    },
+    "tags": ["crafting_table"],
+    "pattern": ["F F", " G ", "   "],
+    "key": {
+      "F": { "item": "minecraft:feather" },
+      "G": { "item": "minecraft:gold_block" }
+    },
+    "unlock": [
+      { "item": "minecraft:gold_block" }
+    ],
+    "result": {
+      "item": "steveo:golden_snitch"
+    }
+  }
+}
