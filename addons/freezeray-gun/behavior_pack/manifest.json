@@ -4,21 +4,21 @@
     "name": "Freeze Ray Gun BP",
     "description": "A freeze ray that locks a mob in place for a random few seconds so you can escape or finish it off. Short cooldown, and it cannot freeze players.",
     "uuid": "b7bd76af-29fe-44fe-b2e9-c5ba21d311be",
-    "version": [1, 0, 0],
+    "version": [1, 1, 0],
     "min_engine_version": [1, 26, 40]
   },
   "modules": [
     {
       "type": "data",
       "uuid": "31866b86-0377-4980-b3a9-95bca4851a1f",
-      "version": [1, 0, 0]
+      "version": [1, 1, 0]
     },
     {
       "type": "script",
       "language": "javascript",
       "entry": "scripts/main.js",
       "uuid": "1d6cf205-b258-490a-b62f-9c337ed61702",
-      "version": [1, 0, 0]
+      "version": [1, 1, 0]
     }
   ],
   "dependencies": [

@@ -20,11 +20,22 @@
  *    a mob frozen mid-jump in the air, which is a feature.
  * 3. Frost particles around the mob, so everyone can see it is frozen.
  *
+ * On top of that, a frozen mob cannot hurt anything. The Weakness only
+ * covers melee, so the harm is cut off at the source instead:
+ *
+ * - Any damage whose attacker is a frozen mob, or a projectile a frozen mob
+ *   fired, is cancelled in the `entityHurt` before-event. That covers melee
+ *   hits, arrows, fireballs, a guardian's beam, and anything else the game
+ *   attributes to the mob.
+ * - Explosions caused by a frozen mob (a creeper's, or a ghast fireball's)
+ *   are cancelled before they happen.
+ * - Projectiles a frozen mob fires are removed the moment they spawn, so a
+ *   frozen skeleton's arrows never fly and a blaze's fireballs cannot set
+ *   you alight. The hurt cancellation is the backstop if one slips through.
+ *
  * Frozen mobs still take damage, and a frozen mob is thawed the moment it
  * dies or is removed. Re-freezing a mob rolls a fresh duration and keeps
- * whichever is longer. Ranged mobs (skeletons, blazes) can still shoot and a
- * creeper standing next to you can still swell, so the freeze buys distance
- * rather than immunity; the README says so.
+ * whichever is longer.
  *
  * The cooldown is 1.5 s, declared on the item (so the hotbar shows the sweep)
  * and enforced again here, since a block interaction can fire the use event
@@ -231,6 +242,34 @@ function thaw(record: Frozen, entity: Entity | undefined): void {
   }
 }
 
+/**
+ * Whether `entity` is a frozen mob, or a projectile one fired. The owner of
+ * a projectile is the mob that shot it, so a frozen skeleton's arrow and a
+ * frozen ghast's fireball both count as the mob itself.
+ */
+function isFrozenAttacker(entity: Entity | undefined): boolean {
+  if (!entity) return false;
+  if (frozen.has(entity.id)) return true;
+  try {
+    const owner = entity.getComponent('minecraft:projectile')?.owner;
+    return owner !== undefined && frozen.has(owner.id);
+  } catch {
+    return false;
+  }
+}
+
+/** Removes `projectile` if a frozen mob fired it. Returns true once there is nothing more to check. */
+function removeFrozenShot(projectile: Entity): boolean {
+  try {
+    if (!projectile.isValid) return true;
+    if (!isFrozenAttacker(projectile)) return false;
+    projectile.remove();
+    return true;
+  } catch {
+    return true;
+  }
+}
+
 function thawAll(): number {
   const count = frozen.size;
   for (const record of [...frozen.values()]) thaw(record, world.getEntity(record.entityId));
@@ -375,6 +414,33 @@ world.afterEvents.itemUse.subscribe((event) => {
 world.afterEvents.playerInteractWithBlock.subscribe((event) => {
   if (!event.itemStack || !event.isFirstEvent) return;
   if (event.itemStack.typeId === GUN_ID) handleUse(event.player);
+});
+
+// A frozen mob cannot hurt anything: damage it deals, directly or through a
+// projectile it fired, is cancelled before it lands.
+world.beforeEvents.entityHurt.subscribe((event) => {
+  const { damagingEntity, damagingProjectile } = event.damageSource;
+  if (isFrozenAttacker(damagingEntity) || isFrozenAttacker(damagingProjectile)) event.cancel = true;
+});
+
+// Nor can it blow anything up: a frozen creeper's explosion, or the blast of
+// a fireball a frozen ghast launched, is cancelled outright.
+world.beforeEvents.explosion.subscribe((event) => {
+  if (isFrozenAttacker(event.source)) event.cancel = true;
+});
+
+// Anything a frozen mob shoots is removed as it spawns. The projectile's
+// owner may not be set until the tick after it appears, so a projectile that
+// has no frozen owner yet is checked once more on the next tick.
+world.afterEvents.entitySpawn.subscribe((event) => {
+  const projectile = event.entity;
+  try {
+    if (!projectile.getComponent('minecraft:projectile')) return;
+  } catch {
+    return;
+  }
+  if (removeFrozenShot(projectile)) return;
+  system.run(() => removeFrozenShot(projectile));
 });
 
 world.afterEvents.entityDie.subscribe((event) => {

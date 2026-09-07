@@ -1,9 +1,9 @@
 # Freeze Ray Gun
 
 A ray gun that freezes the first mob it hits for a random **8 to 20
-seconds**. A frozen mob cannot move, turn, or hurt you in melee, and it
-still takes damage, so you can walk away or finish it off. The gun never
-freezes players, needs no ammo, and never breaks.
+seconds**. A frozen mob cannot move, turn, or hurt you, and it still
+takes damage, so you can walk away or finish it off. The gun never freezes
+players, needs no ammo, and never breaks.
 
 ## Crafting
 
@@ -48,10 +48,18 @@ Bedrock has no freeze effect for mobs, so the gun builds one:
   from a hit.
 - **Frost particles** around the mob, so everyone can see it is frozen.
 
-Two things the freeze does not stop, because vanilla mobs give a script no
-handle on them: ranged mobs such as skeletons and blazes can still shoot,
-and a creeper you stand next to can still swell. Freezing them still buys
-you the distance to get out of range.
+A frozen mob also cannot harm anyone, whatever it is:
+
+- **Damage it deals is cancelled** before it lands, whether by a melee hit,
+  an arrow, a fireball, a guardian's beam, or anything else the game
+  attributes to the mob.
+- **Its explosions are cancelled.** A frozen creeper may still swell, but
+  the blast never happens, and neither does the blast of a fireball a
+  frozen ghast launched.
+- **Its projectiles are removed** the moment they spawn, so a frozen
+  skeleton's arrows never fly and a frozen blaze cannot set you alight.
+
+Once the freeze ends the mob is back to normal, so use the time.
 
 ## Chat commands
 
@@ -81,7 +89,9 @@ Messages from the add-on are prefixed `[Freeze Ray]`.
 - **The gun says "Nothing to freeze" while aiming at a mob**: the ray
   stops at the first block, and it ignores anything without health
   (dropped items, arrows). Step to where there is a clear line.
-- **A frozen skeleton still shoots me**: expected; see above.
+- **A frozen mob still hurt me**: it should not. Check the content log for
+  a `freezeray-gun` error; the damage and explosion blocks run in
+  before-events, which the game skips if the script has faulted.
 - **Pack icons missing in the Realm's Edit World screen**: expected on
   Realms for every add-on; not a bug in this pack.
 
@@ -91,7 +101,7 @@ Messages from the add-on are prefixed `[Freeze Ray]`.
 |---|---|
 | `behavior_pack/items/freezeray_gun.json` | The gun: no durability, 1.5 s cooldown |
 | `behavior_pack/recipes/freezeray_gun.json` | The crafting recipe |
-| `src/main.ts` | Ray casting, the freeze (effects, per-tick hold, thaw), countdown, hints, chat commands |
+| `src/main.ts` | Ray casting, the freeze (effects, per-tick hold, thaw), blocking a frozen mob's damage, explosions, and projectiles, countdown, hints, chat commands |
 | `resource_pack/particles/freeze_beam.json` | The beam, one mote per 0.75 blocks along the ray |
 | `resource_pack/particles/frost_burst.json` | The puff of frost when a mob freezes or thaws |
 | `resource_pack/particles/frost_aura.json` | Motes drifting off a frozen mob |
