@@ -1,0 +1,9 @@
+{
+  "resource_pack_name": "golden-snitch",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "steveo_golden_snitch": {
+      "textures": "textures/items/golden_snitch"
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Golden Snitch RP",
+    "description": "A craftable golden snitch that, when released in the Nether, flies off to find the nearest nether fortress, trailing fire behind it.",
+    "uuid": "8f39f124-40c6-4a15-850f-be7c933a41f4",
+    "version": [1, 0, 0],
+    "min_engine_version": [1, 26, 40]
+  },
+  "modules": [
+    {
+      "type": "resources",
+      "uuid": "b977a4c7-787f-4b2d-840b-ec2257c786bc",
+      "version": [1, 0, 0]
+    }
+  ],
+  "metadata": {
+    "authors": ["Steven Le"],
+    "license": "MIT"
+  }
+}

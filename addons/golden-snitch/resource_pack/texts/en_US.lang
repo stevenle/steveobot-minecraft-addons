@@ -1,0 +1,28 @@
+## Strings for the Golden Snitch add-on.
+## Client-side translations live in the resource pack; the behavior pack
+## references them by key with RawMessage { translate: ... }.
+
+item.steveo:golden_snitch.name=Golden Snitch
+entity.steveo:snitch.name=Golden Snitch
+
+golden_snitch.hint=Use in the Nether to release the snitch. It flies off toward the nearest nether fortress; tap it to catch it again.
+golden_snitch.not_nether=The snitch only stirs in the Nether.
+golden_snitch.released=The snitch is loose! It circles you while it searches for a fortress.
+golden_snitch.searching=The snitch senses no fortress within %s blocks. Keep exploring; it keeps looking.
+golden_snitch.found=The snitch has caught the scent of a fortress about %s blocks away. Follow the fire!
+golden_snitch.waiting=The snitch is coming back for you.
+golden_snitch.arrived=The snitch has found the fortress! Tap it to catch it.
+golden_snitch.caught=You caught the Golden Snitch.
+golden_snitch.caught.full=You caught the Golden Snitch, but your hands were full, so it dropped at your feet.
+golden_snitch.owner_gone=Its owner is gone, so the snitch waits where it is.
+
+golden_snitch.debug.given=A Golden Snitch has been placed in your inventory.
+golden_snitch.debug.status=Your snitches:
+golden_snitch.debug.status.none= none
+golden_snitch.debug.status.one= [%s at %s%s]
+golden_snitch.debug.scan=Scan from %s: %s chunks loaded, %s unloaded, out to %s blocks.
+golden_snitch.debug.scan.hit=Nearest nether brick at %s, %s blocks away.
+golden_snitch.debug.scan.miss=No nether brick in loaded chunks.
+golden_snitch.debug.recalled=Recalled %s of your snitches.
+golden_snitch.debug.demo=Spawned a demo snitch that circles you for 30 seconds. If you cannot see it, the resource pack is not rendering.
+golden_snitch.debug.help=Usage: /scriptevent steveo:snitch <give|status|scan|recall|demo>

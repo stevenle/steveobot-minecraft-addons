@@ -274,8 +274,9 @@ and the Java flow closes before uploading the same way. Without it, minting
 the upload session can be refused with a 403 `"Could not set upload state"`;
 that is not an auth failure — close first, or wait out the previous session's
 token (~1h). The reopen right after upload can itself be refused while the
-service is still swapping the world in; if the CLI says so, open the Realm
-from the client's Realm settings.
+service is still swapping the world in; if the CLI says so, retry with
+`pnpm realm --realm "My Realm" --open` once the swap has settled, or open the
+Realm from the client's Realm settings.
 
 #### Probing for an upload endpoint
 

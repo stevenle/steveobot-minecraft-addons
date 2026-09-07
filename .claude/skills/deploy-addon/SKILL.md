@@ -63,8 +63,9 @@ downloaded world by hand, and do not "fix" those code paths away.
 ### After a successful upload
 
 The immediate reopen is usually refused (503) while the service swaps the
-world in. That is normal: tell the user to open the Realm from the client's
-Realm settings, and verify with `pnpm realm --list-realms` (shows OPEN/CLOSED).
+world in. That is normal: wait a minute, then `pnpm realm --realm <id> --open`
+and verify with `pnpm realm --list-realms` (shows OPEN/CLOSED). If that is also
+refused, tell the user to open the Realm from the client's Realm settings.
 Do not script extra Realms API writes outside `tools/realm.ts` — implement
 missing operations as flags there instead.
 

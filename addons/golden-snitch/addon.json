@@ -1,0 +1,5 @@
+{
+  "$schema": "../../tools/schemas/addon.schema.json",
+  "name": "Golden Snitch",
+  "description": "A craftable golden snitch that, when released in the Nether, flies off to find the nearest nether fortress, trailing fire behind it."
+}

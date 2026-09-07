@@ -1,0 +1,19 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.steveo_snitch.flutter": {
+      "loop": true,
+      "bones": {
+        "body": {
+          "position": [0, "0.6 * math.sin(query.life_time * 420)", 0]
+        },
+        "wing_left": {
+          "rotation": [0, "-45 * math.sin(query.life_time * 2400)", "10 * math.sin(query.life_time * 2400 + 90)"]
+        },
+        "wing_right": {
+          "rotation": [0, "45 * math.sin(query.life_time * 2400)", "-10 * math.sin(query.life_time * 2400 + 90)"]
+        }
+      }
+    }
+  }
+}

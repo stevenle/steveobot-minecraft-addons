@@ -22,6 +22,7 @@
  *   node tools/realm.ts --world <path> --list
  *   node tools/realm.ts --login
  *   node tools/realm.ts --list-realms
+ *   node tools/realm.ts --realm <id|name> --open
  *   node tools/realm.ts --realm <id> --probe-upload [--yes]
  *
  * `--world` accepts a `.mcworld` file (what "Download World" gives you) or an
@@ -618,6 +619,30 @@ async function probeUploadHost(client: RealmsClient, discoveryBody: string): Pro
 }
 
 /**
+ * Reopens a Realm on its own. The reopen at the end of `--upload --close` is
+ * often refused with a 503 while the service is still swapping the world in
+ * (observed live 2026-09-01 and 2026-09-06), which leaves the Realm closed;
+ * this is the retry, so the fix does not have to happen in the client.
+ */
+async function openRealm(args: ParsedArgs, selector: string): Promise<void> {
+  const client = await connect(args);
+  let realms: RealmSummary[];
+  try {
+    realms = await client.listRealms();
+  } catch (err) {
+    explainApiError(err);
+  }
+  const realm = resolveRealm(realms, selector);
+  log.step(`Opening ${color.bold(realm.name)} ${color.dim(`(id ${realm.id}, currently ${realm.state})`)}`);
+  try {
+    await client.openRealm(realm.id);
+  } catch (err) {
+    explainApiError(err);
+  }
+  log.done('Opened. Confirm with `pnpm realm --list-realms`.');
+}
+
+/**
  * Sends a baked `.mcworld` back to a Realm slot over the captured upload flow:
  * `GET /archive/upload/world/{id}/{slot}` for a target and token, then a POST
  * of the archive as `application/x-mcworld`. Every piece of that shape comes
@@ -777,6 +802,14 @@ async function main(): Promise<void> {
   }
 
   const realmSelector = stringFlag(args, 'realm');
+
+  if (boolFlag(args, 'open')) {
+    if (realmSelector === undefined) {
+      fail('--open needs --realm <id|name> to know which Realm to open.');
+    }
+    await openRealm(args, realmSelector);
+    return;
+  }
 
   if (boolFlag(args, 'probe-upload')) {
     if (realmSelector === undefined) {
