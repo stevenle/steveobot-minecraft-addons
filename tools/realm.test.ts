@@ -288,6 +288,31 @@ describe('realm.ts against a stand-in Realms service', () => {
     ]);
   });
 
+  it('opens a Realm on its own with --open, for a reopen the upload flow could not do', async () => {
+    stub.clearProbeRoutes();
+    stub.requests.length = 0;
+    stub.setProbeRoute('PUT /worlds/99/open', { status: 200, body: 'true' });
+
+    const { stdout } = await cli(['--realm', '99', '--open']);
+    assert.deepEqual(stub.requests.filter((r) => r.startsWith('PUT ')), ['PUT /worlds/99/open']);
+    assert.match(stdout, /Opened/);
+    assert.ok(!stub.requests.some((u) => u.startsWith('GET /archive/download/')), 'must not download the world');
+  });
+
+  it('--open reports a refusal verbatim instead of retrying', async () => {
+    stub.clearProbeRoutes();
+    stub.requests.length = 0;
+    stub.setProbeRoute('PUT /worlds/99/open', { status: 503, body: 'Retry again later' });
+
+    const err = await cli(['--realm', '99', '--open']).then(
+      () => null,
+      (e: { stdout?: string; stderr?: string }) => e,
+    );
+    assert.ok(err, 'expected a non-zero exit');
+    assert.match(`${err.stdout ?? ''}${err.stderr ?? ''}`, /503/);
+    assert.equal(stub.requests.filter((r) => r === 'PUT /worlds/99/open').length, 1);
+  });
+
   it('reopens the Realm even when the upload session is refused, and explains the 403', async () => {
     stub.clearProbeRoutes();
     stub.requests.length = 0;
