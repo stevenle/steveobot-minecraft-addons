@@ -26,13 +26,16 @@ Hold the gun and aim at a block within 64 blocks.
 |---|---|
 | **Use** (right-click / tap) | Fires the loaded portal |
 | **Attack** (left-click / swing, even at air) | Switches between **blue** and **orange** |
+| **Crouch + Use** | Also switches colors, for touch and controller players |
 
 The gun shows which color is loaded: its core and muzzle glow blue or
 orange, and its name reads *Portal Gun (Blue)* or *Portal Gun (Orange)*.
 The action bar confirms each switch. Under the hood the gun is two item
 variants that the script swaps in your hand, keeping any custom name or lore.
 Attacking with the gun never breaks blocks, in Survival or Creative, so the
-attack button is safe to press anywhere.
+attack button is safe to press anywhere. Crouch + Use does the same switch
+without a swing, which matters on touch where a tap on empty space does not
+count as an attack.
 
 Firing a color again moves that portal. Each player owns one pair, and any
 player, mob, or item can travel through anyone's pair. A portal on a wall is
@@ -80,7 +83,7 @@ Messages from the add-on are prefixed `[Portal Gun]`.
   loaded. A pair only works while both chunks are loaded.
 - **Attack does not switch colors**: the swing event needs script API 2.9
   or newer (see the version triple). On touch, attack is a tap on a block or
-  mob; a tap on empty space does not swing.
+  mob; a tap on empty space does not swing. Crouch + Use switches regardless.
 - **Portal placed oddly on a short wall**: expected; it slid down to fit.
 - **Pack icons missing in the Realm's Edit World screen**: expected on
   Realms for every add-on; not a bug in this pack.

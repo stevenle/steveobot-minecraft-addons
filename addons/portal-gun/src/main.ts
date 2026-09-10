@@ -8,8 +8,9 @@
  *
  * The gun is two item variants, one per color, with matching icons so the
  * item in hand shows which portal it will fire. Attacking (swinging the gun,
- * even at air) swaps the held item for the other variant. The gun never
- * breaks blocks, so the attack button is safe to use as a toggle.
+ * even at air) or using it while crouching swaps the held item for the other
+ * variant. The gun never breaks blocks, so the attack button is safe to use
+ * as a toggle; crouch + use covers touch, where a tap on air does not swing.
  *
  * A portal is a `steveo:portal` marker entity that the resource pack renders
  * as a glowing oval, oriented by `mark_variant` and colored by `variant`.
@@ -470,10 +471,16 @@ function fire(player: Player, color: Color): void {
   actionBar(player, pair[other] ? 'portal_gun.linked' : `portal_gun.placed.${color}`);
 }
 
-function handleUse(player: Player, color: Color): void {
+function handleUse(player: Player, held: ItemStack, color: Color): void {
   const tick = system.currentTick;
   if (lastShot.get(player.id) === tick) return; // itemUse + block interaction, same click
   lastShot.set(player.id, tick);
+
+  // Crouch + use switches colors instead of firing, same as a swing.
+  if (player.isSneaking) {
+    toggleColor(player, held, color);
+    return;
+  }
 
   fire(player, color);
   try {
@@ -638,14 +645,15 @@ system.runInterval(() => {
 
 world.afterEvents.itemUse.subscribe((event) => {
   const color = colorOfGun(event.itemStack.typeId);
-  if (color) handleUse(event.source, color);
+  if (color) handleUse(event.source, event.itemStack, color);
 });
 
 // Using the gun on a block fires this instead of (or as well as) itemUse.
 world.afterEvents.playerInteractWithBlock.subscribe((event) => {
   if (!event.isFirstEvent) return;
-  const color = colorOfGun(event.itemStack?.typeId);
-  if (color) handleUse(event.player, color);
+  const held = event.itemStack;
+  const color = colorOfGun(held?.typeId);
+  if (held && color) handleUse(event.player, held, color);
 });
 
 // Attacking with the gun (a swing, even at nothing) switches colors.
