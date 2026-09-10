@@ -4,27 +4,27 @@
     "name": "Portal Gun BP",
     "description": "A craftable, unbreakable portal gun. Fire a blue and an orange portal; walk into one and come out the other.",
     "uuid": "a0188fe5-5aa2-449a-a9ab-d1cf2eeecf23",
-    "version": [1, 1, 0],
+    "version": [1, 1, 1],
     "min_engine_version": [1, 26, 40]
   },
   "modules": [
     {
       "type": "data",
       "uuid": "005ed6af-dd48-425a-aee8-9f8b15840ae5",
-      "version": [1, 1, 0]
+      "version": [1, 1, 1]
     },
     {
       "type": "script",
       "language": "javascript",
       "entry": "scripts/main.js",
       "uuid": "32a60c7a-09c3-44f2-94ea-750e104ba36d",
-      "version": [1, 1, 0]
+      "version": [1, 1, 1]
     }
   ],
   "dependencies": [
     {
       "uuid": "87c5aedc-c6d9-4d9b-860c-346981b109d2",
-      "version": [1, 1, 0]
+      "version": [1, 1, 1]
     },
     {
       "module_name": "@minecraft/server",

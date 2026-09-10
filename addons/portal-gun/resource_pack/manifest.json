@@ -4,14 +4,14 @@
     "name": "Portal Gun RP",
     "description": "A craftable, unbreakable portal gun. Fire a blue and an orange portal; walk into one and come out the other.",
     "uuid": "87c5aedc-c6d9-4d9b-860c-346981b109d2",
-    "version": [1, 1, 0],
+    "version": [1, 1, 1],
     "min_engine_version": [1, 26, 40]
   },
   "modules": [
     {
       "type": "resources",
       "uuid": "9cc3828f-c4fc-4ba0-80d6-8e8520712625",
-      "version": [1, 1, 0]
+      "version": [1, 1, 1]
     }
   ],
   "metadata": {
