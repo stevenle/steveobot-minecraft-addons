@@ -296,18 +296,6 @@
     },
     "inventory_item@common.button": {
         "$pressed_button_name": "button.form_button_click",
-        "button_mappings": [
-            {
-                "from_button_id": "$pressed_button_name",
-                "to_button_id": "any",
-                "mapping_type": "pressed"
-            },
-            {
-                "from_button_id": "$pressed_button_name",
-                "to_button_id": "any",
-                "mapping_type": "focused"
-            }
-        ],
         "bindings": [
             {
                 "binding_name": "#form_button_text",

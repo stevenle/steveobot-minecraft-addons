@@ -63,6 +63,11 @@ If a game update shifts the numeric ids, vanilla icons in the backpack come
 out wrong until `typeIds.js` is refreshed from upstream; the item names stay
 correct either way.
 
+One local change to the vendored UI: upstream ships the inventory section as
+display-only by giving its buttons a dead input mapping. `chest_inventory_system.json`
+here drops that override so the inventory slots are real buttons. Keep that
+edit when refreshing from upstream, or taps on your own items do nothing.
+
 Two things can go wrong, and both are reported in chat:
 
 - **"Out of reach right now"**: the vault chunk is not loaded yet (the first
