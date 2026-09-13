@@ -1,9 +1,0 @@
-{
-  "resource_pack_name": "backpack",
-  "texture_name": "atlas.items",
-  "texture_data": {
-    "steveo_backpack": {
-      "textures": "textures/items/backpack"
-    }
-  }
-}
