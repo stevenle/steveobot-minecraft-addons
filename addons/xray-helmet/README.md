@@ -22,9 +22,12 @@ it is in the Equipment tab with the other helmets.
 
 ## How it works
 
-**Wear it below Y=60.** The helmet only works "in the mines". Above that
-height it stays quiet, so it does not clutter your base or the surface. When
-you first put it on, a chat message confirms it is active.
+**Wear it below Y=60, or anywhere in the Nether.** In the Overworld the
+helmet only works "in the mines": above that height it stays quiet, so it
+does not clutter your base or the surface. The Nether has no surface to
+protect, so there it works at any height, which is where it earns its keep
+finding ancient debris and nether gold. When you first put it on, a chat
+message confirms it is active.
 
 **It scans around you every two seconds** and lights up ores within 8 blocks
 horizontally and 6 blocks vertically of your head. Each ore gets a glowing
@@ -59,12 +62,13 @@ add-on is misbehaving.
 
 | Command | What it does |
 |---|---|
-| `/scriptevent steveo:xray` | Spawns one test crystal of each color in the air in front of you (they fade after about six seconds), then runs a scan and reports in chat how many ores it found, your current Y, and the Y limit. Works with or without the helmet on. |
+| `/scriptevent steveo:xray` | Spawns one test crystal of each color in the air in front of you (they fade after about six seconds), then runs a scan and reports in chat how many ores it found, your current Y, and whether a Y limit applies where you are. Works with or without the helmet on. |
 
 How to read the result:
 
 - **Crystals appear and the scan reports ores**: everything works. If ores
-  still do not glow while mining, you are probably above Y=60.
+  still do not glow while mining, you are probably in the Overworld above
+  Y=60.
 - **Crystals appear but the scan reports 0 ores**: the script and the
   resource pack are fine; there is simply no ore in range.
 - **No crystals but a chat reply arrives**: the behavior pack runs but the

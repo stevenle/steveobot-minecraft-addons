@@ -1,7 +1,8 @@
 /**
  * X-Ray Helmet — a craftable helmet that makes nearby gems glow while you mine.
  *
- * While a player wears the helmet below MINE_MAX_Y, the script periodically
+ * While a player wears the helmet "in the mines" — below MINE_MAX_Y in the
+ * Overworld, or anywhere at all in the Nether — the script periodically
  * scans the blocks around them and drops a `steveo:ore_marker` entity on each
  * ore it finds. The resource pack renders that entity as an emissive colored
  * outline with depth testing disabled, so the glow shows through solid stone.
@@ -23,6 +24,7 @@ import {
   world,
   type Dimension,
   type Entity,
+  type RawMessage,
   type Vector3,
 } from '@minecraft/server';
 
@@ -34,7 +36,9 @@ const log = createLogger('xray-helmet');
 const HELMET_ID = 'steveo:xray_helmet';
 const MARKER_ID = 'steveo:ore_marker';
 
-/** At or above this Y the helmet stays quiet — it only works "in the mines". */
+/** At or above this Y the helmet stays quiet — it only works "in the mines".
+ * The limit applies in the Overworld only: the Nether has no surface to
+ * speak of, so there the helmet works at any height. */
 const MINE_MAX_Y = 60;
 
 /** Horizontal / vertical scan reach, in blocks, around the player's head. */
@@ -122,6 +126,17 @@ function markerKey(dimensionId: string, pos: Vector3): string {
   return `${dimensionId}|${pos.x},${pos.y},${pos.z}`;
 }
 
+/** Whether the Y limit applies where the player is: only the Overworld has
+ * an "above ground" the helmet should stay quiet in. */
+function hasHeightLimit(player: Player): boolean {
+  return player.dimension.id === 'minecraft:overworld';
+}
+
+/** True when the helmet should be scanning for this player's position. */
+function inTheMines(player: Player): boolean {
+  return !hasHeightLimit(player) || player.location.y < MINE_MAX_Y;
+}
+
 function isWearingHelmet(player: Player): boolean {
   const equippable = player.getComponent('minecraft:equippable');
   return equippable?.getEquipment(EquipmentSlot.Head)?.typeId === HELMET_ID;
@@ -205,14 +220,12 @@ function* scanJob(player: Player, report = false): Generator<void, void, void> {
     }
 
     if (report) {
+      const y = `${Math.floor(player.location.y)}`;
+      const detail: RawMessage = hasHeightLimit(player)
+        ? { translate: 'xray_helmet.debug.scan', with: [`${hits.length}`, y, `${MINE_MAX_Y}`] }
+        : { translate: 'xray_helmet.debug.scan.no_limit', with: [`${hits.length}`, y] };
       player.sendMessage({
-        rawtext: [
-          { text: `${Format.gray}[X-Ray Helmet]${Format.reset} ` },
-          {
-            translate: 'xray_helmet.debug.scan',
-            with: [`${hits.length}`, `${Math.floor(player.location.y)}`, `${MINE_MAX_Y}`],
-          },
-        ],
+        rawtext: [{ text: `${Format.gray}[X-Ray Helmet]${Format.reset} ` }, detail],
       });
     }
   } catch (err) {
@@ -269,7 +282,7 @@ system.runInterval(() => {
 
   for (const player of world.getAllPlayers()) {
     if (!wearing.has(player.id)) continue;
-    if (player.location.y >= MINE_MAX_Y) continue; // above ground: stay quiet
+    if (!inTheMines(player)) continue; // above ground in the Overworld: stay quiet
     if (scanning.has(player.id)) continue;
 
     scanning.add(player.id);

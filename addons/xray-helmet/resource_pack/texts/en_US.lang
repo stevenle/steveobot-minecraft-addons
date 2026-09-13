@@ -4,7 +4,8 @@
 
 item.steveo:xray_helmet.name=X-Ray Helmet
 
-xray_helmet.equipped=The helmet hums softly. Head below ground and nearby gems will shimmer through the stone.
+xray_helmet.equipped=The helmet hums softly. Head below ground, or into the Nether, and nearby gems will shimmer through the stone.
 
 xray_helmet.debug.markers=Spawned one test crystal of each color in front of you (they fade after ~6s). No floating crystals = the resource pack is not rendering markers.
-xray_helmet.debug.scan=Scan found %s ore block(s) in range. You are at Y=%s; the helmet only scans below Y=%s.
+xray_helmet.debug.scan=Scan found %s ore block(s) in range. You are at Y=%s; in the Overworld the helmet only scans below Y=%s.
+xray_helmet.debug.scan.no_limit=Scan found %s ore block(s) in range. You are at Y=%s; outside the Overworld the helmet scans at any height.
