@@ -1,0 +1,5 @@
+{
+  "$schema": "../../tools/schemas/addon.schema.json",
+  "name": "Backpack",
+  "description": "A craftable backpack you carry like a portable shulker box: use it to open a chest's worth of storage that goes wherever the backpack goes."
+}

@@ -1,0 +1,18 @@
+## Strings for the Backpack add-on.
+## Client-side translations live in the resource pack; the behavior pack
+## references them by key with RawMessage { translate: ... }.
+
+item.steveo:backpack.name=Backpack
+entity.steveo:backpack_storage.name=Backpack
+
+backpack.tap=Tap the backpack to open it
+backpack.not_yours=That is someone else's backpack.
+backpack.unreachable=Your backpack's storage is out of reach right now. Try again in a moment.
+backpack.lost=Your backpack's storage is missing (was it removed with /kill?). Hold the backpack and type /scriptevent steveo:backpack reset to give it fresh, empty storage.
+backpack.self_nest=A backpack cannot go inside itself.
+backpack.reset=Your backpack now has fresh, empty storage.
+
+backpack.debug.given=A Backpack has been placed in your inventory.
+backpack.debug.status.none=Hold a backpack first.
+backpack.debug.status=Backpack storage: %s. Items inside: %s. Vault chunk loaded: %s.
+backpack.debug.help=Usage: /scriptevent steveo:backpack <open|give|status|reset>
