@@ -5,11 +5,11 @@
 item.steveo:backpack.name=Backpack
 entity.steveo:backpack_storage.name=Backpack
 
-backpack.tap=Tap the backpack to open it
-backpack.not_yours=That is someone else's backpack.
+backpack.full=The backpack is full.
+backpack.inventory_full=Your inventory is full.
+backpack.self_nest=A backpack cannot go inside itself.
 backpack.unreachable=Your backpack's storage is out of reach right now. Try again in a moment.
 backpack.lost=Your backpack's storage is missing (was it removed with /kill?). Hold the backpack and type /scriptevent steveo:backpack reset to give it fresh, empty storage.
-backpack.self_nest=A backpack cannot go inside itself.
 backpack.reset=Your backpack now has fresh, empty storage.
 
 backpack.debug.given=A Backpack has been placed in your inventory.

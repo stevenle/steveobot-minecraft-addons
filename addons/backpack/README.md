@@ -21,36 +21,47 @@ is in the Items tab.
 
 ## Opening it
 
-Hold the backpack and **use** it (right-click, or tap on touch). The backpack
-floats up in front of your face; tap it (right-click, or the *Open* button on
-touch) and the chest screen opens. Move items in and out like any chest,
-then close it and walk on. The floating backpack goes back where it came
-from when you step away, when the backpack leaves your inventory, or after
-two minutes.
+Hold the backpack and **use** it (right-click, or tap on touch). A chest
+screen opens at once: the top grid is the backpack, the bottom is your own
+inventory laid out the way the inventory screen shows it. **Tap an item to
+move it across**: tap something in the backpack and it lands in your
+inventory, tap something in your inventory and it goes into the backpack. A
+whole stack moves per tap. Close the screen with the usual back button.
 
-Only the player who brought a backpack out can open it. Anyone else who taps
-it is told so.
+This is a form styled to look like a chest, not a real chest screen, so
+there is no dragging and no splitting stacks; take the stack out, split it
+in your inventory, and put part back. In exchange it opens directly from
+your hand with one tap, which a real container cannot do in Bedrock.
 
-The storage holds **27 items** (one chest). Bedrock's container screen only
-comes in chest and double-chest sizes, so 27 is the closest it can get to
-30; `inventory_size` in `behavior_pack/entities/backpack_storage.json` can be
-raised to 54 for a double chest.
+The storage holds **27 items** (one chest). Bedrock's chest layout comes in
+rows of nine, so 27 is the closest it can get to 30; `CHEST_27_SLOTS` and
+the matching `inventory_size` in `behavior_pack/entities/backpack_storage.json`
+are the two numbers to change.
 
 The items belong to the backpack, not to you: hand the backpack to a friend,
 or leave it in a chest, and whoever picks it up next gets everything inside.
-A backpack cannot go inside itself; the script hands it back to you if you
-try. Backpacks can go inside other backpacks.
+A backpack cannot go inside itself. Backpacks can go inside other backpacks.
 
 ## How the storage works
 
 Every backpack is tied to a hidden `steveo:backpack_storage` entity with a
 27-slot container. The backpack item remembers its entity by id in a dynamic
-property, and the entity spends its life parked in a "vault" high in the
-Overworld sky at `100000, 200, 100000`, which the script keeps loaded with a
-ticking area named `steveo_backpack_vault`. Opening the backpack teleports
-the entity to you and back. Because the storage is a real container, nothing
-is serialized: enchanted tools, shulker boxes, named items, and other
-backpacks all survive inside it.
+property, and the entity lives in a "vault" high in the Overworld sky at
+`100000, 200, 100000`, which the script keeps loaded with a ticking area
+named `steveo_backpack_vault`. The chest screen is a form; each tap moves a
+stack between your inventory and that container with `transferItem`, so
+nothing is serialized: enchanted tools, shulker boxes, named items, and
+other backpacks all survive inside it. Nobody can open the entity directly.
+
+The chest look comes from [Chest-UI](https://github.com/Herobrine643928/Chest-UI)
+by LeGend077 and Herobrine64 (CC-BY-4.0): `resource_pack/ui/` restyles any
+form whose title carries its size flag into a chest grid with the player's
+inventory below, and `src/chest-ui/typeIds.js` maps item ids to the numbers
+that UI uses to draw icons. Icons for items the table does not know (this
+repo's own items) are given as texture paths in `src/chest-ui/chest-form.ts`.
+If a game update shifts the numeric ids, vanilla icons in the backpack come
+out wrong until `typeIds.js` is refreshed from upstream; the item names stay
+correct either way.
 
 Two things can go wrong, and both are reported in chat:
 
@@ -84,17 +95,18 @@ the backpack in your hand.
 | `behavior_pack/items/backpack.json` | The item: single-stack, no durability, a short use cooldown |
 | `behavior_pack/recipes/backpack.json` | The crafting recipe |
 | `behavior_pack/entities/backpack_storage.json` | The storage entity: a 27-slot container that cannot be hurt, pushed, or despawned |
-| `src/main.ts` | Use handling, storage lookup, the vault, sessions, ownership, chat commands |
-| `resource_pack/entity/backpack_storage.entity.json` | Client entity for the floating backpack |
-| `resource_pack/models/entity/backpack.geo.json` | The backpack model |
-| `resource_pack/render_controllers/backpack.render_controllers.json` | Render controller for the floating backpack |
-| `resource_pack/animations/backpack.animation.json` | The gentle bob while it floats |
+| `src/main.ts` | Use handling, storage lookup, the vault, the tap-to-move loop, chat commands |
+| `src/chest-ui/chest-form.ts` | Builds the chest-styled form: slot buttons, icons, stack and durability markers |
+| `src/chest-ui/typeIds.js` | Vendored Chest-UI item id table (CC-BY-4.0, see `LICENSE` beside it) |
+| `resource_pack/ui/` | Vendored Chest-UI layouts: `server_form.json` picks the chest look, `chest_server_form.json` and `chest_inventory_system.json` draw it |
+| `resource_pack/textures/ui/` | Slot and background textures for the chest look |
+| `resource_pack/entity/backpack_storage.entity.json`, `models/`, `render_controllers/`, `animations/` | How the storage entity would render; it lives out of sight in the vault |
 | `resource_pack/textures/items/backpack.png`, `textures/entity/backpack.png` | Item icon and model texture |
 | `resource_pack/texts/en_US.lang` | Every player-facing string |
 | `assets/generate.mjs` | Regenerates the textures and pack icons |
 
 ## Tuning
 
-The numbers live at the top of `src/main.ts` as named constants: how far
-the backpack floats from you, the walk-away range and timeout, and the vault
-location. Change them there, run `pnpm check`, and redeploy.
+The numbers live at the top of `src/main.ts` as named constants: the vault
+location and the busy-retry cadence for the form. Change them there, run
+`pnpm check`, and redeploy.

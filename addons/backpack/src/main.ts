@@ -9,17 +9,13 @@
  * Overworld sky that the script keeps loaded with a ticking area, so the
  * entity can always be found no matter where its owner travels.
  *
- * Opening: the player uses the backpack from their hand. The script fetches
- * the storage entity and floats it in front of the player's face; tapping it
- * opens the familiar chest screen (the game handles that — it is a real
- * container). When the player walks away, no longer has the backpack, or a
- * couple of minutes pass, the entity goes back to the vault. Only the player
- * who opened a backpack can look inside it while it is out.
- *
- * Nothing here serializes items: the container is the storage, so
- * enchantments, names, shulker contents, and nested backpacks all survive
- * untouched. The one rule is that a backpack cannot be put inside itself;
- * the script ejects it back to the player if that happens.
+ * Opening: the player uses the backpack from their hand and a chest-styled
+ * form opens at once (see chest-ui/chest-form.ts). The top grid shows the
+ * backpack, the bottom mirrors the player's inventory, and tapping an item
+ * moves it across; the form re-opens after every move until the player
+ * closes it. Items move with `Container.transferItem`, so enchantments,
+ * names, shulker contents, and nested backpacks all survive untouched. The
+ * one rule is that a backpack cannot be put inside itself.
  */
 import {
   EquipmentSlot,
@@ -34,9 +30,12 @@ import {
   type RawMessage,
   type Vector3,
 } from '@minecraft/server';
+import { FormCancelationReason } from '@minecraft/server-ui';
 
 import { createLogger } from '@shared/log';
 import { Format } from '@shared/chat';
+
+import { CHEST_27_SLOTS, ChestForm, describeItem } from './chest-ui/chest-form.js';
 
 const log = createLogger('backpack');
 const PREFIX: RawMessage = { text: `${Format.gray}[Backpack]${Format.reset} ` };
@@ -49,36 +48,22 @@ const STORAGE_PROP = 'steveo:storage_entity';
 /** Dynamic property on the storage entity: the tick it was last opened. Debug aid. */
 const LAST_OPENED_PROP = 'steveo:last_opened';
 
-/** Where storage entities wait when no one is using them. Far from anywhere
- * a player is likely to build, high in the sky, and kept loaded by the
- * ticking area below. Coordinates are kept modest so entity positions stay
- * precise. */
+/** Where storage entities live. Far from anywhere a player is likely to
+ * build, high in the sky, and kept loaded by the ticking area below.
+ * Coordinates are kept modest so entity positions stay precise. */
 const VAULT: Vector3 = { x: 100_000, y: 200, z: 100_000 };
 const VAULT_TICKING_AREA = 'steveo_backpack_vault';
 
-/** How far in front of the eyes the backpack floats, and how much closer it
- * comes when a wall is in the way. */
-const OPEN_DISTANCE = 1.4;
-const WALL_GAP = 0.45;
-const MIN_OPEN_DISTANCE = 0.5;
-
-/** A floating backpack goes home when its owner is farther than this. */
-const SESSION_RANGE = 4;
-/** ...or when this many ticks have passed since it came out (2 minutes). */
-const SESSION_MAX_TICKS = 20 * 120;
-/** Poll cadence for open sessions and for the stray-entity sweep. */
-const SESSION_TICKS = 10;
+/** How often to park storage entities that are loaded but not at the vault. */
 const SWEEP_TICKS = 100;
 
-/** A storage entity that is "out" for a player. */
-interface Session {
-  playerId: string;
-  entityId: string;
-  openedTick: number;
-}
+/** How many times to retry opening the form when the player is busy with
+ * another screen (the use often lands while the previous form is closing). */
+const BUSY_RETRIES = 4;
+const BUSY_RETRY_TICKS = 5;
 
-/** Open sessions keyed by player id. At most one per player. */
-const sessions = new Map<string, Session>();
+/** Players with a backpack form open, so a use cannot stack a second one. */
+const browsing = new Set<string>();
 
 // ---------- Helpers ----------
 
@@ -102,6 +87,10 @@ function actionBar(player: Player, key: string): void {
   player.onScreenDisplay.setActionBar({ translate: key });
 }
 
+function wait(ticks: number): Promise<void> {
+  return new Promise((resolve) => system.runTimeout(resolve, ticks));
+}
+
 function isBackpack(slot: ContainerSlot): boolean {
   return slot.hasItem() && slot.getItem()?.typeId === BACKPACK_ID;
 }
@@ -117,18 +106,6 @@ function heldBackpack(player: Player): ContainerSlot | undefined {
 function storageIdOf(slot: ContainerSlot): string | undefined {
   const id = slot.getDynamicProperty(STORAGE_PROP);
   return typeof id === 'string' && id.length > 0 ? id : undefined;
-}
-
-/** Whether the backpack tied to `storageId` is anywhere in the player's
- * inventory. Access to the storage lasts only as long as it is. */
-function carries(player: Player, storageId: string): boolean {
-  const inventory = player.getComponent('minecraft:inventory')?.container;
-  if (!inventory) return false;
-  for (let i = 0; i < inventory.size; i++) {
-    const slot = inventory.getSlot(i);
-    if (isBackpack(slot) && storageIdOf(slot) === storageId) return true;
-  }
-  return false;
 }
 
 function isAtVault(entity: Entity): boolean {
@@ -161,6 +138,10 @@ function storageContainer(entity: Entity): Container | undefined {
   return entity.getComponent('minecraft:inventory')?.container;
 }
 
+function playerInventory(player: Player): Container | undefined {
+  return player.getComponent('minecraft:inventory')?.container;
+}
+
 function countItems(container: Container): number {
   let count = 0;
   for (let i = 0; i < container.size; i++) if (container.getItem(i)) count++;
@@ -176,60 +157,9 @@ function parkEntity(entity: Entity): void {
   }
 }
 
-/** Moves a backpack that ended up inside its own storage back to the player,
- * so it can never be sealed away with its own contents. */
-function ejectSelf(entity: Entity, player: Player): void {
-  const container = storageContainer(entity);
-  const inventory = player.getComponent('minecraft:inventory')?.container;
-  if (!container) return;
-  let ejected = false;
-  for (let i = 0; i < container.size; i++) {
-    const item = container.getItem(i);
-    if (item?.typeId !== BACKPACK_ID || item.getDynamicProperty(STORAGE_PROP) !== entity.id) continue;
-    container.setItem(i, undefined);
-    if (inventory && inventory.emptySlotsCount > 0) inventory.addItem(item);
-    else player.dimension.spawnItem(item, player.location);
-    ejected = true;
-  }
-  if (ejected) say(player, 'backpack.self_nest');
-}
-
-/** Sends a floating backpack home. Ejects a self-nested backpack first, while
- * the player is still around to receive it. */
-function endSession(playerId: string): void {
-  const session = sessions.get(playerId);
-  if (!session) return;
-  sessions.delete(playerId);
-  const entity = world.getEntity(session.entityId);
-  if (!entity?.isValid) return;
-  const player = world.getEntity(playerId);
-  if (player instanceof Player && player.isValid) ejectSelf(entity, player);
-  parkEntity(entity);
-}
-
-// ---------- Opening ----------
-
-/** Where the backpack should float: in front of the eyes, pulled closer if a
- * block is in the way so it never spawns inside a wall. */
-function floatLocation(player: Player): Vector3 {
-  const head = player.getHeadLocation();
-  const view = player.getViewDirection();
-  let reach = OPEN_DISTANCE;
-  const hit = player.getBlockFromViewDirection({ maxDistance: OPEN_DISTANCE + WALL_GAP, includeLiquidBlocks: false });
-  if (hit) {
-    const point = {
-      x: hit.block.location.x + hit.faceLocation.x,
-      y: hit.block.location.y + hit.faceLocation.y,
-      z: hit.block.location.z + hit.faceLocation.z,
-    };
-    reach = Math.max(MIN_OPEN_DISTANCE, Math.min(reach, distance(head, point) - WALL_GAP));
-  }
-  // The entity's origin is its bottom; lift it so the bag is centered on the eyes.
-  return { x: head.x + view.x * reach, y: head.y + view.y * reach - 0.35, z: head.z + view.z * reach };
-}
-
 function createStorage(player: Player, slot: ContainerSlot): Entity {
-  const entity = player.dimension.spawnEntity(STORAGE_ID, player.location);
+  const entity = overworld().spawnEntity(STORAGE_ID, vaultLoaded() ? VAULT : player.location);
+  if (!isAtVault(entity)) parkEntity(entity);
   slot.setDynamicProperty(STORAGE_PROP, entity.id);
   log.info(`created storage ${entity.id} for ${player.name}`);
   return entity;
@@ -256,76 +186,93 @@ function resolveStorage(player: Player, slot: ContainerSlot): Entity | undefined
   return undefined;
 }
 
-/** True if the player's floating backpack is out and under their crosshair,
- * meaning the use that just happened was the tap that opens it. */
-function isTappingOwnBackpack(player: Player): boolean {
-  const session = sessions.get(player.id);
-  if (!session) return false;
-  return player
-    .getEntitiesFromViewDirection({ maxDistance: SESSION_RANGE })
-    .some((hit) => hit.entity.id === session.entityId);
+// ---------- The form ----------
+
+function buildForm(bag: Container, inventory: Container): ChestForm {
+  const form = new ChestForm({ translate: 'item.steveo:backpack.name' });
+  for (let i = 0; i < CHEST_27_SLOTS; i++) {
+    const item = i < bag.size ? bag.getItem(i) : undefined;
+    form.slot(item ? describeItem(item) : undefined);
+  }
+  for (let i = 0; i < inventory.size; i++) {
+    const item = inventory.getItem(i);
+    form.slot(item ? describeItem(item) : undefined);
+  }
+  return form;
 }
 
-function openBackpack(player: Player, slot: ContainerSlot): void {
-  // Re-using it while it is already out just refreshes the timer and position.
-  endSession(player.id);
-
-  const entity = resolveStorage(player, slot);
-  if (!entity) return;
-  entity.setDynamicProperty(LAST_OPENED_PROP, system.currentTick);
-
-  const head = player.getHeadLocation();
-  entity.teleport(floatLocation(player), { dimension: player.dimension, facingLocation: head });
-  sessions.set(player.id, { playerId: player.id, entityId: entity.id, openedTick: system.currentTick });
-  actionBar(player, 'backpack.tap');
-  player.playSound('armor.equip_leather');
+/** Moves the item in `from[slot]` into `to`, telling the player if it did
+ * not all fit. */
+function move(player: Player, from: Container, slot: number, to: Container, fullKey: string): void {
+  const leftover = from.transferItem(slot, to);
+  if (leftover) actionBar(player, fullKey);
+  else player.playSound('random.pop');
 }
 
-// ---------- Input ----------
+/** Shows the backpack and keeps re-showing it after each move until the
+ * player closes it. */
+async function browse(player: Player): Promise<void> {
+  if (browsing.has(player.id)) return;
+  browsing.add(player.id);
+  try {
+    let busyRetries = BUSY_RETRIES;
+    while (player.isValid) {
+      const slot = heldBackpack(player);
+      if (!slot) return;
+      const storage = resolveStorage(player, slot);
+      if (!storage) return;
+      const bag = storageContainer(storage);
+      const inventory = playerInventory(player);
+      if (!bag || !inventory) return;
+      storage.setDynamicProperty(LAST_OPENED_PROP, system.currentTick);
+
+      const response = await buildForm(bag, inventory).show(player);
+      if (response.canceled) {
+        if (response.cancelationReason === FormCancelationReason.UserBusy && busyRetries-- > 0) {
+          await wait(BUSY_RETRY_TICKS);
+          continue;
+        }
+        return;
+      }
+      busyRetries = BUSY_RETRIES;
+      const selection = response.selection;
+      if (selection === undefined || !player.isValid || !storage.isValid) return;
+
+      if (selection < CHEST_27_SLOTS) {
+        if (bag.getItem(selection)) move(player, bag, selection, inventory, 'backpack.inventory_full');
+        continue;
+      }
+      const invSlot = selection - CHEST_27_SLOTS;
+      const item = inventory.getItem(invSlot);
+      if (!item) continue;
+      if (item.typeId === BACKPACK_ID && item.getDynamicProperty(STORAGE_PROP) === storage.id) {
+        actionBar(player, 'backpack.self_nest');
+        continue;
+      }
+      move(player, inventory, invSlot, bag, 'backpack.full');
+    }
+  } catch (error) {
+    log.error('backpack form failed', error);
+  } finally {
+    browsing.delete(player.id);
+  }
+}
+
+// ---------- Events ----------
 
 world.afterEvents.itemUse.subscribe((event) => {
   if (event.itemStack.typeId !== BACKPACK_ID) return;
-  const { source: player } = event;
-  if (isTappingOwnBackpack(player)) return; // let the tap open the container
-  const slot = heldBackpack(player);
-  if (slot) openBackpack(player, slot);
+  void browse(event.source);
 });
 
-/** Only the player who brought a backpack out may open it. */
+/** Storage entities are never opened directly; the form is the only door. */
 world.beforeEvents.playerInteractWithEntity.subscribe((event) => {
-  if (event.target.typeId !== STORAGE_ID) return;
-  const session = sessions.get(event.player.id);
-  if (session && session.entityId === event.target.id) return;
-  event.cancel = true;
-  const { player } = event;
-  system.run(() => actionBar(player, 'backpack.not_yours'));
+  if (event.target.typeId === STORAGE_ID) event.cancel = true;
 });
 
-// ---------- Housekeeping ----------
-
-/** Ends sessions whose owner walked away, lost the backpack, or left. */
+/** Parks any loaded storage entity that is away from the vault — left out by
+ * an older version of this add-on, or spawned before the vault was loaded. */
 system.runInterval(() => {
-  for (const [playerId, session] of sessions) {
-    const player = world.getEntity(playerId);
-    const entity = world.getEntity(session.entityId);
-    if (!(player instanceof Player) || !player.isValid || !entity?.isValid) {
-      sessions.delete(playerId);
-      if (entity) parkEntity(entity);
-      continue;
-    }
-    // Eject first, so a backpack dropped into itself is never parked inside.
-    ejectSelf(entity, player);
-    const inRange =
-      entity.dimension.id === player.dimension.id && distance(entity.location, player.getHeadLocation()) <= SESSION_RANGE;
-    const expired = system.currentTick - session.openedTick > SESSION_MAX_TICKS;
-    if (!carries(player, session.entityId) || !inRange || expired) endSession(playerId);
-  }
-}, SESSION_TICKS);
-
-/** Parks any loaded storage entity that is out without a session — left
- * behind by a crash, a reload mid-session, or a player who logged off. */
-system.runInterval(() => {
-  const out = new Set([...sessions.values()].map((s) => s.entityId));
   for (const dimensionId of ['overworld', 'nether', 'the_end']) {
     let entities: Entity[];
     try {
@@ -334,15 +281,10 @@ system.runInterval(() => {
       continue;
     }
     for (const entity of entities) {
-      if (out.has(entity.id) || isAtVault(entity)) continue;
-      parkEntity(entity);
+      if (!isAtVault(entity)) parkEntity(entity);
     }
   }
 }, SWEEP_TICKS);
-
-world.afterEvents.playerLeave.subscribe((event) => {
-  endSession(event.playerId);
-});
 
 world.afterEvents.worldLoad.subscribe(() => {
   ensureVaultTickingArea();
@@ -359,13 +301,12 @@ system.afterEvents.scriptEventReceive.subscribe(
 
     switch (event.message.trim()) {
       case 'open': {
-        const slot = heldBackpack(player);
-        if (slot) openBackpack(player, slot);
+        if (heldBackpack(player)) void browse(player);
         else say(player, 'backpack.debug.status.none');
         break;
       }
       case 'give': {
-        player.getComponent('minecraft:inventory')?.container.addItem(new ItemStack(BACKPACK_ID, 1));
+        playerInventory(player)?.addItem(new ItemStack(BACKPACK_ID, 1));
         say(player, 'backpack.debug.given');
         break;
       }
@@ -389,7 +330,6 @@ system.afterEvents.scriptEventReceive.subscribe(
           say(player, 'backpack.debug.status.none');
           break;
         }
-        endSession(player.id);
         const old = storageIdOf(slot);
         const entity = old === undefined ? undefined : world.getEntity(old);
         if (entity?.isValid) entity.remove();
