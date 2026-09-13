@@ -11,7 +11,6 @@
       "minecraft:inventory": {
         "container_type": "container",
         "inventory_size": 27,
-        "private": true,
         "can_be_siphoned_from": false
       },
       "minecraft:collision_box": { "width": 0.7, "height": 0.7 },

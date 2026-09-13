@@ -4,27 +4,27 @@
     "name": "Backpack BP",
     "description": "A craftable backpack you carry like a portable shulker box: use it to open a chest's worth of storage that goes wherever the backpack goes.",
     "uuid": "426faf68-ac27-46f5-bb0e-8dd48aef373a",
-    "version": [1, 1, 0],
+    "version": [1, 1, 1],
     "min_engine_version": [1, 26, 40]
   },
   "modules": [
     {
       "type": "data",
       "uuid": "8a9c4b8f-a2de-40b9-b469-8cd3a5b9c28d",
-      "version": [1, 1, 0]
+      "version": [1, 1, 1]
     },
     {
       "type": "script",
       "language": "javascript",
       "entry": "scripts/main.js",
       "uuid": "66f33498-4e21-44b5-ab32-d9e7b09d4536",
-      "version": [1, 1, 0]
+      "version": [1, 1, 1]
     }
   ],
   "dependencies": [
     {
       "uuid": "6eb5e5f5-7790-4770-9fd1-6cc063af7827",
-      "version": [1, 1, 0]
+      "version": [1, 1, 1]
     },
     {
       "module_name": "@minecraft/server",

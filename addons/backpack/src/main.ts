@@ -64,6 +64,13 @@ const BUSY_RETRY_TICKS = 5;
 
 /** Players with a backpack form open, so a use cannot stack a second one. */
 const browsing = new Set<string>();
+/** Players who toggled `/scriptevent steveo:backpack debug`: every tap is
+ * narrated in chat, which is the only diagnostic a Realm offers. */
+const debugging = new Set<string>();
+
+function debug(player: Player, text: string): void {
+  if (debugging.has(player.id)) player.sendMessage({ rawtext: [PREFIX, { text: `${Format.gray}${text}` }] });
+}
 
 // ---------- Helpers ----------
 
@@ -201,12 +208,22 @@ function buildForm(bag: Container, inventory: Container): ChestForm {
   return form;
 }
 
-/** Moves the item in `from[slot]` into `to`, telling the player if it did
- * not all fit. */
+/** Moves the stack in `from[slot]` into `to`, telling the player if it did
+ * not all fit. Uses the most basic container calls (read, add, write back)
+ * and reports any failure in chat, because a Realm has no content log. */
 function move(player: Player, from: Container, slot: number, to: Container, fullKey: string): void {
-  const leftover = from.transferItem(slot, to);
-  if (leftover) actionBar(player, fullKey);
-  else player.playSound('random.pop');
+  try {
+    const item = from.getItem(slot);
+    if (!item) return;
+    const leftover = to.addItem(item);
+    from.setItem(slot, leftover);
+    debug(player, `moved ${item.typeId} x${item.amount}; leftover ${leftover ? leftover.amount : 0}`);
+    if (leftover && leftover.amount === item.amount) actionBar(player, fullKey);
+    else player.playSound('random.pop');
+  } catch (error) {
+    log.error('move failed', error);
+    say(player, 'backpack.error', [error instanceof Error ? error.message : String(error)]);
+  }
 }
 
 /** Shows the backpack and keeps re-showing it after each move until the
@@ -236,6 +253,7 @@ async function browse(player: Player): Promise<void> {
       }
       busyRetries = BUSY_RETRIES;
       const selection = response.selection;
+      debug(player, `tap: selection ${selection ?? 'none'} (bag ${bag.size} slots, inventory ${inventory.size} slots)`);
       if (selection === undefined || !player.isValid || !storage.isValid) return;
 
       if (selection < CHEST_27_SLOTS) {
@@ -244,6 +262,7 @@ async function browse(player: Player): Promise<void> {
       }
       const invSlot = selection - CHEST_27_SLOTS;
       const item = inventory.getItem(invSlot);
+      debug(player, `inventory slot ${invSlot}: ${item ? `${item.typeId} x${item.amount}` : 'empty'}`);
       if (!item) continue;
       if (item.typeId === BACKPACK_ID && item.getDynamicProperty(STORAGE_PROP) === storage.id) {
         actionBar(player, 'backpack.self_nest');
@@ -253,6 +272,7 @@ async function browse(player: Player): Promise<void> {
     }
   } catch (error) {
     log.error('backpack form failed', error);
+    if (player.isValid) say(player, 'backpack.error', [error instanceof Error ? error.message : String(error)]);
   } finally {
     browsing.delete(player.id);
   }
@@ -335,6 +355,12 @@ system.afterEvents.scriptEventReceive.subscribe(
         if (entity?.isValid) entity.remove();
         createStorage(player, slot);
         say(player, 'backpack.reset');
+        break;
+      }
+      case 'debug': {
+        if (debugging.has(player.id)) debugging.delete(player.id);
+        else debugging.add(player.id);
+        say(player, debugging.has(player.id) ? 'backpack.debug.on' : 'backpack.debug.off');
         break;
       }
       default:

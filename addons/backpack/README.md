@@ -87,6 +87,7 @@ the backpack in your hand.
 | `/scriptevent steveo:backpack give` | Puts a backpack in your inventory. |
 | `/scriptevent steveo:backpack status` | Reports the storage entity id, how many slots are used, and whether the vault chunk is loaded. |
 | `/scriptevent steveo:backpack reset` | Replaces the held backpack's storage with a new, empty one. |
+| `/scriptevent steveo:backpack debug` | Toggles a chat narration of every tap in the backpack screen: which slot was hit, what was there, and whether it moved. Errors in the screen are reported in chat regardless. |
 
 ## Files
 

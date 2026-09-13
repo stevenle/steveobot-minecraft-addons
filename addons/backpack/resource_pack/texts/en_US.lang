@@ -11,8 +11,11 @@ backpack.self_nest=A backpack cannot go inside itself.
 backpack.unreachable=Your backpack's storage is out of reach right now. Try again in a moment.
 backpack.lost=Your backpack's storage is missing (was it removed with /kill?). Hold the backpack and type /scriptevent steveo:backpack reset to give it fresh, empty storage.
 backpack.reset=Your backpack now has fresh, empty storage.
+backpack.error=Something went wrong: %s
 
 backpack.debug.given=A Backpack has been placed in your inventory.
 backpack.debug.status.none=Hold a backpack first.
 backpack.debug.status=Backpack storage: %s. Items inside: %s. Vault chunk loaded: %s.
-backpack.debug.help=Usage: /scriptevent steveo:backpack <open|give|status|reset>
+backpack.debug.on=Debug on: every tap in the backpack screen is narrated here.
+backpack.debug.off=Debug off.
+backpack.debug.help=Usage: /scriptevent steveo:backpack <open|give|status|reset|debug>

@@ -4,14 +4,14 @@
     "name": "Backpack RP",
     "description": "A craftable backpack you carry like a portable shulker box: use it to open a chest's worth of storage that goes wherever the backpack goes.",
     "uuid": "6eb5e5f5-7790-4770-9fd1-6cc063af7827",
-    "version": [1, 1, 0],
+    "version": [1, 1, 1],
     "min_engine_version": [1, 26, 40]
   },
   "modules": [
     {
       "type": "resources",
       "uuid": "eb1e216c-4e30-463f-b389-b3cb288c8657",
-      "version": [1, 1, 0]
+      "version": [1, 1, 1]
     }
   ],
   "metadata": {
