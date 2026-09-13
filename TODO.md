@@ -22,6 +22,28 @@
 - [x] Verified in-game (2026-09-01): world replaced, packs active. `--upload`
       promoted from experimental in README/CLAUDE.md
 
+## Next deploy: remove the backpack add-on from the Realm
+
+The backpack add-on was deleted from the repo on 2026-09-12 (the form-based
+tap-to-move interaction was not good enough), but version 1.1.2 is still
+applied to Realm 34568298 "Blub the Axolotl". `pnpm realm` can only add or
+update packs, so removing it takes these steps, in this order:
+
+- [ ] In-game, before the upload, clean up what the script left behind:
+      `/tickingarea remove steveo_backpack_vault` and
+      `/kill @e[type=steveo:backpack_storage]`. Backpack items in inventories
+      and chests turn into unknown items once the pack is gone; take out
+      anything stored in a backpack first, or it is lost with the entity.
+- [ ] Remove the packs from the world. Either add a `--remove <slug>` flag to
+      `tools/realm.ts` (delete the pack folders and drop the entries from
+      `world_behavior_packs.json` / `world_resource_packs.json` by UUID), or
+      deactivate them from the client's Realm world settings. The UUIDs, which
+      are no longer in the repo: behavior pack
+      `426faf68-ac27-46f5-bb0e-8dd48aef373a`, resource pack
+      `6eb5e5f5-7790-4770-9fd1-6cc063af7827`.
+- [ ] Verify with `pnpm realm --realm 34568298 --list` after someone has joined
+      (the download lags the upload until then).
+
 ## Later
 
 - [ ] Parse the upload SSE events for progress and a clean failure signal
