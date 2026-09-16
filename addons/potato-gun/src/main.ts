@@ -23,6 +23,12 @@
  * reloaded mid-flight, say) the potato entity's variant and mark_variant carry
  * the same information. Potatoes also have an 8-second fuse in
  * entities/potato.json so a lost one despawns on its own.
+ *
+ * The potato entity pins `isolated_physics: true` on its projectile
+ * component. Bedrock 1.26.50 flipped that default to false for entities on
+ * older format versions, which put air drag on top of the tuned `inertia`
+ * and changed how the guns felt; the explicit value keeps the flight stable
+ * across game updates.
  */
 import {
   EquipmentSlot,

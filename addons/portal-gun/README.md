@@ -41,6 +41,8 @@ Firing a color again moves that portal. Each player owns one pair, and any
 player, mob, or item can travel through anyone's pair. A portal on a wall is
 one block wide and two tall; on a floor or ceiling it is a one-block disc.
 Shooting the top edge of a short wall slides the portal down so it still fits.
+Floor and ceiling portals sit on the block's real surface, so they work on
+soul sand, slabs, and snow layers as well as full blocks.
 
 A shot fizzles, with a note in the action bar, when nothing is in range,
 when there is no room in front of the surface, or when the spot already has
