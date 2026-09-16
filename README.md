@@ -268,6 +268,16 @@ pnpm realm hello-world --realm "My Realm" --upload --close --yes   # upload
 
 It replaces the slot's world on the live Realm, so back up first.
 
+Applying can only add or update packs. To take an add-on off the Realm,
+name its packs by header UUID with `--remove` (comma-separated); the pack
+folders and their `world_*_packs.json` entries are stripped from the world
+before the selected add-ons are applied. The UUIDs of a deleted add-on are
+gone from the repo, so read them off `pnpm realm --realm "My Realm" --list`:
+
+```bash
+pnpm realm portal-gun --realm "My Realm" --remove <bp-uuid>,<rp-uuid> --upload --close --yes
+```
+
 `--close` closes the Realm for the upload (disconnecting players) and reopens
 it after — the close/open routes are prismarine-realms' `changeRealmState`,
 and the Java flow closes before uploading the same way. Without it, minting

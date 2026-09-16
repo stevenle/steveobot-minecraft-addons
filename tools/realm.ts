@@ -19,6 +19,7 @@
  *   node tools/realm.ts <slug...> --world <path> [--out <file>] [--in-place]
  *   node tools/realm.ts <slug...> --realm <id|name> [--out <file>]
  *   node tools/realm.ts <slug...> --realm <id|name> --upload [--close] [--yes]
+ *   node tools/realm.ts <slug...> --realm <id|name> --remove <uuid[,uuid...]> [--upload ...]
  *   node tools/realm.ts --world <path> --list
  *   node tools/realm.ts --login
  *   node tools/realm.ts --list-realms
@@ -27,7 +28,9 @@
  *
  * `--world` accepts a `.mcworld` file (what "Download World" gives you) or an
  * unpacked world folder (what lives in com.mojang/minecraftWorlds/<id>).
- * `--realm` takes a Realm id or a substring of its name.
+ * `--realm` takes a Realm id or a substring of its name. `--remove` strips
+ * packs by header uuid, which is the only way to get an add-on off a Realm
+ * once it has left the repo: applying can only add or update.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -49,6 +52,7 @@ import {
   packListFile,
   readPackList,
   readWorldName,
+  removePackEntry,
   upsertPackEntry,
   writePackList,
   type WorldPackEntry,
@@ -146,6 +150,55 @@ function applyPack(worldRoot: string, pack: Pack): { replaced: boolean } {
   writePackList(worldRoot, pack.kind, entries);
 
   return { replaced };
+}
+
+/**
+ * Strips a pack from the world by header uuid: every folder under either
+ * packs directory whose manifest carries the uuid, plus its pack-list entry.
+ * Both halves matter — a folder without an entry is ignored by the game, and
+ * an entry without a folder shows up as MISSING in `--list`.
+ */
+function removePack(worldRoot: string, uuid: string): { folders: number; entries: number } {
+  let folders = 0;
+  let entries = 0;
+  for (const kind of ['behavior', 'resource'] as const) {
+    const packsDir = path.join(worldRoot, packFolder(kind));
+    if (exists(packsDir)) {
+      for (const entry of fs.readdirSync(packsDir, { withFileTypes: true })) {
+        if (entry.isDirectory() && hasUuid(path.join(packsDir, entry.name), uuid)) {
+          rmrf(path.join(packsDir, entry.name));
+          folders++;
+        }
+      }
+    }
+    const { entries: next, removed } = removePackEntry(readPackList(worldRoot, kind), uuid);
+    if (removed) {
+      writePackList(worldRoot, kind, next);
+      entries++;
+    }
+  }
+  return { folders, entries };
+}
+
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * Pack header uuids named by `--remove a,b`. Validated up front so a typo
+ * fails before the world is downloaded rather than silently removing nothing.
+ */
+function removalUuids(args: ParsedArgs): string[] {
+  if (boolFlag(args, 'remove')) {
+    fail('--remove needs the pack header uuid(s) to strip, separated by commas.');
+  }
+  const raw = stringFlag(args, 'remove');
+  if (raw === undefined) return [];
+  const uuids = raw.split(',').map((s) => s.trim()).filter(Boolean);
+  for (const uuid of uuids) {
+    if (!UUID_PATTERN.test(uuid)) {
+      fail(`--remove takes pack header uuids separated by commas (got "${uuid}").`);
+    }
+  }
+  return uuids;
 }
 
 function listWorld(source: string): void {
@@ -819,6 +872,9 @@ async function main(): Promise<void> {
     return;
   }
 
+  // Validated before the download so a typo fails fast, not after 14 MB.
+  const removals = removalUuids(args);
+
   const source = realmSelector !== undefined
     ? await downloadRealmWorld(args, realmSelector)
     : stringFlag(args, 'world');
@@ -846,6 +902,17 @@ async function main(): Promise<void> {
   if (addons.length === 0) {
     fail('No add-ons found in addons/. Nothing to apply.');
   }
+  for (const addon of addons) {
+    for (const pack of addon.packs) {
+      const uuid = pack.manifest.header?.uuid;
+      if (uuid !== undefined && removals.some((r) => r.toLowerCase() === uuid.toLowerCase())) {
+        fail(
+          `--remove ${uuid} names the ${addon.slug} ${pack.kind} pack, which this run would also ` +
+            'apply. Drop the add-on from the slug list instead.',
+        );
+      }
+    }
+  }
 
   if (!boolFlag(args, 'no-build')) {
     for (const addon of addons) {
@@ -857,6 +924,18 @@ async function main(): Promise<void> {
   const worldName = readWorldName(staged.root);
 
   try {
+    if (removals.length > 0) {
+      log.step(`Removing ${removals.length} pack(s) from ${color.bold(worldName)}`);
+      for (const uuid of removals) {
+        const { folders, entries } = removePack(staged.root, uuid);
+        if (folders === 0 && entries === 0) {
+          log.warn(`${uuid} is not in this world; nothing to remove.`);
+        } else {
+          log.done(`removed ${uuid} ${color.dim(`(${folders} folder(s), ${entries} list entr${entries === 1 ? 'y' : 'ies'})`)}`);
+        }
+      }
+    }
+
     log.step(`Applying ${addons.length} add-on(s) to ${color.bold(worldName)}`);
 
     for (const addon of addons) {

@@ -188,6 +188,59 @@ describe('realm.ts against a stand-in Realms service', () => {
     assert.deepEqual(ours?.version, [1, 0, 0], 'string version from Realms is normalized');
   });
 
+  it('strips packs named by --remove from the folders and the pack lists', async () => {
+    const out = path.join(outDir, 'removed.mcworld');
+    const legacy = '11111111-2222-3333-4444-555555555555';
+    const { stdout } = await cli(['hello-world', '--realm', '99', '--out', out, '--remove', legacy]);
+
+    assert.match(stdout, new RegExp(`removed ${legacy}`));
+    const zip = new AdmZip(out);
+    const entries = zip.getEntries().map((e) => e.entryName);
+    assert.ok(!entries.includes('behavior_packs/legacy_pack/manifest.json'), 'the folder is gone');
+    assert.ok(entries.includes('behavior_packs/hello-world_bp/manifest.json'), 'our add-on still applies');
+    const bp = JSON.parse(zip.readAsText('world_behavior_packs.json')) as Array<{ pack_id: string }>;
+    assert.deepEqual(bp.map((e) => e.pack_id), ['2bdba555-b0e4-4044-af7f-f9fe3cca6a20']);
+  });
+
+  it('warns when a --remove uuid is not in the world', async () => {
+    const out = path.join(outDir, 'remove-miss.mcworld');
+    const { stderr } = await cli([
+      'hello-world', '--realm', '99', '--out', out, '--remove', 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
+    ]);
+    assert.match(stderr, /not in this world/);
+    assert.ok(fs.existsSync(out), 'the world is still baked and written');
+  });
+
+  it('rejects a malformed --remove before touching the Realm', async () => {
+    stub.requests.length = 0;
+    const failed = (args: string[]) =>
+      cli(args).then(
+        () => null,
+        (e: { stdout?: string; stderr?: string }) => `${e.stdout ?? ''}${e.stderr ?? ''}`,
+      );
+
+    const typo = await failed(['hello-world', '--realm', '99', '--remove', 'backpack']);
+    assert.ok(typo, 'expected a non-zero exit');
+    assert.match(typo, /pack header uuids/);
+
+    const bare = await failed(['hello-world', '--realm', '99', '--remove']);
+    assert.ok(bare, 'expected a non-zero exit');
+    assert.match(bare, /needs the pack header uuid/);
+
+    assert.equal(stub.requests.length, 0, 'validation must happen before any download');
+  });
+
+  it('refuses to --remove a pack the same run would apply', async () => {
+    const err = await cli([
+      'hello-world', '--realm', '99', '--remove', '2bdba555-b0e4-4044-af7f-f9fe3cca6a20',
+    ]).then(
+      () => null,
+      (e: { stdout?: string; stderr?: string }) => e,
+    );
+    assert.ok(err, 'expected a non-zero exit');
+    assert.match(`${err.stdout ?? ''}${err.stderr ?? ''}`, /Drop the add-on from the slug list/);
+  });
+
   it('refuses to upload without --yes and sends nothing', async () => {
     stub.clearProbeRoutes();
     stub.requests.length = 0;
