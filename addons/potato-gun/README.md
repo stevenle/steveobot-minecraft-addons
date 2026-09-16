@@ -35,8 +35,8 @@ potatoes come from nowhere, and nothing is consumed per shot.
 
 | Gun | Speed | Damage | Cooldown | Explosive radius |
 |---|---|---|---|---|
-| Potato Crossbow | fast, arcs | 4 (2 hearts) | 0.5 s | 1.8 blocks |
-| Potato Launcher | slower, straight | 8 (4 hearts) | 1.5 s | 3 blocks (a creeper) |
+| Potato Crossbow | fast, arcs | 6 (3 hearts) | 0.5 s | 1.8 blocks |
+| Potato Launcher | slower, straight | 12 (6 hearts) | 1.5 s | 3 blocks (a creeper) |
 
 Potatoes splat into chunks where they land. An explosive potato also
 detonates, and the blast is credited to whoever fired it. Whether the blast

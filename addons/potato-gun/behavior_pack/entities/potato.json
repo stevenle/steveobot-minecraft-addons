@@ -12,7 +12,7 @@
         "minecraft:projectile": {
           "on_hit": {
             "impact_damage": {
-              "damage": 4,
+              "damage": 6,
               "knockback": true,
               "difficulty_randomization": "none",
               "power_multiplier": 0,
@@ -37,7 +37,7 @@
         "minecraft:projectile": {
           "on_hit": {
             "impact_damage": {
-              "damage": 8,
+              "damage": 12,
               "knockback": true,
               "difficulty_randomization": "none",
               "power_multiplier": 0,
@@ -84,7 +84,7 @@
       "minecraft:projectile": {
         "on_hit": {
           "impact_damage": {
-            "damage": 4,
+            "damage": 6,
             "knockback": true,
             "difficulty_randomization": "none",
             "power_multiplier": 0,
