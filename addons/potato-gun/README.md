@@ -92,7 +92,7 @@ Messages from the add-on are prefixed `[Potato Gun]`.
 | `behavior_pack/items/potato_crossbow*.json`, `potato_launcher*.json` | The four guns (plain and explosive), no durability, per-gun cooldown |
 | `behavior_pack/items/explosive_enchantment.json` | The glinting enchantment book |
 | `behavior_pack/recipes/*.json` | One recipe per item above |
-| `behavior_pack/entities/potato.json` | The potato projectile: crossbow/launcher stats as component groups, explosive flag as `variant`, 8 s self-destruct fuse. Sets `isolated_physics` explicitly so a game update cannot change the flight (1.26.50 did) |
+| `behavior_pack/entities/potato.json` | The potato projectile: crossbow/launcher stats as component groups, explosive flag as `variant`, 8 s self-destruct fuse. Stays on format 1.16.0: `isolated_physics` breaks script-launched potatoes |
 | `src/main.ts` | Firing, hit effects, explosions, lore, hints, chat commands |
 | `resource_pack/entity/potato.entity.json` | Client entity: textures by variant, spin, smoke and flame trails |
 | `resource_pack/models/entity/potato.geo.json` | A lumpy three-cube potato |

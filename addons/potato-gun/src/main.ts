@@ -24,11 +24,11 @@
  * the same information. Potatoes also have an 8-second fuse in
  * entities/potato.json so a lost one despawns on its own.
  *
- * The potato entity pins `isolated_physics: true` on its projectile
- * component. Bedrock 1.26.50 flipped that default to false for entities on
- * older format versions, which put air drag on top of the tuned `inertia`
- * and changed how the guns felt; the explicit value keeps the flight stable
- * across game updates.
+ * The potato entity stays on entity format_version 1.16.0 on purpose. Moving
+ * it to 1.26.40 with `isolated_physics: true` stopped the guns firing on
+ * 1.26.50: the potato spawned but never took the velocity from `shoot()`.
+ * Isolated physics is meant for projectiles launched by an item or a mob
+ * goal, not by script.
  */
 import {
   EquipmentSlot,

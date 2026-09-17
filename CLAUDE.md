@@ -253,12 +253,13 @@ Three things constrain changes here:
   re-enter the world.
 - Placeholder `pack_icon.png` files are 128×128 and intentionally generic;
   replacing them is a real task, not a nicety.
-- Custom projectile entities must set `isolated_physics` explicitly on
-  `minecraft:projectile` (needs entity `format_version` 1.26.20+). Its default
-  is gated on format version and has flipped between game releases (1.26.50
-  turned it off for older formats), which silently changes how a projectile
-  flies. Use `format_version` 1.26.40 fields (`difficulty_randomization`, not
-  `semi_random_diff_damage`) when touching an entity's projectile component.
+- Do not set `isolated_physics: true` on a projectile entity that a script
+  launches with `ProjectileComponent.shoot()`: on 1.26.50 the entity spawned
+  but never moved (potato-gun, 2026-09-16). It is meant for projectiles fired
+  by an item or a mob goal. The default is gated on entity `format_version`
+  (true from 1.26.30), so a script-launched projectile must stay on an older
+  format or set it to false explicitly. No Realm content log shows this; the
+  gun just goes silent.
 - Floor-level entity checks must not assume a block's surface is at a whole
   Y: soul sand is 7/8 high, slabs 1/2, snow layers 1/8 each. `Entity.location`
   is the feet, so an entity on soul sand reads 0.125 below the cell above it.

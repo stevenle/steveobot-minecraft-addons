@@ -1,5 +1,5 @@
 {
-  "format_version": "1.26.40",
+  "format_version": "1.16.0",
   "minecraft:entity": {
     "description": {
       "identifier": "steveo:potato",
@@ -14,8 +14,7 @@
             "impact_damage": {
               "damage": 6,
               "knockback": true,
-              "difficulty_randomization": "none",
-              "power_multiplier": 0,
+              "semi_random_diff_damage": false,
               "destroy_on_hit": true
             },
             "remove_on_hit": {}
@@ -27,8 +26,7 @@
           "anchor": 1,
           "offset": [0, -0.1, 0],
           "inertia": 0.99,
-          "liquid_inertia": 0.6,
-          "isolated_physics": true
+          "liquid_inertia": 0.6
         }
       },
       "steveo:launcher": {
@@ -39,8 +37,7 @@
             "impact_damage": {
               "damage": 12,
               "knockback": true,
-              "difficulty_randomization": "none",
-              "power_multiplier": 0,
+              "semi_random_diff_damage": false,
               "destroy_on_hit": true
             },
             "remove_on_hit": {}
@@ -52,8 +49,7 @@
           "anchor": 1,
           "offset": [0, -0.1, 0],
           "inertia": 0.995,
-          "liquid_inertia": 0.6,
-          "isolated_physics": true
+          "liquid_inertia": 0.6
         }
       },
       "steveo:explosive": {
@@ -86,8 +82,7 @@
           "impact_damage": {
             "damage": 6,
             "knockback": true,
-            "difficulty_randomization": "none",
-            "power_multiplier": 0,
+            "semi_random_diff_damage": false,
             "destroy_on_hit": true
           },
           "remove_on_hit": {}
@@ -99,8 +94,7 @@
         "anchor": 1,
         "offset": [0, -0.1, 0],
         "inertia": 0.99,
-        "liquid_inertia": 0.6,
-        "isolated_physics": true
+        "liquid_inertia": 0.6
       }
     },
     "events": {
