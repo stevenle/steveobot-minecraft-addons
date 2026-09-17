@@ -1,0 +1,9 @@
+{
+  "resource_pack_name": "warp-whistle",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "steveo_warp_whistle": {
+      "textures": "textures/items/warp_whistle"
+    }
+  }
+}

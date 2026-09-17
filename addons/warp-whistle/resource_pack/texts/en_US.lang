@@ -1,0 +1,68 @@
+## Strings for the Warp Whistle add-on.
+## Client-side translations live in the resource pack; the behavior pack
+## references them by key with RawMessage { translate: ... }.
+
+item.steveo:warp_whistle.name=Warp Whistle
+
+warp_whistle.hint=Use: open the warp menu. Crouch + use: set a waypoint where you stand. Home is always your bed.
+
+## Main menu
+warp_whistle.menu.title=Warp Whistle
+warp_whistle.menu.body=Where to?
+warp_whistle.menu.home=Home (your bed)
+warp_whistle.menu.home.none=Home §7(no bed yet)
+warp_whistle.menu.set=Set a waypoint here
+warp_whistle.menu.manage=Manage waypoints
+warp_whistle.dim.nether=Nether
+warp_whistle.dim.the_end=The End
+
+## Set / rename
+warp_whistle.set.title=New waypoint
+warp_whistle.set.name=Name
+warp_whistle.set.placeholder=e.g. Mine, Village, Farm
+warp_whistle.set.submit=Set waypoint
+warp_whistle.set.default=Waypoint %s
+warp_whistle.set.done=Waypoint §e%s§r set at %s.
+warp_whistle.set.full=All %s waypoint slots are taken. Delete one first.
+warp_whistle.set.empty=A waypoint needs a name.
+warp_whistle.set.long=Names can be at most %s characters.
+warp_whistle.set.duplicate=There is already a waypoint called §e%s§r.
+
+## Manage
+warp_whistle.manage.title=Waypoints
+warp_whistle.manage.body=Pick a waypoint to warp, rename, move, or delete it.
+warp_whistle.manage.none=No waypoints yet. Crouch and use the whistle to set one.
+warp_whistle.manage.detail=§e%s§r\n%s\nSet by %s
+warp_whistle.manage.warp=Warp there
+warp_whistle.manage.rename=Rename
+warp_whistle.manage.move=Move it here
+warp_whistle.manage.delete=Delete
+warp_whistle.manage.back=Back
+warp_whistle.rename.title=Rename waypoint
+warp_whistle.rename.submit=Rename
+warp_whistle.rename.done=Renamed §e%s§r to §e%s§r.
+warp_whistle.move.done=Moved §e%s§r to %s.
+warp_whistle.delete.title=Delete waypoint?
+warp_whistle.delete.body=Delete §e%s§r for everyone? This cannot be undone.
+warp_whistle.delete.confirm=Delete
+warp_whistle.delete.cancel=Keep it
+warp_whistle.delete.done=Deleted §e%s§r.
+warp_whistle.gone=That waypoint no longer exists.
+
+## Warping
+warp_whistle.home.none=You have no bed yet. Sleep in one, then blow the whistle.
+warp_whistle.warping=Whistling... hold on!
+warp_whistle.cooldown=The whistle needs a moment to catch its breath.
+warp_whistle.arrived=Whoosh! You are at §e%s§r.
+warp_whistle.arrived.home=Whoosh! Home sweet home.
+warp_whistle.failed=The wind fizzled out. Try again.
+
+## Debug (/scriptevent steveo:warp ...)
+warp_whistle.debug.given=A Warp Whistle has been placed in your inventory.
+warp_whistle.debug.list=Waypoints (%s of %s):
+warp_whistle.debug.list.home= Home: %s
+warp_whistle.debug.list.home.none= Home: no bed set
+warp_whistle.debug.list.one= [%s] %s at %s (set by %s)
+warp_whistle.debug.cleared=Removed %s waypoints.
+warp_whistle.debug.demo=Playing the warp effect in place. If you see no sparkles or hear no whistle, the script is not running.
+warp_whistle.debug.help=Usage: /scriptevent steveo:warp <give|list|clear|demo>
