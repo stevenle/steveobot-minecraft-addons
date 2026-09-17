@@ -35,8 +35,8 @@ potatoes come from nowhere, and nothing is consumed per shot.
 
 | Gun | Speed | Damage | Cooldown | Explosive radius |
 |---|---|---|---|---|
-| Potato Crossbow | fast, arcs | 4 (2 hearts) | 0.5 s | 1.8 blocks |
-| Potato Launcher | slower, straight | 8 (4 hearts) | 1.5 s | 3 blocks (a creeper) |
+| Potato Crossbow | fast, arcs | 6 (3 hearts) | 0.5 s | 1.8 blocks |
+| Potato Launcher | slower, straight | 12 (6 hearts) | 1.5 s | 3 blocks (a creeper) |
 
 Potatoes splat into chunks where they land. An explosive potato also
 detonates, and the blast is credited to whoever fired it. Whether the blast
@@ -92,7 +92,7 @@ Messages from the add-on are prefixed `[Potato Gun]`.
 | `behavior_pack/items/potato_crossbow*.json`, `potato_launcher*.json` | The four guns (plain and explosive), no durability, per-gun cooldown |
 | `behavior_pack/items/explosive_enchantment.json` | The glinting enchantment book |
 | `behavior_pack/recipes/*.json` | One recipe per item above |
-| `behavior_pack/entities/potato.json` | The potato projectile: crossbow/launcher stats as component groups, explosive flag as `variant`, 8 s self-destruct fuse |
+| `behavior_pack/entities/potato.json` | The potato projectile: crossbow/launcher stats as component groups, explosive flag as `variant`, 8 s self-destruct fuse. Stays on format 1.16.0: `isolated_physics` breaks script-launched potatoes |
 | `src/main.ts` | Firing, hit effects, explosions, lore, hints, chat commands |
 | `resource_pack/entity/potato.entity.json` | Client entity: textures by variant, spin, smoke and flame trails |
 | `resource_pack/models/entity/potato.geo.json` | A lumpy three-cube potato |

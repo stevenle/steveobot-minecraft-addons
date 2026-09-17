@@ -136,3 +136,16 @@ export function upsertPackEntry(
   next[index] = entry;
   return { entries: next, replaced: true };
 }
+
+/**
+ * Drops one pack from a world's pack list by `pack_id`. Returns the new list
+ * and whether anything was actually removed.
+ */
+export function removePackEntry(
+  entries: WorldPackEntry[],
+  uuid: string,
+): { entries: WorldPackEntry[]; removed: boolean } {
+  const id = uuid.toLowerCase();
+  const next = entries.filter((e) => e.pack_id.toLowerCase() !== id);
+  return { entries: next, removed: next.length !== entries.length };
+}
