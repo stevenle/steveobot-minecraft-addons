@@ -47,6 +47,8 @@ const WAYPOINTS_PROP = 'steveo:warp_waypoints';
 /** How many shared waypoints the world can hold. */
 const MAX_WAYPOINTS = 10;
 const MAX_NAME_LENGTH = 24;
+/** Plain string on purpose: form text fields reject RawMessage placeholders and defaults. */
+const NAME_PLACEHOLDER = 'e.g. Mine, Village, Farm';
 /** Ticks between blowing the whistle and actually leaving. */
 const WINDUP_TICKS = 40;
 /** Extra cooldown after a warp, on top of the wind-up. */
@@ -245,11 +247,12 @@ async function openSetWaypoint(player: Player): Promise<void> {
   // Capture the spot when the form opens, not when it is submitted.
   const here = whereIs(player);
 
+  // The text field's placeholder and default must be plain strings: the
+  // typings accept a RawMessage, but the client rejects the form with
+  // "invalid form json ... /content/0/default: expected 'string' got 'object'".
   const form = new ModalFormData()
     .title(t('warp_whistle.set.title'))
-    .textField(t('warp_whistle.set.name'), t('warp_whistle.set.placeholder'), {
-      defaultValue: t('warp_whistle.set.default', `${waypoints.length + 1}`),
-    })
+    .textField(t('warp_whistle.set.name'), NAME_PLACEHOLDER, { defaultValue: `Waypoint ${waypoints.length + 1}` })
     .submitButton(t('warp_whistle.set.submit'));
 
   const response = await show(player, form);
@@ -345,7 +348,7 @@ async function openWaypoint(player: Player, name: string): Promise<void> {
 async function renameWaypoint(player: Player, oldName: string): Promise<void> {
   const form = new ModalFormData()
     .title(t('warp_whistle.rename.title'))
-    .textField(t('warp_whistle.set.name'), t('warp_whistle.set.placeholder'), { defaultValue: oldName })
+    .textField(t('warp_whistle.set.name'), NAME_PLACEHOLDER, { defaultValue: oldName })
     .submitButton(t('warp_whistle.rename.submit'));
   const response = await show(player, form);
   const newName = validName(player, response?.formValues?.[0], oldName);

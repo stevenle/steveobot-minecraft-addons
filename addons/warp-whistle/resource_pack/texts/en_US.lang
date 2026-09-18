@@ -19,9 +19,7 @@ warp_whistle.dim.the_end=The End
 ## Set / rename
 warp_whistle.set.title=New waypoint
 warp_whistle.set.name=Name
-warp_whistle.set.placeholder=e.g. Mine, Village, Farm
 warp_whistle.set.submit=Set waypoint
-warp_whistle.set.default=Waypoint %s
 warp_whistle.set.done=Waypoint §e%s§r set at %s.
 warp_whistle.set.full=All %s waypoint slots are taken. Delete one first.
 warp_whistle.set.empty=A waypoint needs a name.
