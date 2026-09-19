@@ -1,0 +1,5 @@
+{
+  "$schema": "../../tools/schemas/addon.schema.json",
+  "name": "Warp Whistle",
+  "description": "A craftable Warp Whistle: blow it to fast-travel home to your bed or to any of the waypoints you have set."
+}

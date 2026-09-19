@@ -1,0 +1,42 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Warp Whistle BP",
+    "description": "A craftable Warp Whistle: blow it to fast-travel home to your bed or to any of the waypoints you have set.",
+    "uuid": "f75f1f7c-9ede-453a-a6b1-788a0814ab1e",
+    "version": [1, 0, 1],
+    "min_engine_version": [1, 26, 40]
+  },
+  "modules": [
+    {
+      "type": "data",
+      "uuid": "7bef0daa-c0dc-4e07-9e03-f1a8f0c57c0c",
+      "version": [1, 0, 1]
+    },
+    {
+      "type": "script",
+      "language": "javascript",
+      "entry": "scripts/main.js",
+      "uuid": "b3d9468a-1de2-45ea-9837-c4d6abd7ead8",
+      "version": [1, 0, 1]
+    }
+  ],
+  "dependencies": [
+    {
+      "uuid": "827e9b89-ff92-43f9-af8c-ddb88d3fc19a",
+      "version": [1, 0, 1]
+    },
+    {
+      "module_name": "@minecraft/server",
+      "version": "2.9.0"
+    },
+    {
+      "module_name": "@minecraft/server-ui",
+      "version": "2.1.0"
+    }
+  ],
+  "metadata": {
+    "authors": ["Steven Le"],
+    "license": "MIT"
+  }
+}

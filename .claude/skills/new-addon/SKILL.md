@@ -47,6 +47,12 @@ define that key in `en_US.lang`.
   yields every N `getBlock` calls, or a few thousand lookups stall the tick.
   Wrap `getBlock` in try/catch: unloaded chunks and world bounds throw.
 - Always pass `{ namespaces: ['steveo'] }` to `scriptEventReceive.subscribe`.
+- **`@minecraft/server-ui` text fields take plain strings only** for the
+  placeholder and `defaultValue`. The typings accept a `RawMessage`, but the
+  client rejects the whole form: `Received invalid form json. Error:
+  /content/0/default: invalid type for property. Expected 'string' got
+  'object'` (warp-whistle, Switch, 2026-09-17). Titles, bodies, labels, and
+  button text do accept `{ translate }`.
 - Give every gameplay add-on a `/scriptevent steveo:<debug>` command that
   exercises its moving parts and replies in chat. On a Realm, chat is the only
   console you have.
