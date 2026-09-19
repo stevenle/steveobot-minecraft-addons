@@ -28,6 +28,7 @@ import {
   type Block,
   type Dimension,
   type RawMessage,
+  type Vector3,
 } from '@minecraft/server';
 
 import { createLogger } from '@shared/log';
@@ -58,6 +59,29 @@ const XP_ORBS = 3;
 const SWEEP_TICKS = 100;
 /** Pickaxe tiers good enough to mine Heart Ore, as vanilla item tags. */
 const MINING_TIERS = ['minecraft:iron_tier', 'minecraft:diamond_tier', 'minecraft:netherite_tier'];
+
+/**
+ * Seeding Heart Ore into chunks that were generated before the pack existed
+ * (`/scriptevent steveo:hearts seed`). These mirror features/ and
+ * feature_rules/ so seeded ore is about as common as generated ore.
+ */
+const SEED_REPLACEABLE = new Set([
+  'minecraft:stone',
+  'minecraft:granite',
+  'minecraft:diorite',
+  'minecraft:andesite',
+  'minecraft:tuff',
+  'minecraft:deepslate',
+]);
+const SEED_Y_MIN = -58;
+const SEED_Y_MAX = 24;
+const SEED_VEINS_PER_CHUNK = 2;
+const SEED_VEIN_SIZE = 5;
+/** Radius in chunks around the player; loaded chunks only, so keep it small. */
+const SEED_RADIUS_DEFAULT = 2;
+const SEED_RADIUS_MAX = 4;
+/** Block lookups between yields, so a big seed does not stall the tick. */
+const SEED_YIELD_EVERY = 64;
 
 // ---------- messages ----------
 
@@ -223,6 +247,96 @@ function debugStatus(player: Player): void {
   );
 }
 
+/** A block lookup that treats unloaded chunks and world bounds as "nothing there". */
+function blockAt(dimension: Dimension, location: Vector3): Block | undefined {
+  try {
+    return dimension.getBlock(location);
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Places random Heart Ore veins in the stone of the loaded chunks around the
+ * player, the way world generation would have. Runs as a job so the block
+ * lookups are spread over several ticks.
+ */
+function* seedOre(player: Player, radius: number): Generator<void, void, void> {
+  const dimension = player.dimension;
+  const originX = Math.floor(player.location.x / 16);
+  const originZ = Math.floor(player.location.z / 16);
+  let chunks = 0;
+  let unloaded = 0;
+  let veins = 0;
+  let blocks = 0;
+  let lookups = 0;
+
+  for (let dx = -radius; dx <= radius; dx++) {
+    for (let dz = -radius; dz <= radius; dz++) {
+      const chunkX = (originX + dx) * 16;
+      const chunkZ = (originZ + dz) * 16;
+      if (blockAt(dimension, { x: chunkX, y: SEED_Y_MAX, z: chunkZ }) === undefined) {
+        unloaded++;
+        continue;
+      }
+      chunks++;
+      for (let vein = 0; vein < SEED_VEINS_PER_CHUNK; vein++) {
+        let pos: Vector3 = {
+          x: chunkX + randomInt(0, 15),
+          y: randomInt(SEED_Y_MIN, SEED_Y_MAX),
+          z: chunkZ + randomInt(0, 15),
+        };
+        let placed = 0;
+        // A random walk from the start point, converting stone as it goes.
+        for (let step = 0; step < SEED_VEIN_SIZE * 3 && placed < SEED_VEIN_SIZE; step++) {
+          const block = blockAt(dimension, pos);
+          lookups++;
+          if (block !== undefined && SEED_REPLACEABLE.has(block.typeId)) {
+            block.setType(ORE_ID);
+            placed++;
+          }
+          const axis = randomInt(0, 2);
+          const delta = randomInt(0, 1) === 0 ? -1 : 1;
+          pos =
+            axis === 0
+              ? { x: pos.x + delta, y: pos.y, z: pos.z }
+              : axis === 1
+                ? { x: pos.x, y: pos.y + delta, z: pos.z }
+                : { x: pos.x, y: pos.y, z: pos.z + delta };
+          if (lookups % SEED_YIELD_EVERY === 0) yield;
+        }
+        if (placed > 0) {
+          veins++;
+          blocks += placed;
+        }
+      }
+    }
+  }
+
+  log.info(`seeded ${blocks} heart ore in ${veins} veins across ${chunks} chunks (${unloaded} unloaded)`);
+  if (player.isValid) {
+    say(
+      player,
+      'extra_hearts.debug.seed.done',
+      String(blocks),
+      String(veins),
+      String(chunks),
+      String(unloaded),
+    );
+  }
+}
+
+function debugSeed(player: Player, arg: string | undefined): void {
+  const radius = arg === undefined ? SEED_RADIUS_DEFAULT : Number(arg);
+  if (!Number.isInteger(radius) || radius < 1 || radius > SEED_RADIUS_MAX) {
+    say(player, 'extra_hearts.debug.seed.bad', String(SEED_RADIUS_MAX));
+    return;
+  }
+  const side = radius * 2 + 1;
+  say(player, 'extra_hearts.debug.seed.start', `${side}x${side}`);
+  system.runJob(seedOre(player, radius));
+}
+
 function debugOre(player: Player): void {
   const hit = player.getBlockFromViewDirection({ maxDistance: 8, includeLiquidBlocks: false });
   if (hit === undefined) {
@@ -264,6 +378,9 @@ system.afterEvents.scriptEventReceive.subscribe(
         break;
       case 'ore':
         debugOre(player);
+        break;
+      case 'seed':
+        debugSeed(player, arg);
         break;
       default:
         say(player, 'extra_hearts.debug.help');

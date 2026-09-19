@@ -17,8 +17,19 @@ Heart Fragments plus a little experience; Fortune adds up to its level in
 extra fragments, and Silk Touch drops the ore block itself.
 
 Ore only appears in chunks generated **after** the add-on is installed. Land
-you have already explored will not sprout any; head somewhere new, or use
-the debug command below to test in place.
+you have already explored will not sprout any. To fill in old ground, stand
+in it and run the seed command:
+
+```
+/scriptevent steveo:hearts seed        # the 5x5 chunks around you
+/scriptevent steveo:hearts seed 4      # the 9x9 chunks around you (the max)
+```
+
+It places random veins in stone at the same depths and about the same rate
+as world generation, in the chunks that are currently loaded around you,
+and reports what it placed. Unloaded chunks are skipped, so on a Realm with
+a small simulation distance a big radius will say so; walk on and run it
+again. Running it twice in the same place adds ore twice.
 
 ## Crafting
 
@@ -53,6 +64,7 @@ Chat is the only console on a Realm, so the add-on answers to a script event:
 /scriptevent steveo:hearts set 25    # jump straight to a heart count (10–30)
 /scriptevent steveo:hearts reset     # back to 10 hearts
 /scriptevent steveo:hearts ore       # turn the block you are looking at into Heart Ore
+/scriptevent steveo:hearts seed 2    # seed random veins into the loaded chunks around you
 ```
 
 ## How it works
