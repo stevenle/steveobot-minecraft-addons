@@ -5,6 +5,7 @@
 item.steveo:heart_fragment.name=Heart Fragment
 item.steveo:heart_container.name=Heart Container
 tile.steveo:heart_ore.name=Heart Ore
+tile.steveo:deepslate_heart_ore.name=Deepslate Heart Ore
 
 ## Mining
 extra_hearts.ore.tool=Heart Ore needs an iron pickaxe or better.

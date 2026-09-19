@@ -118,13 +118,14 @@ const FRAGMENT = [
   '................',
 ];
 
-// ---------- Heart Ore: stone with heart-red specks ----------
-function paintOre() {
+// ---------- Heart Ore: stone or deepslate with heart-red specks ----------
+const STONE = [hex('#7F7F7F'), hex('#868686'), hex('#737373'), hex('#8C8C8C'), hex('#6E6E6E')];
+const DEEPSLATE = [hex('#4E4E52'), hex('#56565A'), hex('#454549'), hex('#5C5C60'), hex('#3F3F43')];
+function paintOre(stone) {
   const c = canvas(16, 16);
   // Deterministic stone noise so the texture is stable between runs.
   let seed = 0x5eed;
   const rand = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
-  const stone = [hex('#7F7F7F'), hex('#868686'), hex('#737373'), hex('#8C8C8C'), hex('#6E6E6E')];
   for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) c.set(x, y, stone[Math.floor(rand() * stone.length)]);
   const specks = [
     [2, 2], [3, 2], [2, 3], [3, 3],
@@ -199,7 +200,8 @@ fs.mkdirSync(path.join(rp, 'textures', 'blocks'), { recursive: true });
 fs.mkdirSync(path.join(bp, 'entities'), { recursive: true });
 fs.writeFileSync(path.join(rp, 'textures', 'items', 'heart_fragment.png'), paintIcon(FRAGMENT));
 fs.writeFileSync(path.join(rp, 'textures', 'items', 'heart_container.png'), paintIcon(CONTAINER));
-fs.writeFileSync(path.join(rp, 'textures', 'blocks', 'heart_ore.png'), paintOre());
+fs.writeFileSync(path.join(rp, 'textures', 'blocks', 'heart_ore.png'), paintOre(STONE));
+fs.writeFileSync(path.join(rp, 'textures', 'blocks', 'deepslate_heart_ore.png'), paintOre(DEEPSLATE));
 const icon = paintPackIcon();
 fs.writeFileSync(path.join(rp, 'pack_icon.png'), icon);
 fs.writeFileSync(path.join(bp, 'pack_icon.png'), icon);

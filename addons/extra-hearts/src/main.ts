@@ -1,11 +1,12 @@
 /**
  * Extra Hearts — mine Heart Ore, craft Heart Containers, eat them for more hearts.
  *
- * Heart Ore generates underground in the Overworld (feature_rules/). Breaking
- * it with an iron pickaxe or better drops Heart Fragments; Fortune adds more
- * and Silk Touch drops the ore block instead. Five fragments in a heart shape
- * craft a Heart Container, and eating one adds a permanent heart, up to
- * MAX_HEARTS in total.
+ * Heart Ore generates underground in the Overworld (feature_rules/): a stone
+ * variant in stone, granite, diorite and andesite, and a deepslate variant in
+ * deepslate and tuff, like vanilla ores. Breaking either with an iron pickaxe
+ * or better drops Heart Fragments; Fortune adds more and Silk Touch drops the
+ * ore block instead. Five fragments in a heart shape craft a Heart Container,
+ * and eating one adds a permanent heart, up to MAX_HEARTS in total.
  *
  * How the extra health works: Bedrock scripts cannot set an entity's max
  * health directly, so the behavior pack overrides the vanilla player entity
@@ -38,6 +39,8 @@ const log = createLogger('extra-hearts');
 const PREFIX: RawMessage = { text: `${Format.gray}[Extra Hearts]${Format.reset} ` };
 
 const ORE_ID = 'steveo:heart_ore';
+const DEEPSLATE_ORE_ID = 'steveo:deepslate_heart_ore';
+const ORE_IDS = new Set([ORE_ID, DEEPSLATE_ORE_ID]);
 const FRAGMENT_ID = 'steveo:heart_fragment';
 const CONTAINER_ID = 'steveo:heart_container';
 /** Player dynamic property: number of bonus hearts, 0..(MAX_HEARTS - BASE_HEARTS). */
@@ -65,13 +68,13 @@ const MINING_TIERS = ['minecraft:iron_tier', 'minecraft:diamond_tier', 'minecraf
  * (`/scriptevent steveo:hearts seed`). These mirror features/ and
  * feature_rules/ so seeded ore is about as common as generated ore.
  */
-const SEED_REPLACEABLE = new Set([
-  'minecraft:stone',
-  'minecraft:granite',
-  'minecraft:diorite',
-  'minecraft:andesite',
-  'minecraft:tuff',
-  'minecraft:deepslate',
+const SEED_REPLACEABLE = new Map<string, string>([
+  ['minecraft:stone', ORE_ID],
+  ['minecraft:granite', ORE_ID],
+  ['minecraft:diorite', ORE_ID],
+  ['minecraft:andesite', ORE_ID],
+  ['minecraft:deepslate', DEEPSLATE_ORE_ID],
+  ['minecraft:tuff', DEEPSLATE_ORE_ID],
 ]);
 const SEED_Y_MIN = -58;
 const SEED_Y_MAX = 24;
@@ -195,7 +198,8 @@ function dropAt(dimension: Dimension, block: Block, stack: ItemStack): void {
 }
 
 world.afterEvents.playerBreakBlock.subscribe((event) => {
-  if (event.brokenBlockPermutation.type.id !== ORE_ID) return;
+  const brokenId = event.brokenBlockPermutation.type.id;
+  if (!ORE_IDS.has(brokenId)) return;
   const { player, block, dimension } = event;
   if (player.getGameMode() === GameMode.Creative) return;
   const tool = event.itemStackBeforeBreak;
@@ -204,7 +208,7 @@ world.afterEvents.playerBreakBlock.subscribe((event) => {
     return;
   }
   if (enchantmentLevel(tool, 'silk_touch') > 0) {
-    dropAt(dimension, block, new ItemStack(ORE_ID, 1));
+    dropAt(dimension, block, new ItemStack(brokenId, 1));
     return;
   }
   // Fortune adds up to its level in extra fragments, chosen at random.
@@ -291,8 +295,9 @@ function* seedOre(player: Player, radius: number): Generator<void, void, void> {
         for (let step = 0; step < SEED_VEIN_SIZE * 3 && placed < SEED_VEIN_SIZE; step++) {
           const block = blockAt(dimension, pos);
           lookups++;
-          if (block !== undefined && SEED_REPLACEABLE.has(block.typeId)) {
-            block.setType(ORE_ID);
+          const ore = block === undefined ? undefined : SEED_REPLACEABLE.get(block.typeId);
+          if (block !== undefined && ore !== undefined) {
+            block.setType(ore);
             placed++;
           }
           const axis = randomInt(0, 2);
@@ -343,7 +348,8 @@ function debugOre(player: Player): void {
     say(player, 'extra_hearts.debug.ore.none');
     return;
   }
-  hit.block.setType(ORE_ID);
+  // Deepslate and tuff get the deepslate look; anything else gets the stone one.
+  hit.block.setType(SEED_REPLACEABLE.get(hit.block.typeId) ?? ORE_ID);
   say(player, 'extra_hearts.debug.ore');
 }
 

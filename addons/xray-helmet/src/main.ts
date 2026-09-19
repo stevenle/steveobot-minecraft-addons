@@ -73,7 +73,7 @@ const ORES: ReadonlyArray<{ label: string; blocks: readonly string[] }> = [
     // Heart Ore from the extra-hearts add-on. No dependency: in a world
     // without that pack the id simply never matches.
     label: 'heart',
-    blocks: ['steveo:heart_ore'],
+    blocks: ['steveo:heart_ore', 'steveo:deepslate_heart_ore'],
   },
   {
     label: 'ancient_debris',

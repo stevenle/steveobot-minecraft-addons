@@ -8,8 +8,11 @@ grow from the usual 10 hearts up to 30.
 ## Heart Ore
 
 Heart Ore generates underground in every Overworld biome, from Y -58 up to
-Y 24, about as common as iron in that band. It is grey stone flecked with
-red and gives off a faint glow, so it is easy to spot in a dark cave.
+Y 24, about as common as iron in that band. Like vanilla ores it comes in
+two looks that match the rock around it: grey stone flecked with red in
+stone, granite, diorite and andesite, and a darker Deepslate Heart Ore in
+deepslate and tuff. Both give off a faint glow, so they are easy to spot in
+a dark cave, and both drop the same fragments.
 
 It needs an **iron pickaxe or better**. Breaking it with anything else drops
 nothing and the ore is gone, so bring the right tool. Each block drops 1–2
@@ -87,7 +90,7 @@ generator.
 
 | Path | What it is |
 |---|---|
-| `behavior_pack/blocks/heart_ore.json` | The ore block: texture, hardness, empty loot table |
+| `behavior_pack/blocks/heart_ore.json`, `deepslate_heart_ore.json` | The two ore blocks: texture, hardness, empty loot table |
 | `behavior_pack/features/` and `feature_rules/` | Underground ore generation |
 | `behavior_pack/items/` | Heart Fragment and Heart Container |
 | `behavior_pack/recipes/heart_container.json` | The heart-shaped recipe |

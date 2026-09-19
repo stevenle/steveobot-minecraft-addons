@@ -12,9 +12,14 @@
           "minecraft:stone",
           "minecraft:granite",
           "minecraft:diorite",
-          "minecraft:andesite",
-          "minecraft:tuff",
-          "minecraft:deepslate"
+          "minecraft:andesite"
+        ]
+      },
+      {
+        "places_block": "steveo:deepslate_heart_ore",
+        "may_replace": [
+          "minecraft:deepslate",
+          "minecraft:tuff"
         ]
       }
     ]

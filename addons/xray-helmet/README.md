@@ -44,7 +44,7 @@ walls:
 | Redstone | Redstone ore, deepslate redstone ore, lit or not |
 | Iron | Iron ore, deepslate iron ore |
 | Coal | Coal ore, deepslate coal ore |
-| Heart | Heart Ore from the Extra Hearts add-on (glows red; ranks just below diamond) |
+| Heart | Heart Ore and deepslate Heart Ore from the Extra Hearts add-on (glows red; ranks just below diamond) |
 
 **At most 16 ores glow at once.** In an ore-rich cave the most valuable ones
 win, in the order of the table above, and closer ones beat farther ones. Iron
