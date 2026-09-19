@@ -41,8 +41,8 @@ Firing a color again moves that portal. Each player owns one pair, and any
 player, mob, or item can travel through anyone's pair. A portal on a wall is
 one block wide and two tall; on a floor or ceiling it is a one-block disc.
 Shooting the top edge of a short wall slides the portal down so it still fits.
-Floor and ceiling portals sit on the block's real surface, so they work on
-soul sand, slabs, and snow layers as well as full blocks.
+Floor and ceiling portals need a full block; on soul sand or a slab the disc
+floats at the top of the cell.
 
 A shot fizzles, with a note in the action bar, when nothing is in range,
 when there is no room in front of the surface, or when the spot already has
@@ -101,7 +101,6 @@ Messages from the add-on are prefixed `[Portal Gun]`.
 | `resource_pack/models/entity/portal.geo.json` | A vertical 1×2 plane and a horizontal 1×1 plane, toggled by orientation |
 | `resource_pack/render_controllers/portal.render_controllers.json` | Picks the texture by color and the plane by orientation |
 | `resource_pack/animations/portal.animation.json` | Rotates walls to face the right axis; pulses and spins the ovals |
-| `resource_pack/materials/entity.material` | Emissive, alpha-blended, double-sided material |
 | `resource_pack/textures/entity/portal_*.png` | Wall oval and floor disc per color |
 | `resource_pack/textures/items/portal_gun_*.png` | Gun icon per loaded color |
 | `resource_pack/texts/en_US.lang` | Every player-facing string |

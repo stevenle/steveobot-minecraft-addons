@@ -1,0 +1,5 @@
+{
+  "$schema": "../../tools/schemas/addon.schema.json",
+  "name": "Extra Hearts",
+  "description": "Mine Heart Ore for Heart Fragments, craft them into Heart Containers, and eat them for extra hearts, up to 30 in total."
+}

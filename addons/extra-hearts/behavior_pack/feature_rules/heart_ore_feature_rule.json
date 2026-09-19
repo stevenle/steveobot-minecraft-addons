@@ -1,0 +1,21 @@
+{
+  "format_version": "1.13.0",
+  "minecraft:feature_rules": {
+    "description": {
+      "identifier": "steveo:overworld_underground_heart_ore_feature",
+      "places_feature": "steveo:heart_ore_feature"
+    },
+    "conditions": {
+      "placement_pass": "underground_pass",
+      "minecraft:biome_filter": [
+        { "test": "has_biome_tag", "operator": "==", "value": "overworld" }
+      ]
+    },
+    "distribution": {
+      "iterations": 2,
+      "x": { "distribution": "uniform", "extent": [0, 16] },
+      "y": { "distribution": "uniform", "extent": [-58, 24] },
+      "z": { "distribution": "uniform", "extent": [0, 16] }
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "steveo:heart_container_recipe"
+    },
+    "tags": ["crafting_table"],
+    "pattern": ["F F", "FFF", " F "],
+    "key": {
+      "F": { "item": "steveo:heart_fragment" }
+    },
+    "unlock": [{ "item": "steveo:heart_fragment" }],
+    "result": {
+      "item": "steveo:heart_container"
+    }
+  }
+}
