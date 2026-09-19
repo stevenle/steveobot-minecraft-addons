@@ -44,8 +44,12 @@ const COOLDOWN_CATEGORY = 'steveo_warp_whistle';
 /** World dynamic property holding the JSON array of waypoints. */
 const WAYPOINTS_PROP = 'steveo:warp_waypoints';
 
-/** How many shared waypoints the world can hold. */
-const MAX_WAYPOINTS = 10;
+/**
+ * There is no count limit on waypoints. The only ceiling is the world dynamic
+ * property that stores them, which the game caps at 32 KB per value; the
+ * guard below keeps a margin under that.
+ */
+const MAX_STORAGE_CHARS = 30000;
 const MAX_NAME_LENGTH = 24;
 /** Plain string on purpose: form text fields reject RawMessage placeholders and defaults. */
 const NAME_PLACEHOLDER = 'e.g. Mine, Village, Farm';
@@ -113,8 +117,12 @@ function loadWaypoints(): Waypoint[] {
   }
 }
 
-function saveWaypoints(waypoints: Waypoint[]): void {
-  world.setDynamicProperty(WAYPOINTS_PROP, JSON.stringify(waypoints));
+/** Saves the list; false when it would no longer fit in the dynamic property. */
+function saveWaypoints(waypoints: Waypoint[]): boolean {
+  const json = JSON.stringify(waypoints);
+  if (json.length > MAX_STORAGE_CHARS) return false;
+  world.setDynamicProperty(WAYPOINTS_PROP, json);
+  return true;
 }
 
 function findWaypoint(name: string): Waypoint | undefined {
@@ -240,10 +248,6 @@ async function openMenu(player: Player): Promise<void> {
 
 async function openSetWaypoint(player: Player): Promise<void> {
   const waypoints = loadWaypoints();
-  if (waypoints.length >= MAX_WAYPOINTS) {
-    tell(player, t('warp_whistle.set.full', `${MAX_WAYPOINTS}`));
-    return;
-  }
   // Capture the spot when the form opens, not when it is submitted.
   const here = whereIs(player);
 
@@ -260,12 +264,11 @@ async function openSetWaypoint(player: Player): Promise<void> {
   if (name === undefined) return;
 
   const fresh = loadWaypoints();
-  if (fresh.length >= MAX_WAYPOINTS) {
-    tell(player, t('warp_whistle.set.full', `${MAX_WAYPOINTS}`));
+  fresh.push({ name, ...here, by: player.name });
+  if (!saveWaypoints(fresh)) {
+    tell(player, t('warp_whistle.set.full'));
     return;
   }
-  fresh.push({ name, ...here, by: player.name });
-  saveWaypoints(fresh);
   player.playSound('random.orb', { pitch: 1.4, volume: 0.6 });
   tell(player, t('warp_whistle.set.done', name, describe(here, here.dimension)));
 }
@@ -361,7 +364,10 @@ async function renameWaypoint(player: Player, oldName: string): Promise<void> {
     return;
   }
   target.name = newName;
-  saveWaypoints(waypoints);
+  if (!saveWaypoints(waypoints)) {
+    tell(player, t('warp_whistle.set.full'));
+    return;
+  }
   tell(player, t('warp_whistle.rename.done', oldName, newName));
 }
 
@@ -540,7 +546,7 @@ world.afterEvents.playerLeave.subscribe((event) => {
 function listMessage(player: Player): RawMessage {
   const waypoints = loadWaypoints();
   const home = homeOf(player);
-  const rawtext: RawMessage[] = [PREFIX, t('warp_whistle.debug.list', `${waypoints.length}`, `${MAX_WAYPOINTS}`)];
+  const rawtext: RawMessage[] = [PREFIX, t('warp_whistle.debug.list', `${waypoints.length}`)];
   rawtext.push({ text: '\n' }, home ? t('warp_whistle.debug.list.home', describe(home.location, home.dimension.id)) : t('warp_whistle.debug.list.home.none'));
   waypoints.forEach((w, i) => {
     rawtext.push({ text: '\n' }, t('warp_whistle.debug.list.one', `${i + 1}`, w.name, describe(w, w.dimension), w.by));

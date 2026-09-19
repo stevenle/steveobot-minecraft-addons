@@ -34,8 +34,8 @@ The menu lists, in order:
 2. **Waypoints** — every shared waypoint, with its coordinates and, outside
    the Overworld, its dimension.
 3. **Set a waypoint here** — asks for a name and saves your current spot and
-   facing. The world holds up to 10 waypoints; names are up to 24 characters
-   and must be unique.
+   facing. There is no limit on how many waypoints the world holds; names
+   are up to 24 characters and must be unique.
 4. **Manage waypoints** — pick a waypoint to warp to it, rename it, move it
    to where you stand, or delete it (with a confirmation).
 

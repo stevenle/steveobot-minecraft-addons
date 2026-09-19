@@ -21,7 +21,7 @@ warp_whistle.set.title=New waypoint
 warp_whistle.set.name=Name
 warp_whistle.set.submit=Set waypoint
 warp_whistle.set.done=Waypoint §e%s§r set at %s.
-warp_whistle.set.full=All %s waypoint slots are taken. Delete one first.
+warp_whistle.set.full=The whistle cannot remember any more waypoints. Delete some first.
 warp_whistle.set.empty=A waypoint needs a name.
 warp_whistle.set.long=Names can be at most %s characters.
 warp_whistle.set.duplicate=There is already a waypoint called §e%s§r.
@@ -57,7 +57,7 @@ warp_whistle.failed=The wind fizzled out. Try again.
 
 ## Debug (/scriptevent steveo:warp ...)
 warp_whistle.debug.given=A Warp Whistle has been placed in your inventory.
-warp_whistle.debug.list=Waypoints (%s of %s):
+warp_whistle.debug.list=Waypoints (%s):
 warp_whistle.debug.list.home= Home: %s
 warp_whistle.debug.list.home.none= Home: no bed set
 warp_whistle.debug.list.one= [%s] %s at %s (set by %s)
