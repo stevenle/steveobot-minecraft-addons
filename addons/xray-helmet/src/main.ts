@@ -70,6 +70,12 @@ const ORES: ReadonlyArray<{ label: string; blocks: readonly string[] }> = [
     blocks: ['minecraft:diamond_ore', 'minecraft:deepslate_diamond_ore'],
   },
   {
+    // Heart Ore from the extra-hearts add-on. No dependency: in a world
+    // without that pack the id simply never matches.
+    label: 'heart',
+    blocks: ['steveo:heart_ore'],
+  },
+  {
     label: 'ancient_debris',
     blocks: ['minecraft:ancient_debris'],
   },
