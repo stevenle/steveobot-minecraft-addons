@@ -1,0 +1,37 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:block": {
+    "description": {
+      "identifier": "steveo:heart_ore",
+      "menu_category": {
+        "category": "nature",
+        "group": "minecraft:itemGroup.name.ore"
+      }
+    },
+    "components": {
+      "minecraft:display_name": "tile.steveo:heart_ore.name",
+      "minecraft:geometry": "minecraft:geometry.full_block",
+      "minecraft:material_instances": {
+        "*": {
+          "texture": "steveo_heart_ore",
+          "render_method": "opaque"
+        }
+      },
+      "minecraft:map_color": "#B0263A",
+      "minecraft:light_emission": 2,
+      "minecraft:destructible_by_explosion": {
+        "explosion_resistance": 3
+      },
+      "minecraft:destructible_by_mining": {
+        "seconds_to_destroy": 15,
+        "item_specific_speeds": [
+          {
+            "item": { "tags": "q.any_tag('minecraft:is_pickaxe')" },
+            "destroy_speed": 1.2
+          }
+        ]
+      },
+      "minecraft:loot": "loot_tables/blocks/heart_ore.json"
+    }
+  }
+}

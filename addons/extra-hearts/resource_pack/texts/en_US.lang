@@ -1,0 +1,25 @@
+## Strings for the Extra Hearts add-on.
+## Client-side translations live in the resource pack; the behavior pack
+## references them by key with RawMessage { translate: ... }.
+
+item.steveo:heart_fragment.name=Heart Fragment
+item.steveo:heart_container.name=Heart Container
+tile.steveo:heart_ore.name=Heart Ore
+
+## Mining
+extra_hearts.ore.tool=Heart Ore needs an iron pickaxe or better.
+
+## Eating a Heart Container
+extra_hearts.gained=Your heart grows stronger! §c%s§r hearts.
+extra_hearts.gained.max=Your heart grows stronger! §c%s§r hearts. That is as strong as it gets.
+extra_hearts.full=You already have §c%s§r hearts, the most anyone can hold.
+
+## Debug (/scriptevent steveo:hearts ...)
+extra_hearts.debug.given=Heart Fragments and a Heart Container have been placed in your inventory.
+extra_hearts.debug.status=Hearts: §c%s§r of %s (%s bonus). Health right now: %s of %s.
+extra_hearts.debug.set=Hearts set to §c%s§r.
+extra_hearts.debug.set.bad=Pick a whole number from %s to %s.
+extra_hearts.debug.reset=Bonus hearts cleared. Back to §c%s§r hearts.
+extra_hearts.debug.ore=The block you are looking at is now Heart Ore.
+extra_hearts.debug.ore.none=Look at a block within reach first.
+extra_hearts.debug.help=Usage: /scriptevent steveo:hearts <give|status|set N|reset|ore>

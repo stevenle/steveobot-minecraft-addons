@@ -263,3 +263,7 @@ Three things constrain changes here:
 - Floor-level entity checks must not assume a block's surface is at a whole
   Y: soul sand is 7/8 high, slabs 1/2, snow layers 1/8 each. `Entity.location`
   is the feet, so an entity on soul sand reads 0.125 below the cell above it.
+  But do not move a *rendered* marker entity by that surface height: after
+  portal-gun placed its floor/ceiling discs at the measured surface (from
+  `BlockRaycastHit.faceLocation`), portals stopped showing on 1.26.50 and the
+  change was reverted (2026-09-19). Keep markers on whole-block boundaries.

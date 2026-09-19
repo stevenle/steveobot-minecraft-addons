@@ -1,0 +1,12 @@
+{
+  "resource_pack_name": "extra-hearts",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "steveo_heart_fragment": {
+      "textures": "textures/items/heart_fragment"
+    },
+    "steveo_heart_container": {
+      "textures": "textures/items/heart_container"
+    }
+  }
+}
