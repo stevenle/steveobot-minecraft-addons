@@ -8,9 +8,9 @@ top of an Enchantment Tower.
 
 Enchantment Towers generate on the surface of every Overworld land biome
 (oceans, rivers and beaches are skipped so they do not float on water),
-roughly one per 250 chunks, a 9×9 stone-brick tower about twenty blocks
-tall. Enter through the doorway, climb the ladder on the north wall
-through two hatches, and the open roof holds the fountain in a ring of sea
+roughly one per 250 chunks: a squat 9×9 stone-brick tower with two levels.
+Enter through the doorway, climb the ladder on the north wall through the
+roof hatch, and the open rooftop holds the fountain in a ring of sea
 lanterns and bookshelves. The tower is buried four blocks into the ground,
 so on a slope one side shows its cobblestone foundation, like a vanilla
 outpost.
@@ -26,7 +26,9 @@ It rises around you with its ground floor at your feet.
 
 ## The Super Enchantment Fountain
 
-Hold the item you want to enchant and use the fountain. A menu lists every
+Hold the item you want to enchant and use the fountain. Using it never
+uses the item itself, so armor stays in your hand instead of equipping and
+food is not eaten. A menu lists every
 enchantment that item can take: the vanilla ones the game would allow, plus
 the new ones below. Enchantments already on the item are listed first with
 their current level. Pick one and a slider offers every level from the
@@ -46,7 +48,7 @@ letters shooting out of the fountain. They are decoration.
 Bedrock refuses to put Sharpness VI on a sword, so a super level is two
 things at once: the vanilla enchantment at its own maximum (the game keeps
 doing what it does), plus a record on the item that shows as a lore line
-such as **✦ Sharpness XX**. The add-on's script reads that record and adds
+such as **Sharpness XX** in aqua under the vanilla lines. The add-on's script reads that record and adds
 the missing power itself. What the extra levels do:
 
 | Enchantment | Each level above the vanilla max |
@@ -126,10 +128,10 @@ new `.mcstructure`.
 
 ## Not yet verified in-game
 
-`pnpm check` passes, but the pieces below only prove out in the game:
+The tower places, the fountain menu works, and the lore lines render
+(Realm, 2026-09-19). Still only proven by `pnpm check`:
 
-- World generation of the tower (the feature rule's `heightmap` placement
-  and biome filter) and the `.mcstructure` written by the generator.
-- The fountain's custom geometry and texture, and the letter particle.
+- Natural world generation of the tower (the feature rule's `heightmap`
+  placement and biome filter), as opposed to the debug command.
+- The letter particle.
 - `entityHitBlock` firing on bedrock for the Super Efficiency timer.
-- Lore lines written as translatable `RawMessage`s rather than plain text.

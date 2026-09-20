@@ -108,6 +108,8 @@ const BEDROCK_CUT_PER_LEVEL = 0.04;
 /** Ticks a bedrock miner may look away before the attempt is abandoned. */
 const BEDROCK_IDLE_TICKS = 100;
 const BEDROCK_REACH = 7;
+/** How far away the fountain can be tapped; matches the game's block reach. */
+const FOUNTAIN_REACH = 7;
 /** Ticks between the passive sweeps (Haste, water breathing) and the repair sweep. */
 const PASSIVE_TICKS = 20;
 const REPAIR_TICKS = 100;
@@ -193,7 +195,8 @@ function writeSuper(item: ItemStack, levels: SuperLevels): void {
   item.setDynamicProperty(SUPER_PROP, JSON.stringify(levels));
   item.setLore(
     ids.map((id) => ({
-      rawtext: [{ text: `${Format.reset}${Format.aqua}✦ ` }, enchantName(id), { text: ` ${roman(levels[id] ?? 0)}` }],
+      // ASCII only: any other character makes Bedrock fall back to a different font.
+      rawtext: [{ text: Format.aqua }, enchantName(id), { text: ` ${roman(levels[id] ?? 0)}` }],
     })),
   );
 }
@@ -460,6 +463,23 @@ world.beforeEvents.playerInteractWithBlock.subscribe((event) => {
   });
 });
 
+/** True when the fountain is the block under the player's crosshair. */
+function facingFountain(player: Player): boolean {
+  try {
+    return player.getBlockFromViewDirection({ maxDistance: FOUNTAIN_REACH, includeLiquidBlocks: false })?.block.typeId === FOUNTAIN_ID;
+  } catch {
+    return false;
+  }
+}
+
+// Cancelling the block interaction does not stop the held item from being
+// used as well: armor would equip itself, food would start being eaten, a bow
+// would draw. Swallow the item use whenever the fountain is what was tapped,
+// so the item is still in hand when the menu opens.
+world.beforeEvents.itemUse.subscribe((event) => {
+  if (facingFountain(event.source)) event.cancel = true;
+});
+
 // ---------- damage: super Sharpness/Smite/Bane/Power, super Protection ----------
 
 function hasFamily(entity: Entity, family: string): boolean {
@@ -701,7 +721,7 @@ world.afterEvents.entityHitBlock.subscribe((event) => {
 
 function progressBar(fraction: number): string {
   const filled = Math.round(fraction * 10);
-  return `${Format.aqua}${'▮'.repeat(filled)}${Format.gray}${'▯'.repeat(10 - filled)}${Format.reset}`;
+  return `${Format.aqua}[${'#'.repeat(filled)}${Format.gray}${'-'.repeat(10 - filled)}${Format.aqua}]${Format.reset}`;
 }
 
 function breakBedrock(player: Player, block: Block): void {

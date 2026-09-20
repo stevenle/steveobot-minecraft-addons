@@ -231,14 +231,14 @@ function nbtWriter() {
 }
 
 // ---------- The Enchantment Tower ----------
-// Coordinates are structure-local: x/z 0..8 across, y 0..25 up. Layers 0-4 are
+// Coordinates are structure-local: x/z 0..8 across, y 0..13 up. Layers 0-4 are
 // a buried foundation; the feature rule plants the structure four blocks below
-// the surface so the ground floor sits at (or one above) the terrain.
-const SX = 9, SY = 26, SZ = 9;
+// the surface so the ground floor sits at (or one above) the terrain. Two
+// levels only: the ground floor and the rooftop with the fountain.
+const SX = 9, SY = 14, SZ = 9;
 const FOUNDATION_TOP = 4; // last foundation layer
 const WALL_BOTTOM = 5;
-const PLATFORM_Y = 23; // top floor
-const MID_FLOORS = [11, 17];
+const PLATFORM_Y = 11; // the rooftop
 const LADDER = { x: 4, z: 1 }; // against the inner north wall (z = 0)
 const DOOR = { x: 4, z: 8 }; // south wall, two blocks tall
 const CENTER = 4;
@@ -264,8 +264,8 @@ for (let y = WALL_BOTTOM; y < PLATFORM_Y; y++) for (let x = 0; x < SX; x++) for 
   at(x, y, z, corner ? 'minecraft:chiseled_stone_bricks' : brick());
 }
 
-// Window slits on every side, three levels, avoiding the ladder's backing block.
-for (const y of [8, 14, 20]) {
+// Window slits on every side, avoiding the ladder's backing block.
+for (const y of [8]) {
   for (const i of [2, 6]) {
     at(i, y, 0, 'minecraft:glass_pane');
     at(i, y, SZ - 1, 'minecraft:glass_pane');
@@ -278,15 +278,9 @@ for (const y of [8, 14, 20]) {
 }
 
 // Sea lanterns set into the inner corners so the stairwell is lit.
-for (const y of [7, 13, 19]) for (const x of [0, SX - 1]) for (const z of [0, SZ - 1]) at(x, y, z, 'minecraft:sea_lantern');
+for (const y of [7]) for (const x of [0, SX - 1]) for (const z of [0, SZ - 1]) at(x, y, z, 'minecraft:sea_lantern');
 
-// Mid floors with a hatch for the ladder.
-for (const y of MID_FLOORS) for (let x = 1; x < SX - 1; x++) for (let z = 1; z < SZ - 1; z++) {
-  if (x === LADDER.x && z === LADDER.z) continue;
-  at(x, y, z, 'minecraft:dark_oak_planks');
-}
-
-// Top platform: stone bricks with a chiseled dais under the fountain.
+// Rooftop: stone bricks with a chiseled dais under the fountain and a hatch for the ladder.
 for (let x = 0; x < SX; x++) for (let z = 0; z < SZ; z++) {
   const dais = Math.abs(x - CENTER) <= 1 && Math.abs(z - CENTER) <= 1;
   at(x, PLATFORM_Y, z, dais ? 'minecraft:chiseled_stone_bricks' : brick());
@@ -309,7 +303,7 @@ for (const [x, z] of [[CENTER, 2], [CENTER, 6], [2, CENTER], [6, CENTER]]) at(x,
 // Doorway on the south wall.
 at(DOOR.x, WALL_BOTTOM, DOOR.z, AIR);
 at(DOOR.x, WALL_BOTTOM + 1, DOOR.z, AIR);
-// Ladder from the ground floor through every hatch onto the platform. It hangs
+// Ladder from the ground floor through the roof hatch onto the rooftop. It hangs
 // on the inner face of the north wall, so it faces south (facing_direction 3).
 for (let y = WALL_BOTTOM; y <= PLATFORM_Y; y++) {
   at(LADDER.x, y, LADDER.z, withStates('minecraft:ladder', { facing_direction: tag.int(3) }));
