@@ -1,0 +1,21 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Super Enchantments RP",
+    "description": "Every enchantment goes to level 20 at the Super Enchantment Fountain atop a randomly generated Enchantment Tower, plus Power Knockback, Extra Hit, and Super Efficiency.",
+    "uuid": "994816c3-722e-4b07-9ea7-12bdca5b7f94",
+    "version": [1, 0, 0],
+    "min_engine_version": [1, 26, 40]
+  },
+  "modules": [
+    {
+      "type": "resources",
+      "uuid": "6e4fe8b8-cab7-4063-9942-8ff865757516",
+      "version": [1, 0, 0]
+    }
+  ],
+  "metadata": {
+    "authors": ["Steven Le"],
+    "license": "MIT"
+  }
+}

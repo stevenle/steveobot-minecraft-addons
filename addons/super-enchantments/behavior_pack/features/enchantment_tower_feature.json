@@ -1,0 +1,14 @@
+{
+  "format_version": "1.13.0",
+  "minecraft:structure_template_feature": {
+    "description": {
+      "identifier": "steveo:enchantment_tower_feature"
+    },
+    "structure_name": "steveo:enchantment_tower",
+    "adjustment_radius": 8,
+    "facing_direction": "random",
+    "constraints": {
+      "unburied": {}
+    }
+  }
+}
