@@ -1,0 +1,43 @@
+{
+  "format_version": "1.21.60",
+  "minecraft:block": {
+    "description": {
+      "identifier": "steveo:enchantment_fountain",
+      "menu_category": {
+        "category": "construction"
+      }
+    },
+    "components": {
+      "minecraft:display_name": "tile.steveo:enchantment_fountain.name",
+      "minecraft:geometry": "geometry.steveo_enchantment_fountain",
+      "minecraft:material_instances": {
+        "*": {
+          "texture": "steveo_enchantment_fountain",
+          "render_method": "alpha_test",
+          "ambient_occlusion": false
+        }
+      },
+      "minecraft:collision_box": {
+        "origin": [-8, 0, -8],
+        "size": [16, 16, 16]
+      },
+      "minecraft:selection_box": {
+        "origin": [-8, 0, -8],
+        "size": [16, 16, 16]
+      },
+      "minecraft:map_color": "#5B84E8",
+      "minecraft:light_emission": 15,
+      "minecraft:light_dampening": 0,
+      "minecraft:destructible_by_explosion": false,
+      "minecraft:destructible_by_mining": {
+        "seconds_to_destroy": 40,
+        "item_specific_speeds": [
+          {
+            "item": { "tags": "q.any_tag('minecraft:is_pickaxe')" },
+            "destroy_speed": 4
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,91 @@
+## Strings for the Super Enchantments add-on.
+## Client-side translations live in the resource pack; the behavior pack
+## references them by key with RawMessage { translate: ... }.
+
+tile.steveo:enchantment_fountain.name=Super Enchantment Fountain
+
+## Enchantment names, vanilla and custom, used in the fountain menu and item lore.
+super_enchantments.enchant.aqua_affinity=Aqua Affinity
+super_enchantments.enchant.bane_of_arthropods=Bane of Arthropods
+super_enchantments.enchant.binding=Curse of Binding
+super_enchantments.enchant.blast_protection=Blast Protection
+super_enchantments.enchant.breach=Breach
+super_enchantments.enchant.channeling=Channeling
+super_enchantments.enchant.density=Density
+super_enchantments.enchant.depth_strider=Depth Strider
+super_enchantments.enchant.efficiency=Efficiency
+super_enchantments.enchant.feather_falling=Feather Falling
+super_enchantments.enchant.fire_aspect=Fire Aspect
+super_enchantments.enchant.fire_protection=Fire Protection
+super_enchantments.enchant.flame=Flame
+super_enchantments.enchant.fortune=Fortune
+super_enchantments.enchant.frost_walker=Frost Walker
+super_enchantments.enchant.impaling=Impaling
+super_enchantments.enchant.infinity=Infinity
+super_enchantments.enchant.knockback=Knockback
+super_enchantments.enchant.looting=Looting
+super_enchantments.enchant.loyalty=Loyalty
+super_enchantments.enchant.luck_of_the_sea=Luck of the Sea
+super_enchantments.enchant.lure=Lure
+super_enchantments.enchant.mending=Mending
+super_enchantments.enchant.multishot=Multishot
+super_enchantments.enchant.piercing=Piercing
+super_enchantments.enchant.power=Power
+super_enchantments.enchant.projectile_protection=Projectile Protection
+super_enchantments.enchant.protection=Protection
+super_enchantments.enchant.punch=Punch
+super_enchantments.enchant.quick_charge=Quick Charge
+super_enchantments.enchant.respiration=Respiration
+super_enchantments.enchant.riptide=Riptide
+super_enchantments.enchant.sharpness=Sharpness
+super_enchantments.enchant.silk_touch=Silk Touch
+super_enchantments.enchant.smite=Smite
+super_enchantments.enchant.soul_speed=Soul Speed
+super_enchantments.enchant.swift_sneak=Swift Sneak
+super_enchantments.enchant.thorns=Thorns
+super_enchantments.enchant.unbreaking=Unbreaking
+super_enchantments.enchant.vanishing=Curse of Vanishing
+super_enchantments.enchant.wind_burst=Wind Burst
+super_enchantments.enchant.power_knockback=Power Knockback
+super_enchantments.enchant.extra_hit=Extra Hit
+super_enchantments.enchant.super_efficiency=Super Efficiency
+
+## The fountain menu
+super_enchantments.fountain.title=Super Enchantment Fountain
+super_enchantments.fountain.body=The waters hum with power. Every enchantment goes up to level %s here.\n\nYou carry §9%s§r lapis lazuli. Each level costs §9%s§r lapis.
+super_enchantments.fountain.button.new=%s
+super_enchantments.fountain.button.upgrade=%s §7(now %s)
+super_enchantments.fountain.level=Level
+super_enchantments.fountain.cost=Each level above the current one costs %s lapis lazuli. You carry %s.
+super_enchantments.fountain.submit=Enchant
+super_enchantments.fountain.hold=Hold the item you want to enchant, then use the fountain.
+super_enchantments.fountain.nothing=The fountain has nothing to offer that item.
+super_enchantments.fountain.book=The fountain enchants gear directly, not books.
+super_enchantments.fountain.maxed=%s is already at level %s, the most the fountain can give.
+super_enchantments.fountain.changed=You switched items. Hold the item you chose and try again.
+super_enchantments.fountain.lapis=That needs §9%s§r lapis lazuli and you carry §9%s§r.
+super_enchantments.fountain.failed=The fountain could not put %s on that item.
+super_enchantments.fountain.done=The fountain grants §d%s %s§r to your %s for %s lapis.
+
+## Enchantment effects
+super_enchantments.efficiency.start=Super Efficiency bites into the bedrock. Keep mining for %s.
+super_enchantments.efficiency.progress=Mining bedrock %s §7%s%% · %s left
+super_enchantments.efficiency.lost=You stopped mining the bedrock. Progress lost.
+super_enchantments.efficiency.done=The bedrock gives way!
+
+## Debug (/scriptevent steveo:enchant ...)
+super_enchantments.debug.tower=An Enchantment Tower has been raised around you. Climb the ladder.
+super_enchantments.debug.tower.failed=Could not place the tower here: %s
+super_enchantments.debug.fountain=A Super Enchantment Fountain has been placed on the block you are looking at.
+super_enchantments.debug.look=Look at a block within reach first.
+super_enchantments.debug.lapis=64 lapis lazuli have been placed in your inventory.
+super_enchantments.debug.bedrock=A bedrock block has been placed on the block you are looking at.
+super_enchantments.debug.letters=Enchantment letters!
+super_enchantments.debug.info.none=You are not holding anything.
+super_enchantments.debug.info.header=%s carries %s enchantment(s):
+super_enchantments.debug.info.line=  §d%s %s§r (vanilla max %s, in-game level %s)
+super_enchantments.debug.info.empty=  (none)
+super_enchantments.debug.apply=Applied §d%s %s§r to your %s.
+super_enchantments.debug.apply.bad=Usage: apply <enchantment> <1-%s>, for example: apply sharpness 20 or apply extra_hit 5
+super_enchantments.debug.apply.failed=Could not apply %s: %s
+super_enchantments.debug.help=Usage: /scriptevent steveo:enchant <tower|fountain|lapis|bedrock|letters|info|apply <id> <level>>

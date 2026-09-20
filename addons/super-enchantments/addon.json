@@ -1,0 +1,5 @@
+{
+  "$schema": "../../tools/schemas/addon.schema.json",
+  "name": "Super Enchantments",
+  "description": "Every enchantment goes to level 20 at the Super Enchantment Fountain atop a randomly generated Enchantment Tower, plus Power Knockback, Extra Hit, and Super Efficiency."
+}
