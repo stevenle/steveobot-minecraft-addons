@@ -12,7 +12,8 @@
             "texture.lapis",
             "texture.redstone",
             "texture.iron",
-            "texture.coal"
+            "texture.coal",
+            "texture.heart"
           ]
         }
       },

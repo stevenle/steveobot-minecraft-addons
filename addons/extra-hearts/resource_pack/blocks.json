@@ -1,0 +1,13 @@
+{
+  "format_version": [
+    1,
+    1,
+    0
+  ],
+  "steveo:heart_ore": {
+    "sound": "stone"
+  },
+  "steveo:deepslate_heart_ore": {
+    "sound": "deepslate"
+  }
+}

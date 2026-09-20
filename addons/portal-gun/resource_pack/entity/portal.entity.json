@@ -4,7 +4,7 @@
     "description": {
       "identifier": "steveo:portal",
       "materials": {
-        "default": "steveo_portal"
+        "default": "entity_emissive_alpha"
       },
       "textures": {
         "blue": "textures/entity/portal_blue",

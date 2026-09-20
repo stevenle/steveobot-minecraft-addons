@@ -1,0 +1,19 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:item": {
+    "description": {
+      "identifier": "steveo:heart_fragment",
+      "menu_category": {
+        "category": "items"
+      }
+    },
+    "components": {
+      "minecraft:icon": "steveo_heart_fragment",
+      "minecraft:display_name": {
+        "value": "item.steveo:heart_fragment.name"
+      },
+      "minecraft:max_stack_size": 64,
+      "minecraft:rarity": "uncommon"
+    }
+  }
+}

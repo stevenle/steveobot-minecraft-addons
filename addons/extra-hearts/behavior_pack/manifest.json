@@ -1,0 +1,38 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Extra Hearts BP",
+    "description": "Mine Heart Ore for Heart Fragments, craft them into Heart Containers, and eat them for extra hearts, up to 30 in total.",
+    "uuid": "bd325c50-4497-42aa-b58f-0a30392e2190",
+    "version": [1, 0, 2],
+    "min_engine_version": [1, 26, 40]
+  },
+  "modules": [
+    {
+      "type": "data",
+      "uuid": "f17b850d-9331-4983-9981-805fdca62ce3",
+      "version": [1, 0, 2]
+    },
+    {
+      "type": "script",
+      "language": "javascript",
+      "entry": "scripts/main.js",
+      "uuid": "7b7eccb4-c4c1-45c8-a28d-3289ff94d5d3",
+      "version": [1, 0, 2]
+    }
+  ],
+  "dependencies": [
+    {
+      "uuid": "10287469-1641-440f-849e-10a184c8fa22",
+      "version": [1, 0, 2]
+    },
+    {
+      "module_name": "@minecraft/server",
+      "version": "2.9.0"
+    }
+  ],
+  "metadata": {
+    "authors": ["Steven Le"],
+    "license": "MIT"
+  }
+}

@@ -14,9 +14,10 @@
  *
  * A portal is a `steveo:portal` marker entity that the resource pack renders
  * as a glowing oval, oriented by `mark_variant` and colored by `variant`.
- * Floor and ceiling portals are measured from the block's real surface, not
- * its cell boundary, so a portal on soul sand, a slab or a snow layer sits on
- * it and still catches whoever stands in it.
+ * Floor and ceiling portals sit on the cell boundary of a full block. An
+ * earlier version measured the block's real surface so portals could sit on
+ * soul sand and slabs, but portals stopped showing up after that change on
+ * 1.26.50, so it was taken out (2026-09-19).
  *
  * Every tick the script looks for entities inside a linked pair's portals and
  * teleports them to the other end, facing out of it, with their speed
@@ -107,12 +108,6 @@ interface PortalData {
   base: Vector3;
   /** Unit vector pointing out of the portal into open space. */
   normal: Vector3;
-  /**
-   * Height of the solid surface the portal sits on, relative to `base.y`.
-   * Floors: 0 on a full block, -0.125 on soul sand, -0.5 on a bottom slab.
-   * Ceilings: 1 under a full block, 1.5 under a top slab. Walls use 0.
-   */
-  surface: number;
   dimension: string;
   createdAt: number;
 }
@@ -210,9 +205,9 @@ function entityLocation(p: PortalData): Vector3 {
     case 'wall':
       return sub(c, scale(p.normal, 0.5 - PLANE_OFFSET));
     case 'floor':
-      return { x: c.x, y: c.y + p.surface + PLANE_OFFSET, z: c.z };
+      return { x: c.x, y: c.y + PLANE_OFFSET, z: c.z };
     case 'ceiling':
-      return { x: c.x, y: c.y + p.surface - PLANE_OFFSET, z: c.z };
+      return { x: c.x, y: c.y + 1 - PLANE_OFFSET, z: c.z };
   }
 }
 
@@ -223,10 +218,10 @@ function exitLocation(p: PortalData): Vector3 {
     case 'wall':
       return add(c, scale(p.normal, 0.4));
     case 'floor':
-      return { x: c.x, y: c.y + p.surface + 0.1, z: c.z };
+      return { x: c.x, y: c.y + 0.1, z: c.z };
     case 'ceiling':
-      // Feet well below the surface so a player's head sits just under it.
-      return { x: c.x, y: c.y + p.surface - 1.9, z: c.z };
+      // Feet a little below the cell so a player's head sits inside it.
+      return { x: c.x, y: c.y - 0.9, z: c.z };
   }
 }
 
@@ -255,22 +250,19 @@ function isInside(p: PortalData, entity: Entity): boolean {
     const rel = sub(loc, c);
     const fromPlane = dot(rel, p.normal) + 0.5;
     const lateral = Math.abs(rel.x * p.normal.z - rel.z * p.normal.x);
-    // Feet may sit a little below the base cell: soul sand, slabs and the like.
     return (
-      fromPlane > -0.5 && fromPlane < 0.45 && lateral < 0.55 && rel.y > -0.55 && rel.y < 1.8
+      fromPlane > -0.5 && fromPlane < 0.45 && lateral < 0.55 && rel.y > -0.3 && rel.y < 1.8
     );
   }
   if (Math.floor(loc.x) !== p.base.x || Math.floor(loc.z) !== p.base.z) return false;
-  // Feet height above the surface the portal sits on, not the cell boundary,
-  // so a portal on soul sand (7/8 high) or a slab still sees who stands in it.
-  const dy = loc.y - (p.base.y + p.surface);
+  const dy = loc.y - p.base.y;
   if (p.kind === 'floor') {
     // Extend the window upward by the fall speed so a fast faller cannot skip it.
     const falling = Math.max(0, -entity.getVelocity().y);
-    return dy >= -0.2 && dy < 1.5 + falling;
+    return dy >= -0.1 && dy < 1.5 + falling;
   }
-  // Ceiling: the head has to reach the surface, so feet must be within ~1.85 below it.
-  return dy >= -1.85 && dy < 0;
+  // Ceiling: the head has to reach the surface, so feet must be within ~0.85 of the cell.
+  return dy >= -0.85 && dy < 1;
 }
 
 // ---------- registry ----------
@@ -317,9 +309,8 @@ function adopt(entity: Entity): void {
 
   let data: PortalData;
   try {
-    const parsed = JSON.parse(raw) as Omit<PortalData, 'surface'> & Partial<Pick<PortalData, 'surface'>>;
-    // Portals saved before `surface` existed were always placed on full blocks.
-    data = { ...parsed, surface: parsed.surface ?? (parsed.kind === 'ceiling' ? 1 : 0) };
+    // Older portals may carry an extra `surface` field; it is ignored.
+    data = JSON.parse(raw) as PortalData;
   } catch {
     return;
   }
@@ -366,38 +357,21 @@ function isOpen(dimension: Dimension, pos: Vector3): boolean {
   }
 }
 
-/**
- * Height within the hit block at which the ray met it, snapped to sixteenths.
- * The ray stops at the block's collision shape, so a top-face hit reads 1 on a
- * full block, 0.875 on soul sand and 0.5 on a bottom slab; a bottom-face hit
- * reads 0 under a full block and 0.5 under a top slab.
- */
-function surfaceHeight(hit: BlockRaycastHit): number {
-  const y = Math.round(hit.faceLocation.y * 16) / 16;
-  return Math.min(1, Math.max(0, y));
-}
-
 /** Works out where a portal goes for a raycast hit, or undefined if it will not fit. */
-function planPortal(
-  hit: BlockRaycastHit,
-): Pick<PortalData, 'kind' | 'base' | 'normal' | 'surface'> | undefined {
+function planPortal(hit: BlockRaycastHit): Pick<PortalData, 'kind' | 'base' | 'normal'> | undefined {
   const dimension = hit.block.dimension;
   const normal = normalOf(hit.face);
   const front = add(hit.block.location, normal);
   if (!isOpen(dimension, front)) return undefined;
 
-  if (hit.face === Direction.Up) {
-    return { kind: 'floor', base: front, normal, surface: surfaceHeight(hit) - 1 };
-  }
-  if (hit.face === Direction.Down) {
-    return { kind: 'ceiling', base: front, normal, surface: 1 + surfaceHeight(hit) };
-  }
+  if (hit.face === Direction.Up) return { kind: 'floor', base: front, normal };
+  if (hit.face === Direction.Down) return { kind: 'ceiling', base: front, normal };
 
   // Walls need two cells. If the one above is blocked, slide down a block so a
   // shot at the top of a short wall still lands.
-  if (isOpen(dimension, add(front, UP))) return { kind: 'wall', base: front, normal, surface: 0 };
+  if (isOpen(dimension, add(front, UP))) return { kind: 'wall', base: front, normal };
   const below = add(front, DOWN);
-  if (isOpen(dimension, below)) return { kind: 'wall', base: below, normal, surface: 0 };
+  if (isOpen(dimension, below)) return { kind: 'wall', base: below, normal };
   return undefined;
 }
 
