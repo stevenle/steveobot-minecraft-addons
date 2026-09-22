@@ -25,7 +25,7 @@ const TIERS = [
     ingredient: { tag: 'minecraft:planks' },
     repair: ['minecraft:oak_planks', 'minecraft:spruce_planks', 'minecraft:birch_planks', 'minecraft:jungle_planks', 'minecraft:acacia_planks', 'minecraft:dark_oak_planks', 'minecraft:mangrove_planks', 'minecraft:cherry_planks', 'minecraft:pale_oak_planks', 'minecraft:bamboo_planks', 'minecraft:crimson_planks', 'minecraft:warped_planks'],
     unlock: [{ item: 'minecraft:stick' }],
-    colors: { D: [160, 128, 78], L: [196, 164, 110], K: [112, 86, 50] },
+    colors: { A: [55, 41, 16], B: [134, 101, 38], C: [107, 81, 31], D: [117, 88, 33], I: [32, 24, 10], J: [89, 67, 25] },
   },
   {
     id: 'stone', name: 'Stone Paxel', durability: 131, speed: 4, damage: 5, enchant: 5,
@@ -33,7 +33,7 @@ const TIERS = [
     ingredient: { tag: 'minecraft:stone_tool_materials' },
     repair: ['minecraft:cobblestone', 'minecraft:cobbled_deepslate', 'minecraft:blackstone'],
     unlock: [{ item: 'minecraft:cobblestone' }, { item: 'minecraft:cobbled_deepslate' }, { item: 'minecraft:blackstone' }],
-    colors: { D: [130, 130, 130], L: [172, 172, 172], K: [88, 88, 88] },
+    colors: { A: [73, 73, 73], B: [154, 154, 154], C: [127, 127, 127], D: [137, 137, 137], I: [24, 24, 24], J: [108, 108, 108] },
   },
   {
     id: 'copper', name: 'Copper Paxel', durability: 190, speed: 5, damage: 5, enchant: 13,
@@ -41,7 +41,7 @@ const TIERS = [
     ingredient: { item: 'minecraft:copper_ingot' },
     repair: ['minecraft:copper_ingot'],
     unlock: [{ item: 'minecraft:copper_ingot' }],
-    colors: { D: [204, 112, 70], L: [240, 160, 120], K: [140, 70, 40] },
+    colors: { A: [107, 50, 32], B: [252, 174, 156], C: [219, 115, 80], D: [242, 143, 116], I: [68, 28, 19], J: [187, 88, 53] },
   },
   {
     id: 'iron', name: 'Iron Paxel', durability: 250, speed: 6, damage: 6, enchant: 14,
@@ -49,7 +49,7 @@ const TIERS = [
     ingredient: { item: 'minecraft:iron_ingot' },
     repair: ['minecraft:iron_ingot'],
     unlock: [{ item: 'minecraft:iron_ingot' }],
-    colors: { D: [216, 216, 216], L: [250, 250, 250], K: [150, 150, 150] },
+    colors: { A: [68, 68, 68], B: [255, 255, 255], C: [193, 193, 193], D: [216, 216, 216], I: [24, 24, 24], J: [150, 150, 150] },
   },
   {
     id: 'golden', name: 'Golden Paxel', durability: 32, speed: 12, damage: 4, enchant: 22,
@@ -57,7 +57,7 @@ const TIERS = [
     ingredient: { item: 'minecraft:gold_ingot' },
     repair: ['minecraft:gold_ingot'],
     unlock: [{ item: 'minecraft:gold_ingot' }],
-    colors: { D: [250, 210, 60], L: [255, 245, 160], K: [180, 140, 20] },
+    colors: { A: [130, 93, 22], B: [253, 255, 118], C: [233, 177, 21], D: [234, 238, 87], I: [63, 46, 14], J: [220, 150, 19] },
   },
   {
     id: 'diamond', name: 'Diamond Paxel', durability: 1561, speed: 8, damage: 7, enchant: 10,
@@ -65,7 +65,7 @@ const TIERS = [
     ingredient: { item: 'minecraft:diamond' },
     repair: ['minecraft:diamond'],
     unlock: [{ item: 'minecraft:diamond' }],
-    colors: { D: [77, 226, 210], L: [180, 250, 245], K: [37, 150, 140] },
+    colors: { A: [14, 63, 54], B: [51, 235, 203], C: [39, 178, 154], D: [43, 199, 172], I: [8, 37, 32], J: [30, 138, 119] },
   },
   {
     id: 'netherite', name: 'Netherite Paxel', durability: 2031, speed: 9, damage: 8, enchant: 15,
@@ -73,7 +73,7 @@ const TIERS = [
     // Made at a smithing table from the diamond paxel, like vanilla netherite gear.
     smithing: { base: 'diamond', template: 'minecraft:netherite_upgrade_smithing_template', addition: 'minecraft:netherite_ingot' },
     repair: ['minecraft:netherite_ingot'],
-    colors: { D: [78, 68, 72], L: [120, 108, 112], K: [44, 36, 40] },
+    colors: { A: [74, 41, 64], B: [134, 123, 134], C: [79, 60, 62], D: [93, 86, 93], I: [35, 16, 18], J: [50, 39, 39] },
   },
 ];
 
@@ -175,26 +175,27 @@ function png(width, height, rgba) {
 }
 
 // ---------- Pixel art ----------
-// A head that reads as pickaxe (left spike), axe (blade on the right), and
-// shovel (rounded scoop), on a diagonal stick. D/L/K are the material's base,
-// highlight, and shade; W/V the stick; O the outline.
-const STICK = { W: [140, 100, 60], V: [100, 70, 40], O: [30, 30, 30] };
+// A 13x14 axe-shaped head on a diagonal stick, in the style of the classic
+// paxel mods: the head reads as a broad axe blade with a pick spike. Letters
+// are palette roles. Head (per tier): A outline, B highlight, C base, D light,
+// I deep outline, J shade. Stick (shared): E edge, F mid, G light, H dark.
+const STICK = { E: [73, 54, 21], F: [104, 78, 30], G: [137, 103, 39], H: [40, 30, 11] };
 const rows = [
-  '.....OOOOOOO....',
-  '....ODLLDDDDO...',
-  '...ODLDDDDDDDO..',
-  '..ODDKOOODDDDO..',
-  '.ODDKO.O.ODDDKO.',
-  'ODDKO.OWVOODDKO.',
-  'OKKO..OWVO.OKKO.',
-  '.OO..OWVO...OO..',
-  '....OWVO........',
-  '...OWVO.........',
-  '..OWVO..........',
-  '.OWVO...........',
-  'OWVO............',
-  'OVO.............',
-  'OO..............',
+  '................',
+  '........AA......',
+  '.......ABBA.....',
+  '......ABCDAEF...',
+  '.....ABCCCBGH...',
+  '.....IBDCJCBI...',
+  '......IIEAJCDI..',
+  '.......EGHIJCI..',
+  '......EFH..ICI..',
+  '.....EGH...IDI..',
+  '....EFH....IBI..',
+  '...EGH......II..',
+  '.EEFH...........',
+  '.EGH............',
+  '..HH............',
   '................',
 ];
 
