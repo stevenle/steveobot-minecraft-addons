@@ -1,0 +1,27 @@
+{
+  "resource_pack_name": "paxel",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "steveo_wooden_paxel": {
+      "textures": "textures/items/wooden_paxel"
+    },
+    "steveo_stone_paxel": {
+      "textures": "textures/items/stone_paxel"
+    },
+    "steveo_copper_paxel": {
+      "textures": "textures/items/copper_paxel"
+    },
+    "steveo_iron_paxel": {
+      "textures": "textures/items/iron_paxel"
+    },
+    "steveo_golden_paxel": {
+      "textures": "textures/items/golden_paxel"
+    },
+    "steveo_diamond_paxel": {
+      "textures": "textures/items/diamond_paxel"
+    },
+    "steveo_netherite_paxel": {
+      "textures": "textures/items/netherite_paxel"
+    }
+  }
+}

@@ -1,0 +1,18 @@
+## Strings for the Paxel add-on.
+## Client-side translations live in the resource pack; the behavior pack
+## references them by key with RawMessage { translate: ... }.
+
+item.steveo:wooden_paxel.name=Wooden Paxel
+item.steveo:stone_paxel.name=Stone Paxel
+item.steveo:copper_paxel.name=Copper Paxel
+item.steveo:iron_paxel.name=Iron Paxel
+item.steveo:golden_paxel.name=Golden Paxel
+item.steveo:diamond_paxel.name=Diamond Paxel
+item.steveo:netherite_paxel.name=Netherite Paxel
+
+paxel.debug.given=Placed in your inventory: 
+paxel.debug.given_hint=. Craft one with three of the material across the top, one more on the middle right, and two sticks down the middle; netherite comes from a smithing table.
+paxel.debug.unknown_tier=Unknown tier "%s". Choose one of: %s, or "all".
+paxel.debug.status=Holding a %s: %s of %s durability left.
+paxel.debug.not_holding=You are not holding a paxel. Try "/scriptevent steveo:paxel give".
+paxel.debug.help=Usage: /scriptevent steveo:paxel <give [wooden|stone|copper|iron|golden|diamond|netherite|all]|status>
