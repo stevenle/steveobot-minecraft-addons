@@ -1,6 +1,6 @@
 # Super Enchantments
 
-Every enchantment goes up to level 20, four new enchantments join the
+Every enchantment goes up to level 20, five new enchantments join the
 list, and the place to get them is the Super Enchantment Fountain at the
 top of an Enchantment Tower.
 
@@ -96,6 +96,12 @@ abandons the attempt.
 **Keen Edge** (paxels from the Paxel add-on): Sharpness for paxels, which
 cannot take Sharpness itself. Each level adds 1.25 melee damage, the same as
 a Sharpness level, so level V matches Sharpness V and level XX adds 25.
+
+**Super Gems** (swords, axes, paxels, maces, tridents, bows, crossbows):
+every mob you kill has a small chance of dropping a diamond or an emerald,
+on top of its normal loot. Level I is a 2.5% chance; each level adds 0.5%,
+so level XX is 12%. For arrow kills, the bow or crossbow in your hand when
+the mob dies is the one that counts. Players never drop gems.
 
 ## Debug commands
 
