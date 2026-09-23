@@ -1,6 +1,6 @@
 # Super Enchantments
 
-Every enchantment goes up to level 20, three new enchantments join the
+Every enchantment goes up to level 20, four new enchantments join the
 list, and the place to get them is the Super Enchantment Fountain at the
 top of an Enchantment Tower.
 
@@ -92,6 +92,10 @@ action bar counts down, and when it finishes the block breaks and drops as
 an item. Level I takes 3 minutes; each further level shaves 4% off, so
 level XX takes about 43 seconds. Looking away for more than five seconds
 abandons the attempt.
+
+**Keen Edge** (paxels from the Paxel add-on): Sharpness for paxels, which
+cannot take Sharpness itself. Each level adds 1.25 melee damage, the same as
+a Sharpness level, so level V matches Sharpness V and level XX adds 25.
 
 ## Debug commands
 

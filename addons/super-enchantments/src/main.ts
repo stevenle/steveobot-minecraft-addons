@@ -71,12 +71,15 @@ const LAPIS_PER_LEVEL = 2;
 const POWER_KNOCKBACK = 'steveo:power_knockback';
 const EXTRA_HIT = 'steveo:extra_hit';
 const SUPER_EFFICIENCY = 'steveo:super_efficiency';
-const CUSTOM_IDS = [POWER_KNOCKBACK, EXTRA_HIT, SUPER_EFFICIENCY] as const;
+const KEEN_EDGE = 'steveo:keen_edge';
+const CUSTOM_IDS = [POWER_KNOCKBACK, EXTRA_HIT, SUPER_EFFICIENCY, KEEN_EDGE] as const;
 
 // ---------- tuning ----------
 
 /** Extra melee damage per Sharpness level above V (vanilla adds 1.25 per level). */
 const SHARPNESS_PER_LEVEL = 1.25;
+/** Keen Edge: extra melee damage per level, Sharpness's rate, for paxels (which cannot take Sharpness). */
+const KEEN_EDGE_PER_LEVEL = 1.25;
 /** Extra damage per Smite / Bane of Arthropods level above V, against their families. */
 const SMITE_PER_LEVEL = 2.5;
 /** Arrow damage multiplier gained per Power level above V (vanilla is +25% per level). */
@@ -315,6 +318,14 @@ function isPickaxe(item: ItemStack): boolean {
   return item.hasTag('minecraft:is_pickaxe');
 }
 
+/**
+ * Paxels from the paxel add-on, matched by id so this pack does not depend on
+ * that one: an unknown id simply never matches.
+ */
+function isPaxel(item: ItemStack): boolean {
+  return /^steveo:[a-z]+_paxel$/.test(item.typeId);
+}
+
 function customApplies(id: string, item: ItemStack): boolean {
   switch (id) {
     case POWER_KNOCKBACK:
@@ -322,6 +333,8 @@ function customApplies(id: string, item: ItemStack): boolean {
       return isMelee(item);
     case SUPER_EFFICIENCY:
       return isPickaxe(item);
+    case KEEN_EDGE:
+      return isPaxel(item);
     default:
       return false;
   }
@@ -480,7 +493,7 @@ world.beforeEvents.itemUse.subscribe((event) => {
   if (facingFountain(event.source)) event.cancel = true;
 });
 
-// ---------- damage: super Sharpness/Smite/Bane/Power, super Protection ----------
+// ---------- damage: super Sharpness/Smite/Bane/Power, Keen Edge, super Protection ----------
 
 function hasFamily(entity: Entity, family: string): boolean {
   try {
@@ -494,7 +507,7 @@ function attackBonus(attacker: Player, victim: Entity, source: EntityDamageSourc
   const weapon = heldItem(attacker);
   if (weapon === undefined) return damage;
   if (source.cause === EntityDamageCause.entityAttack) {
-    let bonus = SHARPNESS_PER_LEVEL * surplus(weapon, 'sharpness');
+    let bonus = SHARPNESS_PER_LEVEL * surplus(weapon, 'sharpness') + KEEN_EDGE_PER_LEVEL * totalLevel(weapon, KEEN_EDGE);
     if (hasFamily(victim, 'undead')) bonus += SMITE_PER_LEVEL * surplus(weapon, 'smite');
     if (hasFamily(victim, 'arthropod')) bonus += SMITE_PER_LEVEL * surplus(weapon, 'bane_of_arthropods');
     return damage + bonus;

@@ -57,7 +57,8 @@ Each one also:
   tier.
 - Enchants as a pickaxe: Efficiency, Fortune, Silk Touch, Unbreaking, and
   Mending apply and work on every block the paxel breaks. Sword enchantments
-  do not fit.
+  do not fit; with the Super Enchantments add-on, the fountain offers
+  **Keen Edge** instead, which adds Sharpness-style damage to paxels.
 
 Log stripping and path making come from the game's own axe and shovel tool
 tags. The script also checks after every interaction and does the conversion
