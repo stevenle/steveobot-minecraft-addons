@@ -40,7 +40,8 @@
           "minecraft:is_pickaxe",
           "minecraft:is_axe",
           "minecraft:is_shovel",
-          "minecraft:diamond_tier"
+          "minecraft:diamond_tier",
+          "minecraft:transformable_items"
         ]
       },
       "minecraft:digger": {

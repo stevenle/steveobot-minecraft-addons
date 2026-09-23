@@ -62,6 +62,10 @@ const TIERS = [
   {
     id: 'diamond', name: 'Diamond Paxel', durability: 1561, speed: 8, damage: 7, enchant: 10,
     tier: 'minecraft:diamond_tier', diggable: [...PICK_BASE, 'stone_pick_diggable', 'iron_pick_diggable', 'diamond_pick_diggable'],
+    // The smithing table's base slot only accepts items with this tag; without
+    // it the diamond paxel will not sit in the slot and the netherite upgrade
+    // never matches.
+    extraTags: ['minecraft:transformable_items'],
     ingredient: { item: 'minecraft:diamond' },
     repair: ['minecraft:diamond'],
     unlock: [{ item: 'minecraft:diamond' }],
@@ -102,7 +106,7 @@ function itemJson(t) {
           repair_items: [{ items: t.repair, repair_amount: 'query.max_durability * 0.25' }],
         },
         'minecraft:tags': {
-          tags: ['minecraft:is_tool', 'minecraft:is_pickaxe', 'minecraft:is_axe', 'minecraft:is_shovel', t.tier],
+          tags: ['minecraft:is_tool', 'minecraft:is_pickaxe', 'minecraft:is_axe', 'minecraft:is_shovel', t.tier, ...(t.extraTags ?? [])],
         },
         'minecraft:digger': {
           use_efficiency: true,
