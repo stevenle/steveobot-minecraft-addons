@@ -4,7 +4,7 @@
     "controller.render.steveo_potato": {
       "arrays": {
         "textures": {
-          "array.skins": ["texture.plain", "texture.explosive"]
+          "array.skins": ["texture.plain", "texture.explosive", "texture.poison"]
         }
       },
       "geometry": "geometry.default",

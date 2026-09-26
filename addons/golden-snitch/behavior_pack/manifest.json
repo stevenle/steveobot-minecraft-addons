@@ -4,21 +4,21 @@
     "name": "Golden Snitch BP",
     "description": "A craftable golden snitch that, when released in the Nether, flies off to find the nearest nether fortress, trailing fire behind it.",
     "uuid": "7c076ef6-c71b-4453-95ed-f613e3926ef2",
-    "version": [1, 0, 0],
+    "version": [1, 0, 1],
     "min_engine_version": [1, 26, 40]
   },
   "modules": [
     {
       "type": "data",
       "uuid": "c04a7e27-8319-47e3-a290-bfce7b79ff7e",
-      "version": [1, 0, 0]
+      "version": [1, 0, 1]
     },
     {
       "type": "script",
       "language": "javascript",
       "entry": "scripts/main.js",
       "uuid": "cc1bb5ab-9080-47ee-9791-594673bde79c",
-      "version": [1, 0, 0]
+      "version": [1, 0, 1]
     }
   ],
   "dependencies": [

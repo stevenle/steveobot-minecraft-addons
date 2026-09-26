@@ -4,14 +4,14 @@
     "name": "Potato Gun RP",
     "description": "Two potato-firing weapons, a crossbow and a rocket launcher, plus an Explosive enchantment that makes the potatoes go boom.",
     "uuid": "ef899e1f-3639-4d16-947a-fca5691e9ffa",
-    "version": [1, 0, 3],
+    "version": [1, 1, 1],
     "min_engine_version": [1, 26, 40]
   },
   "modules": [
     {
       "type": "resources",
       "uuid": "32b5ee8d-9855-447b-a982-3fc464f1f45c",
-      "version": [1, 0, 3]
+      "version": [1, 1, 1]
     }
   ],
   "metadata": {

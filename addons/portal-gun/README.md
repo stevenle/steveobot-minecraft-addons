@@ -20,12 +20,15 @@ The gun has no durability, so there is nothing to repair.
 
 ## Using it
 
-Hold the gun and aim at a block within 64 blocks.
+Hold the gun and aim at a block within 128 blocks. Past your render
+distance there is nothing loaded to hit, so the shot fizzles. A portal placed
+beyond the Realm's simulation distance appears but only starts teleporting
+once someone is close enough for its chunk to be active.
 
 | Input | Effect |
 |---|---|
 | **Use** (right-click / tap) | Fires the loaded portal |
-| **Attack** (left-click / swing, even at air) | Switches between **blue** and **orange** |
+| **Attack** (left-click / swing, at air or a block) | Switches between **blue** and **orange** |
 | **Crouch + Use** | Also switches colors, for touch and controller players |
 
 The gun shows which color is loaded: its core and muzzle glow blue or
@@ -33,7 +36,9 @@ orange, and its name reads *Portal Gun (Blue)* or *Portal Gun (Orange)*.
 The action bar confirms each switch. Under the hood the gun is two item
 variants that the script swaps in your hand, keeping any custom name or lore.
 Attacking with the gun never breaks blocks, in Survival or Creative, so the
-attack button is safe to press anywhere. Crouch + Use does the same switch
+attack button is safe to press anywhere. Holding attack on a block switches
+once, not over and over. Hitting a mob with the gun does not switch colors,
+so you can fight with it without losing your loaded color. Crouch + Use does the same switch
 without a swing, which matters on touch where a tap on empty space does not
 count as an attack.
 
@@ -57,6 +62,10 @@ clear, so standing in a floor portal does not bounce you back and forth.
 across dimensions, but only while both ends are in loaded chunks. A portal
 whose script bookkeeping is lost fades on its own after 30 seconds instead
 of lingering forever.
+
+Using the gun on a chest, bed, door, lever, crafting table, or anything else
+you can click opens or uses that block instead of firing. The same goes for
+villagers, horses, boats, and minecarts.
 
 ## Chat commands
 

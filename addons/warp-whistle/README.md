@@ -47,6 +47,10 @@ rests for five seconds.
 Waypoints are shared by everyone in the world and saved with it, so they
 survive restarts and Realm uploads. Home is personal.
 
+Using the whistle on a chest, bed, door, lever, crafting table, or anything
+else you can click opens or uses that block instead of the warp menu. The same
+goes for villagers, horses, boats, and minecarts.
+
 ## Debug commands
 
 Chat is the only console on a Realm, so the add-on answers to a script event:

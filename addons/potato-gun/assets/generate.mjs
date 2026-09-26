@@ -71,6 +71,11 @@ const P = {
   hotLight: hex('#F0955A'),
   hotDark: hex('#9C3F16'),
   ember: hex('#FFE066'),
+  toxic: hex('#7FA83A'),
+  toxicLight: hex('#A8CF5C'),
+  toxicDark: hex('#4E6B1F'),
+  toxicSpot: hex('#C6F06A'),
+  spiderEye: hex('#B0283A'),
   wood: hex('#7A4E25'),
   woodLight: hex('#A0703A'),
   limb: hex('#4A3520'),
@@ -83,6 +88,8 @@ const P = {
   redDark: hex('#7B1F17'),
   paper: hex('#EADFC5'),
   fuse: hex('#3B3B3B'),
+  green: hex('#3F7A2A'),
+  greenDark: hex('#23491A'),
 };
 
 /** Paints a 16x16 icon from character rows and a legend. */
@@ -96,12 +103,17 @@ function paintRows(rows, legend) {
 }
 
 // ---------- Potato entity texture: 16x16 tile ----------
-function paintPotatoTile(hot) {
-  const base = hot ? P.hotPotato : P.potato;
-  const light = hot ? P.hotLight : P.potatoLight;
-  const dark = hot ? P.hotDark : P.potatoDark;
+// `variant` is 'plain', 'hot' (explosive), or 'poison'.
+const SKINS = {
+  plain: { base: P.potato, light: P.potatoLight, dark: P.potatoDark, seed: 3 },
+  hot: { base: P.hotPotato, light: P.hotLight, dark: P.hotDark, seed: 7 },
+  poison: { base: P.toxic, light: P.toxicLight, dark: P.toxicDark, seed: 5 },
+};
+
+function paintPotatoTile(variant) {
+  const { base, light, dark, seed } = SKINS[variant];
   const c = canvas(16, 16);
-  const rand = rng(hot ? 7 : 3);
+  const rand = rng(seed);
   for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) {
     const n = rand();
     let col = base;
@@ -114,7 +126,11 @@ function paintPotatoTile(hot) {
     c.set(x, y, P.eye);
     c.set(x + 1, y, dark);
   }
-  if (hot) {
+  if (variant === 'poison') {
+    // Sickly spots, like a vanilla poisonous potato.
+    for (const [x, y] of [[8, 7], [4, 9], [13, 5], [10, 13]]) c.set(x, y, P.toxicSpot);
+  }
+  if (variant === 'hot') {
     // Embers glowing through the skin.
     for (const [x, y] of [[8, 7], [4, 9], [13, 5]]) c.set(x, y, P.ember);
   }
@@ -124,6 +140,8 @@ function paintPotatoTile(hot) {
 // ---------- Icons ----------
 const potatoLegend = { P: P.potato, p: P.potatoLight, d: P.potatoDark, e: P.eye };
 const hotLegend = { P: P.hotPotato, p: P.hotLight, d: P.hotDark, e: P.ember };
+const poisonLegend = { P: P.toxic, p: P.toxicLight, d: P.toxicDark, e: P.toxicSpot };
+const LEGENDS = { plain: potatoLegend, hot: hotLegend, poison: poisonLegend };
 
 function crossbowRows() {
   return [
@@ -188,29 +206,51 @@ function bookRows() {
   ];
 }
 
-function paintCrossbow(hot) {
+function paintCrossbow(variant) {
   return paintRows(crossbowRows(), {
     L: P.limb, S: P.string, W: P.wood, I: P.iron,
-    ...(hot ? hotLegend : potatoLegend),
+    ...LEGENDS[variant],
   });
 }
 
-function paintLauncher(hot) {
+function paintLauncher(variant) {
   return paintRows(launcherRows(), {
     s: P.steelLight, S: P.steel, D: P.steelDark, R: P.wood,
-    ...(hot ? hotLegend : potatoLegend),
+    ...LEGENDS[variant],
   });
 }
 
-function paintBook() {
-  return paintRows(bookRows(), {
-    R: P.redDark, r: P.red, f: P.fuse, e: P.ember, P: P.paper,
-  });
+function paintBook(variant) {
+  // The explosive book is red with a lit fuse; the poison book green with a spider eye.
+  return paintRows(bookRows(), variant === 'poison'
+    ? { R: P.greenDark, r: P.green, f: P.toxicDark, e: P.spiderEye, P: P.paper }
+    : { R: P.redDark, r: P.red, f: P.fuse, e: P.ember, P: P.paper });
 }
 
 // ---------- Pack icon: 128x128 ----------
+// A vanilla-style potato item: a 16x16 sprite lit from the top left, drawn
+// at 6x with hard pixel edges, plus a lit fuse on its tip for the explosive half.
+const PACK_POTATO = [
+  '................',
+  '................',
+  '..........OOO...',
+  '........OOLHLO..',
+  '......OOLLHLPO..',
+  '.....OLLHLPPPO..',
+  '....OLLLPPePDO..',
+  '...OLHLPPPPPDO..',
+  '...OLLPePPPDO...',
+  '..OLLPPPPPDDO...',
+  '..OLPPPPPeDO....',
+  '..OPPePPDDO.....',
+  '..ODPPDDDO......',
+  '...ODDDOO.......',
+  '....OOO.........',
+  '................',
+];
+
 function paintPackIcon() {
-  const S = 128;
+  const S = 128, PX = 6, OFF = 16;
   const c = canvas(S, S);
   const bg = hex('#1B1F27');
   const border = hex('#2C333F');
@@ -218,33 +258,22 @@ function paintPackIcon() {
     const edge = x < 4 || y < 4 || x >= S - 4 || y >= S - 4;
     c.set(x, y, edge ? border : bg);
   }
-  // A big lumpy potato in the middle.
-  const rand = rng(11);
-  const cx = 64, cy = 66, rx = 44, ry = 30;
-  const noise = Array.from({ length: S }, () => Array.from({ length: S }, () => rand()));
-  for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) {
-    const dx = (x - cx) / rx;
-    const dy = (y - cy) / ry;
-    // Two bumps make the ellipse lumpy.
-    const bump = 0.12 * Math.sin(dx * 5) * Math.cos(dy * 3);
-    const r = Math.sqrt(dx * dx + dy * dy) + bump;
-    if (r > 1) continue;
-    const n = noise[y][x];
-    let col = P.potato;
-    if (n < 0.1) col = P.potatoLight;
-    else if (n < 0.2) col = P.potatoDark;
-    if (r > 0.92) col = mix(col, P.potatoDark, 0.6);
-    c.set(x, y, col);
-  }
-  for (const [x, y] of [[40, 56], [78, 50], [60, 80], [92, 74], [48, 78]]) {
-    for (let dy = 0; dy < 3; dy++) for (let dx = 0; dx < 3; dx++) c.set(x + dx, y + dy, P.eye);
-  }
-  // A lit fuse on top, for the explosive half of the add-on.
-  for (let i = 0; i < 14; i++) c.set(70 + Math.round(i * 0.6), 36 - i, P.fuse);
-  for (let i = 0; i < 14; i++) c.set(71 + Math.round(i * 0.6), 36 - i, P.fuse);
-  for (const [dx, dy] of [[0, 0], [1, 0], [0, 1], [1, 1], [-1, 0], [2, 0], [0, -1], [1, -1], [0, 2], [1, 2]]) {
-    c.set(79 + dx, 21 + dy, P.ember);
-  }
+  const cell = (gx, gy, col) => {
+    for (let dy = 0; dy < PX; dy++) for (let dx = 0; dx < PX; dx++) c.set(OFF + gx * PX + dx, OFF + gy * PX + dy, col);
+  };
+  const legend = {
+    O: hex('#4A3014'), D: hex('#9A6A2C'), P: hex('#C8963E'),
+    L: hex('#DDB25A'), H: hex('#F0D48A'), e: hex('#6E4A1C'),
+  };
+  PACK_POTATO.forEach((row, gy) => [...row].forEach((ch, gx) => {
+    const col = legend[ch];
+    if (col) cell(gx, gy, col);
+  }));
+  // The fuse leaves the tip up and to the right; the spark sits in the margin.
+  cell(13, 1, P.fuse);
+  cell(14, 0, P.fuse);
+  cell(15, -1, P.ember);
+  cell(16, -2, mix(P.ember, hex('#FFFFFF'), 0.5));
   return c;
 }
 
@@ -253,13 +282,17 @@ const rp = path.join(out, 'resource_pack');
 fs.mkdirSync(path.join(rp, 'textures', 'entity'), { recursive: true });
 fs.mkdirSync(path.join(rp, 'textures', 'items'), { recursive: true });
 const items = path.join(rp, 'textures', 'items');
-fs.writeFileSync(path.join(items, 'potato_crossbow.png'), paintCrossbow(false).png());
-fs.writeFileSync(path.join(items, 'potato_crossbow_explosive.png'), paintCrossbow(true).png());
-fs.writeFileSync(path.join(items, 'potato_launcher.png'), paintLauncher(false).png());
-fs.writeFileSync(path.join(items, 'potato_launcher_explosive.png'), paintLauncher(true).png());
-fs.writeFileSync(path.join(items, 'explosive_enchantment.png'), paintBook().png());
-fs.writeFileSync(path.join(rp, 'textures', 'entity', 'potato.png'), paintPotatoTile(false).png());
-fs.writeFileSync(path.join(rp, 'textures', 'entity', 'potato_explosive.png'), paintPotatoTile(true).png());
+fs.writeFileSync(path.join(items, 'potato_crossbow.png'), paintCrossbow('plain').png());
+fs.writeFileSync(path.join(items, 'potato_crossbow_explosive.png'), paintCrossbow('hot').png());
+fs.writeFileSync(path.join(items, 'potato_crossbow_poison.png'), paintCrossbow('poison').png());
+fs.writeFileSync(path.join(items, 'potato_launcher.png'), paintLauncher('plain').png());
+fs.writeFileSync(path.join(items, 'potato_launcher_explosive.png'), paintLauncher('hot').png());
+fs.writeFileSync(path.join(items, 'potato_launcher_poison.png'), paintLauncher('poison').png());
+fs.writeFileSync(path.join(items, 'explosive_enchantment.png'), paintBook('hot').png());
+fs.writeFileSync(path.join(items, 'poison_enchantment.png'), paintBook('poison').png());
+fs.writeFileSync(path.join(rp, 'textures', 'entity', 'potato.png'), paintPotatoTile('plain').png());
+fs.writeFileSync(path.join(rp, 'textures', 'entity', 'potato_explosive.png'), paintPotatoTile('hot').png());
+fs.writeFileSync(path.join(rp, 'textures', 'entity', 'potato_poison.png'), paintPotatoTile('poison').png());
 const icon = paintPackIcon().png();
 fs.writeFileSync(path.join(rp, 'pack_icon.png'), icon);
 fs.writeFileSync(path.join(out, 'behavior_pack', 'pack_icon.png'), icon);

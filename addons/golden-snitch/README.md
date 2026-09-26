@@ -58,6 +58,11 @@ place until they return, or until someone catches it. A snitch the script
 has lost track of fades on its own after 60 seconds instead of lingering
 forever.
 
+Using the snitch on a chest, bed, door, lever, crafting table, or anything
+else you can click opens or uses that block instead of releasing the snitch.
+The same goes for villagers, horses, boats, and minecarts. Crouch to release
+it anyway.
+
 ## Chat commands
 
 These are script events. Type them in chat with a leading slash. They are

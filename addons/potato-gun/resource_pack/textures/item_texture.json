@@ -6,6 +6,9 @@
     "steveo_potato_crossbow_explosive": { "textures": "textures/items/potato_crossbow_explosive" },
     "steveo_potato_launcher": { "textures": "textures/items/potato_launcher" },
     "steveo_potato_launcher_explosive": { "textures": "textures/items/potato_launcher_explosive" },
-    "steveo_explosive_enchantment": { "textures": "textures/items/explosive_enchantment" }
+    "steveo_potato_crossbow_poison": { "textures": "textures/items/potato_crossbow_poison" },
+    "steveo_potato_launcher_poison": { "textures": "textures/items/potato_launcher_poison" },
+    "steveo_explosive_enchantment": { "textures": "textures/items/explosive_enchantment" },
+    "steveo_poison_enchantment": { "textures": "textures/items/poison_enchantment" }
   }
 }
