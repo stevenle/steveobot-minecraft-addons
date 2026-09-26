@@ -8,52 +8,17 @@
     },
     "component_groups": {
       "steveo:crossbow": {
-        "minecraft:mark_variant": { "value": 0 },
-        "minecraft:projectile": {
-          "on_hit": {
-            "impact_damage": {
-              "damage": 6,
-              "knockback": true,
-              "semi_random_diff_damage": false,
-              "destroy_on_hit": true
-            },
-            "remove_on_hit": {}
-          },
-          "power": 2.4,
-          "gravity": 0.05,
-          "uncertainty_base": 0,
-          "uncertainty_multiplier": 0,
-          "anchor": 1,
-          "offset": [0, -0.1, 0],
-          "inertia": 0.99,
-          "liquid_inertia": 0.6
-        }
+        "minecraft:mark_variant": { "value": 0 }
       },
       "steveo:launcher": {
         "minecraft:mark_variant": { "value": 1 },
-        "minecraft:scale": { "value": 1.8 },
-        "minecraft:projectile": {
-          "on_hit": {
-            "impact_damage": {
-              "damage": 12,
-              "knockback": true,
-              "semi_random_diff_damage": false,
-              "destroy_on_hit": true
-            },
-            "remove_on_hit": {}
-          },
-          "power": 1.6,
-          "gravity": 0.012,
-          "uncertainty_base": 0,
-          "uncertainty_multiplier": 0,
-          "anchor": 1,
-          "offset": [0, -0.1, 0],
-          "inertia": 0.995,
-          "liquid_inertia": 0.6
-        }
+        "minecraft:scale": { "value": 1.8 }
       },
       "steveo:explosive": {
         "minecraft:variant": { "value": 1 }
+      },
+      "steveo:poison": {
+        "minecraft:variant": { "value": 2 }
       },
       "steveo:fuse": {
         "minecraft:timer": {
@@ -67,35 +32,16 @@
       }
     },
     "components": {
-      "minecraft:type_family": { "family": ["steveo_potato", "projectile", "inanimate"] },
+      "minecraft:type_family": { "family": ["steveo_potato", "inanimate"] },
       "minecraft:collision_box": { "width": 0.25, "height": 0.25 },
-      "minecraft:physics": {},
+      "minecraft:physics": { "has_gravity": false, "has_collision": false },
       "minecraft:pushable": { "is_pushable": false, "is_pushable_by_piston": false },
       "minecraft:fire_immune": {},
       "minecraft:damage_sensor": {
         "triggers": [{ "cause": "all", "deals_damage": false }]
       },
       "minecraft:variant": { "value": 0 },
-      "minecraft:mark_variant": { "value": 0 },
-      "minecraft:projectile": {
-        "on_hit": {
-          "impact_damage": {
-            "damage": 6,
-            "knockback": true,
-            "semi_random_diff_damage": false,
-            "destroy_on_hit": true
-          },
-          "remove_on_hit": {}
-        },
-        "power": 2.4,
-        "gravity": 0.05,
-        "uncertainty_base": 0,
-        "uncertainty_multiplier": 0,
-        "anchor": 1,
-        "offset": [0, -0.1, 0],
-        "inertia": 0.99,
-        "liquid_inertia": 0.6
-      }
+      "minecraft:mark_variant": { "value": 0 }
     },
     "events": {
       "minecraft:entity_spawned": { "add": { "component_groups": ["steveo:fuse"] } },
@@ -106,6 +52,12 @@
       },
       "steveo:launcher_explosive": {
         "add": { "component_groups": ["steveo:fuse", "steveo:launcher", "steveo:explosive"] }
+      },
+      "steveo:crossbow_poison": {
+        "add": { "component_groups": ["steveo:fuse", "steveo:crossbow", "steveo:poison"] }
+      },
+      "steveo:launcher_poison": {
+        "add": { "component_groups": ["steveo:fuse", "steveo:launcher", "steveo:poison"] }
       },
       "steveo:despawn": { "add": { "component_groups": ["steveo:gone"] } }
     }

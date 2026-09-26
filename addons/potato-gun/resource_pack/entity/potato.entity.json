@@ -8,24 +8,28 @@
       },
       "textures": {
         "plain": "textures/entity/potato",
-        "explosive": "textures/entity/potato_explosive"
+        "explosive": "textures/entity/potato_explosive",
+        "poison": "textures/entity/potato_poison"
       },
       "geometry": {
         "default": "geometry.steveo_potato"
       },
       "particle_effects": {
         "smoke": "minecraft:basic_smoke_particle",
-        "flame": "minecraft:basic_flame_particle"
+        "flame": "minecraft:basic_flame_particle",
+        "poison": "steveo:poison_trail"
       },
       "animations": {
         "spin": "animation.steveo_potato.spin",
         "fuse_trail": "animation.steveo_potato.fuse_trail",
-        "rocket_trail": "animation.steveo_potato.rocket_trail"
+        "rocket_trail": "animation.steveo_potato.rocket_trail",
+        "poison_trail": "animation.steveo_potato.poison_trail"
       },
       "scripts": {
         "animate": [
           "spin",
           { "fuse_trail": "query.variant == 1" },
+          { "poison_trail": "query.variant == 2" },
           { "rocket_trail": "query.mark_variant == 1" }
         ]
       },

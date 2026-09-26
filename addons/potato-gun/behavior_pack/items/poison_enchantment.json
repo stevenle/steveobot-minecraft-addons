@@ -1,0 +1,20 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:item": {
+    "description": {
+      "identifier": "steveo:poison_enchantment",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": "steveo_poison_enchantment",
+      "minecraft:display_name": {
+        "value": "item.steveo:poison_enchantment.name"
+      },
+      "minecraft:max_stack_size": 16,
+      "minecraft:rarity": "epic",
+      "minecraft:glint": true
+    }
+  }
+}

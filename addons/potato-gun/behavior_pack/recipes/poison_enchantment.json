@@ -1,0 +1,18 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:recipe_shapeless": {
+    "description": {
+      "identifier": "steveo:poison_enchantment_recipe"
+    },
+    "tags": ["crafting_table"],
+    "ingredients": [
+      { "item": "minecraft:book" },
+      { "item": "minecraft:poisonous_potato" },
+      { "item": "minecraft:spider_eye" }
+    ],
+    "unlock": [{ "item": "minecraft:poisonous_potato" }],
+    "result": {
+      "item": "steveo:poison_enchantment"
+    }
+  }
+}
