@@ -57,6 +57,7 @@ import {
 
 import { createLogger } from '@shared/log';
 import { Format } from '@shared/chat';
+import { onItemUse } from '@shared/use';
 
 const log = createLogger('freezeray-gun');
 const PREFIX: RawMessage = { text: `${Format.gray}[Freeze Ray]${Format.reset} ` };
@@ -406,15 +407,8 @@ function handleUse(player: Player): void {
 
 // ---------- events ----------
 
-world.afterEvents.itemUse.subscribe((event) => {
-  if (event.itemStack.typeId === GUN_ID) handleUse(event.source);
-});
-
-// Using the gun on a block fires this instead of (or as well as) itemUse.
-world.afterEvents.playerInteractWithBlock.subscribe((event) => {
-  if (!event.itemStack || !event.isFirstEvent) return;
-  if (event.itemStack.typeId === GUN_ID) handleUse(event.player);
-});
+// Fires in the air or at a block, but not when the click opens a chest, a bed, a door...
+onItemUse((typeId) => typeId === GUN_ID, (player) => handleUse(player));
 
 // A frozen mob cannot hurt anything: damage it deals, directly or through a
 // projectile it fired, is cancelled before it lands.

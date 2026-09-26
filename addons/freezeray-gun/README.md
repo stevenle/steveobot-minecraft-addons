@@ -61,6 +61,10 @@ A frozen mob also cannot harm anyone, whatever it is:
 
 Once the freeze ends the mob is back to normal, so use the time.
 
+Using the gun on a chest, bed, door, lever, crafting table, or anything else
+you can click opens or uses that block instead of firing. The same goes for
+villagers, horses, boats, and minecarts. Crouch to fire at one anyway.
+
 ## Chat commands
 
 These are script events. Type them in chat with a leading slash. They are

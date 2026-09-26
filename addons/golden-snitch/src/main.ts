@@ -44,6 +44,7 @@ import {
 
 import { createLogger } from '@shared/log';
 import { Format } from '@shared/chat';
+import { onItemUse } from '@shared/use';
 
 const log = createLogger('golden-snitch');
 const PREFIX: RawMessage = { text: `${Format.gray}[Golden Snitch]${Format.reset} ` };
@@ -595,16 +596,8 @@ system.runInterval(() => {
 
 // ---------- events ----------
 
-world.afterEvents.itemUse.subscribe((event) => {
-  if (event.itemStack.typeId !== SNITCH_ITEM) return;
-  release(event.source);
-});
-
-// Using the snitch on a block fires this instead of (or as well as) itemUse.
-world.afterEvents.playerInteractWithBlock.subscribe((event) => {
-  if (event.itemStack?.typeId !== SNITCH_ITEM || !event.isFirstEvent) return;
-  release(event.player);
-});
+// Releases in the air or at a block, but not when the click opens a chest, a bed, a door...
+onItemUse((typeId) => typeId === SNITCH_ITEM, (player) => release(player));
 
 world.afterEvents.playerInteractWithEntity.subscribe((event) => {
   if (event.target.typeId !== SNITCH_ENTITY) return;

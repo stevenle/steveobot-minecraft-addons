@@ -7,9 +7,9 @@
  * again moves that portal.
  *
  * The gun is two item variants, one per color, with matching icons so the
- * item in hand shows which portal it will fire. Attacking (swinging the gun,
- * even at air) or using it while crouching swaps the held item for the other
- * variant. The gun never breaks blocks, so the attack button is safe to use
+ * item in hand shows which portal it will fire. Swinging the gun (at air or
+ * at a block, but not into a mob) or using it while crouching swaps the held
+ * item for the other variant. The gun never breaks blocks, so the attack button is safe to use
  * as a toggle; crouch + use covers touch, where a tap on air does not swing.
  *
  * A portal is a `steveo:portal` marker entity that the resource pack renders
@@ -50,6 +50,7 @@ import {
 
 import { createLogger } from '@shared/log';
 import { Format } from '@shared/chat';
+import { onItemUse } from '@shared/use';
 
 const log = createLogger('portal-gun');
 const PREFIX: RawMessage = { text: `${Format.gray}[Portal Gun]${Format.reset} ` };
@@ -75,6 +76,14 @@ const REFRESH_INTERVAL_TICKS = 100;
 const HOLD_CHECK_TICKS = 10;
 /** Ticks between color toggles, so one press cannot flip twice. */
 const TOGGLE_COOLDOWN_TICKS = 4;
+/**
+ * Holding attack on a block swings over and over (the gun never breaks it).
+ * A block swing this soon after the previous one is the same held press and
+ * does not switch again.
+ */
+const MINE_HOLD_TICKS = 10;
+/** Ticks a swing waits before switching, so a mob hit from the same swing has been reported. */
+const SWING_SETTLE_TICKS = 2;
 /** Ticks after a traversal before the same entity may traverse again. */
 const TRAVERSE_COOLDOWN_TICKS = 5;
 /** Cap on exit speed, in blocks per tick (terminal velocity is about 3.9). */
@@ -132,6 +141,10 @@ const lastShot = new Map<string, number>();
 
 /** Last tick each player toggled colors. */
 const lastToggle = new Map<string, number>();
+/** Tick of each player's last swing at a block, to tell a held press from a new one. */
+const lastMineSwing = new Map<string, number>();
+/** Tick at which each player last hit a mob, so that swing does not switch colors. */
+const lastMobHit = new Map<string, number>();
 
 /** The color a gun item fires, or undefined if the item is not a gun. */
 function colorOfGun(typeId: string | undefined): Color | undefined {
@@ -646,28 +659,42 @@ system.runInterval(() => {
 
 // ---------- events ----------
 
-world.afterEvents.itemUse.subscribe((event) => {
-  const color = colorOfGun(event.itemStack.typeId);
-  if (color) handleUse(event.source, event.itemStack, color);
-});
-
-// Using the gun on a block fires this instead of (or as well as) itemUse.
-world.afterEvents.playerInteractWithBlock.subscribe((event) => {
-  if (!event.isFirstEvent) return;
-  const held = event.itemStack;
-  const color = colorOfGun(held?.typeId);
-  if (held && color) handleUse(event.player, held, color);
-});
-
-// Attacking with the gun (a swing, even at nothing) switches colors.
-world.afterEvents.playerSwingStart.subscribe(
-  (event) => {
-    const held = event.heldItemStack;
-    const color = colorOfGun(held?.typeId);
-    if (held && color) toggleColor(event.player, held, color);
+// Fires in the air or at a block, but not when the click opens a chest, a bed, a door...
+onItemUse(
+  (typeId) => colorOfGun(typeId) !== undefined,
+  (player, item) => {
+    const color = colorOfGun(item.typeId);
+    if (color) handleUse(player, item, color);
   },
-  { swingSource: EntitySwingSource.Attack },
 );
+
+// Swinging the gun switches colors: at air (an Attack swing) or at a block
+// (a Mine swing), but not when the swing hits a mob.
+world.afterEvents.playerSwingStart.subscribe((event) => {
+  const { player, swingSource } = event;
+  if (swingSource !== EntitySwingSource.Attack && swingSource !== EntitySwingSource.Mine) return;
+  if (!colorOfGun(event.heldItemStack?.typeId)) return;
+  const tick = system.currentTick;
+  if (swingSource === EntitySwingSource.Mine) {
+    const last = lastMineSwing.get(player.id);
+    lastMineSwing.set(player.id, tick);
+    if (last !== undefined && tick - last <= MINE_HOLD_TICKS) return;
+  }
+  // The swing and the mob hit it causes arrive as separate events in no
+  // guaranteed order, so decide once both have had time to land.
+  system.runTimeout(() => {
+    if (!player.isValid) return;
+    const hit = lastMobHit.get(player.id);
+    if (hit !== undefined && hit >= tick - 1) return;
+    const held = player.getComponent('minecraft:equippable')?.getEquipment(EquipmentSlot.Mainhand);
+    const color = colorOfGun(held?.typeId);
+    if (held && color) toggleColor(player, held, color);
+  }, SWING_SETTLE_TICKS);
+});
+
+world.afterEvents.entityHitEntity.subscribe((event) => {
+  if (event.damagingEntity instanceof Player) lastMobHit.set(event.damagingEntity.id, system.currentTick);
+});
 
 // The gun is not a pickaxe: attacking a block with it must not break the block.
 world.beforeEvents.playerBreakBlock.subscribe((event) => {
@@ -680,6 +707,8 @@ world.afterEvents.playerLeave.subscribe((event) => {
   hinted.delete(event.playerId);
   lastShot.delete(event.playerId);
   lastToggle.delete(event.playerId);
+  lastMineSwing.delete(event.playerId);
+  lastMobHit.delete(event.playerId);
 });
 
 // Adopt portals that are already loaded when the script starts.

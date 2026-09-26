@@ -4,21 +4,21 @@
     "name": "Warp Whistle BP",
     "description": "A craftable Warp Whistle: blow it to fast-travel home to your bed or to any of the waypoints you have set.",
     "uuid": "f75f1f7c-9ede-453a-a6b1-788a0814ab1e",
-    "version": [1, 0, 1],
+    "version": [1, 0, 2],
     "min_engine_version": [1, 26, 40]
   },
   "modules": [
     {
       "type": "data",
       "uuid": "7bef0daa-c0dc-4e07-9e03-f1a8f0c57c0c",
-      "version": [1, 0, 1]
+      "version": [1, 0, 2]
     },
     {
       "type": "script",
       "language": "javascript",
       "entry": "scripts/main.js",
       "uuid": "b3d9468a-1de2-45ea-9837-c4d6abd7ead8",
-      "version": [1, 0, 1]
+      "version": [1, 0, 2]
     }
   ],
   "dependencies": [

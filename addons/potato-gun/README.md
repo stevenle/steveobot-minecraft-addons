@@ -51,6 +51,10 @@ breaks blocks follows the `mobGriefing` game rule, the same as creepers, so
 `/gamerule mobGriefing false` makes explosive potatoes hurt mobs and players
 without cratering the world. Explosions never start fires.
 
+Using a gun on a chest, bed, door, lever, crafting table, or anything else
+you can click opens or uses that block instead of firing. The same goes for
+villagers, horses, boats, and minecarts. Crouch to fire at one anyway.
+
 ## The Explosive enchantment
 
 Bedrock does not allow custom enchantments, so Explosive is built the way it
@@ -92,6 +96,7 @@ content log.
 |---|---|
 | `/scriptevent steveo:potato give` | Puts all six guns and both enchantments in your inventory. |
 | `/scriptevent steveo:potato status` | Reports potatoes in flight, how many are on the teleport fallback, and whether explosions break blocks. |
+| `/scriptevent steveo:potato hits` | Toggles a chat report for every potato you fire: what it hit, whether the damage landed, and whether the poison took. |
 | `/scriptevent steveo:potato demo` | Fires a crossbow potato from your view with no gun, to check the projectile renders. |
 | `/scriptevent steveo:potato` | Prints the usage line. |
 
@@ -108,6 +113,10 @@ Messages from the add-on are prefixed `[Potato Gun]`.
 - **Potatoes look jerky in flight**: run `status` right after a shot. If it
   reports potatoes on the teleport fallback, the game is ignoring impulses
   on the potato entity and the script is placing it tick by tick instead.
+- **A poison potato hits a mob but it is not poisoned**: turn on `hits` and
+  fire again. Undead mobs (zombies, skeletons, drowned, phantoms, ...) are
+  immune to poison, as in vanilla; the report says so. Only the Poison
+  guns poison; a plain Potato Crossbow never does.
 - **Potatoes hang in the air**: the script stopped. They are cleared within
   5 seconds of it starting again, and their 8-second fuse removes them
   either way.

@@ -34,6 +34,7 @@ import {
 } from '@minecraft/server-ui';
 import { createLogger } from '@shared/log';
 import { Format } from '@shared/chat';
+import { onItemUse } from '@shared/use';
 
 const log = createLogger('warp-whistle');
 const PREFIX: RawMessage = { text: `${Format.gray}[Warp Whistle]${Format.reset} ` };
@@ -513,15 +514,8 @@ function handleUse(player: Player): void {
   flow.catch((err: unknown) => log.error('menu failed', err));
 }
 
-world.afterEvents.itemUse.subscribe((event) => {
-  if (event.itemStack.typeId === WHISTLE_ID) handleUse(event.source);
-});
-
-// Using the whistle on a block fires this instead of (or as well as) itemUse.
-world.afterEvents.playerInteractWithBlock.subscribe((event) => {
-  if (!event.isFirstEvent) return;
-  if (event.itemStack?.typeId === WHISTLE_ID) handleUse(event.player);
-});
+// Opens in the air or at a block, but not when the click opens a chest, a bed, a door...
+onItemUse((typeId) => typeId === WHISTLE_ID, (player) => handleUse(player));
 
 // One-time hint when a player first holds the whistle.
 system.runInterval(() => {

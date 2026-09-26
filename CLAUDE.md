@@ -113,6 +113,10 @@ failure inside Minecraft. Do not merge the two configs, and do not add `"types":
 - **Player-facing strings** go in `resource_pack/texts/en_US.lang` and are sent
   as `RawMessage` `{ translate: 'key' }`, not as hardcoded literals. Add new
   languages to `texts/languages.json`.
+- **Use-activated items** (guns, whistles, anything fired by right-click/tap)
+  subscribe through `onItemUse` from `@shared/use`, not `itemUse` +
+  `playerInteractWithBlock` directly. It folds the two events into one use and
+  skips clicks that open a chest, bed, door, villager, and so on.
 - **Shared code** goes in `shared/` and is imported as `@shared/log`, not by
   relative path across add-ons. Add-ons never import from each other.
 - TypeScript is strict, including `noUncheckedIndexedAccess` and

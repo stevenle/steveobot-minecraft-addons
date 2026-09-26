@@ -37,6 +37,7 @@ import {
   Player,
   system,
   world,
+  type Block,
   type Container,
   type Dimension,
   type Entity,
@@ -46,6 +47,7 @@ import {
 
 import { createLogger } from '@shared/log';
 import { Format } from '@shared/chat';
+import { onItemUse } from '@shared/use';
 
 const log = createLogger('potato-gun');
 const PREFIX: RawMessage = { text: `${Format.gray}[Potato Gun]${Format.reset} ` };
@@ -263,7 +265,7 @@ function canHit(entity: Entity, shot: Shot): boolean {
   }
 }
 
-type Impact = { at: Vector3; entity?: Entity };
+type Impact = { at: Vector3; entity?: Entity; block?: Block };
 
 /** The first thing the potato touches travelling `distance` along `dir` from `from`. */
 function sweep(shot: Shot, from: Vector3, dir: Vector3, distance: number): Impact | undefined {
@@ -279,7 +281,7 @@ function sweep(shot: Shot, from: Vector3, dir: Vector3, distance: number): Impac
   if (block) {
     const at = add(block.block.location, block.faceLocation);
     bestDist = length(sub(at, from));
-    best = { at };
+    best = { at, block: block.block };
   }
 
   const entities = shot.dimension.getEntitiesFromRay(from, dir, {
@@ -390,20 +392,27 @@ function explode(dimension: Dimension, location: Vector3, radius: number, shoote
   }
 }
 
-function hurt(target: Entity, shot: Shot, shooter: Entity | undefined): void {
+/** What a hit did, for `/scriptevent steveo:potato hits`. Values are lang keys. */
+interface HitResult {
+  damage: 'applied' | 'refused' | 'spared';
+  poison: 'applied' | 'immune' | 'spared' | 'none';
+}
+
+function hurt(target: Entity, shot: Shot, shooter: Entity | undefined): HitResult {
   const b = BALLISTICS[shot.gun.kind];
-  const isPlayer = target instanceof Player;
   // Poison potatoes never harm players: no impact damage, no poison.
-  if (shot.gun.effect === 'poison' && isPlayer) return;
+  if (shot.gun.effect === 'poison' && target instanceof Player) return { damage: 'spared', poison: 'spared' };
+
+  let damaged = false;
   try {
-    target.applyDamage(b.damage, {
+    damaged = target.applyDamage(b.damage, {
       damagingProjectile: shot.potato,
       ...(shooter ? { damagingEntity: shooter } : {}),
     });
   } catch {
     // Fall back to a plain projectile hit if the potato entity is not accepted as the source.
     try {
-      target.applyDamage(b.damage, {
+      damaged = target.applyDamage(b.damage, {
         cause: EntityDamageCause.projectile,
         ...(shooter ? { damagingEntity: shooter } : {}),
       });
@@ -411,18 +420,54 @@ function hurt(target: Entity, shot: Shot, shooter: Entity | undefined): void {
       log.warn(`damaging ${target.typeId} failed: ${String(err)}`);
     }
   }
+
+  let poison: HitResult['poison'] = 'none';
   if (shot.gun.effect === 'poison' && target.isValid) {
     try {
       target.addEffect('poison', b.poison.ticks, { amplifier: b.poison.amplifier, showParticles: true });
+      // Undead mobs (zombies, skeletons, ...) are immune, as in vanilla: the call succeeds but nothing sticks.
+      poison = target.getEffect('poison') ? 'applied' : 'immune';
     } catch (err) {
       log.warn(`poisoning ${target.typeId} failed: ${String(err)}`);
+      poison = 'immune';
     }
+  }
+  return { damage: damaged ? 'applied' : 'refused', poison };
+}
+
+/** Players who asked for a chat report of every potato hit. */
+const hitReports = new Set<string>();
+
+function reportHit(shooter: Entity | undefined, shot: Shot, impact: Impact, result: HitResult | undefined): void {
+  if (!(shooter instanceof Player) || !hitReports.has(shooter.id)) return;
+  try {
+    const gun: RawMessage = { translate: `potato_gun.debug.gun.${shot.gun.effect}` };
+    const message: RawMessage = impact.entity && result
+      ? {
+        translate: 'potato_gun.debug.hit.entity',
+        with: {
+          rawtext: [
+            gun,
+            { translate: impact.entity.localizationKey },
+            { translate: `potato_gun.debug.result.${result.damage}` },
+            { translate: `potato_gun.debug.result.poison.${result.poison}` },
+          ],
+        },
+      }
+      : {
+        translate: 'potato_gun.debug.hit.block',
+        with: { rawtext: [gun, impact.block ? { translate: impact.block.localizationKey } : { text: '?' }] },
+      };
+    shooter.sendMessage({ rawtext: [PREFIX, message] });
+  } catch {
+    // The report is a debugging aid; never let it break a hit.
   }
 }
 
 function land(shot: Shot, impact: Impact): void {
   const shooter = world.getEntity(shot.shooterId);
-  if (impact.entity) hurt(impact.entity, shot, shooter);
+  const result = impact.entity ? hurt(impact.entity, shot, shooter) : undefined;
+  reportHit(shooter, shot, impact, result);
   // Remove after damage: the potato is the damage source, so it must still exist.
   finish(shot);
   splat(shot.dimension, impact.at, shot.gun);
@@ -433,20 +478,18 @@ function land(shot: Shot, impact: Impact): void {
 
 // ---------- events ----------
 
-world.afterEvents.itemUse.subscribe((event) => {
-  const gun = GUNS.get(event.itemStack.typeId);
-  if (gun) handleUse(event.source, gun);
-});
-
-// Using the gun on a block fires this instead of (or as well as) itemUse.
-world.afterEvents.playerInteractWithBlock.subscribe((event) => {
-  if (!event.itemStack || !event.isFirstEvent) return;
-  const gun = GUNS.get(event.itemStack.typeId);
-  if (gun) handleUse(event.player, gun);
-});
+// Fires in the air or at a block, but not when the click opens a chest, a bed, a door...
+onItemUse(
+  (typeId) => GUNS.has(typeId),
+  (player, item) => {
+    const gun = GUNS.get(item.typeId);
+    if (gun) handleUse(player, gun);
+  },
+);
 
 world.afterEvents.playerLeave.subscribe((event) => {
   hinted.delete(event.playerId);
+  hitReports.delete(event.playerId);
   lastShot.delete(event.playerId);
 });
 
@@ -495,7 +538,7 @@ system.runInterval(() => {
   }
 }, HOLD_CHECK_TICKS);
 
-// ---------- debug: /scriptevent steveo:potato <give|status|demo> ----------
+// ---------- debug: /scriptevent steveo:potato <give|status|hits|demo> ----------
 
 function give(player: Player, ids: string[]): void {
   const container = inventoryOf(player);
@@ -534,6 +577,13 @@ system.afterEvents.scriptEventReceive.subscribe(
             },
           ],
         });
+        break;
+      }
+      case 'hits': {
+        const on = !hitReports.has(player.id);
+        if (on) hitReports.add(player.id);
+        else hitReports.delete(player.id);
+        say({ rawtext: [PREFIX, { translate: on ? 'potato_gun.debug.hits.on' : 'potato_gun.debug.hits.off' }] });
         break;
       }
       case 'demo': {
