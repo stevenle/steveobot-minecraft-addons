@@ -4,27 +4,27 @@
     "name": "Super Enchantments BP",
     "description": "Every enchantment goes to level 20 at the Super Enchantment Fountain atop a randomly generated Enchantment Tower, plus Power Knockback, Extra Hit, and Super Efficiency.",
     "uuid": "5fdfb0f2-0f7b-49ed-98df-1b0d21bb8da7",
-    "version": [1, 0, 1],
+    "version": [1, 0, 3],
     "min_engine_version": [1, 26, 40]
   },
   "modules": [
     {
       "type": "data",
       "uuid": "1cae24be-6d04-4eb0-bbba-d9828372872d",
-      "version": [1, 0, 1]
+      "version": [1, 0, 3]
     },
     {
       "type": "script",
       "language": "javascript",
       "entry": "scripts/main.js",
       "uuid": "8a48d09a-1be7-42a9-bbae-8208a26574aa",
-      "version": [1, 0, 1]
+      "version": [1, 0, 3]
     }
   ],
   "dependencies": [
     {
       "uuid": "994816c3-722e-4b07-9ea7-12bdca5b7f94",
-      "version": [1, 0, 1]
+      "version": [1, 0, 3]
     },
     {
       "module_name": "@minecraft/server",

@@ -71,12 +71,21 @@ const LAPIS_PER_LEVEL = 2;
 const POWER_KNOCKBACK = 'steveo:power_knockback';
 const EXTRA_HIT = 'steveo:extra_hit';
 const SUPER_EFFICIENCY = 'steveo:super_efficiency';
-const CUSTOM_IDS = [POWER_KNOCKBACK, EXTRA_HIT, SUPER_EFFICIENCY] as const;
+const KEEN_EDGE = 'steveo:keen_edge';
+const SUPER_GEMS = 'steveo:super_gems';
+const CUSTOM_IDS = [POWER_KNOCKBACK, EXTRA_HIT, SUPER_EFFICIENCY, KEEN_EDGE, SUPER_GEMS] as const;
 
 // ---------- tuning ----------
 
 /** Extra melee damage per Sharpness level above V (vanilla adds 1.25 per level). */
 const SHARPNESS_PER_LEVEL = 1.25;
+/** Keen Edge: extra melee damage per level, Sharpness's rate, for paxels (which cannot take Sharpness). */
+const KEEN_EDGE_PER_LEVEL = 1.25;
+/** Super Gems: chance per mob kill of dropping a gem, base plus this much per level. */
+const SUPER_GEMS_BASE_CHANCE = 0.02;
+const SUPER_GEMS_CHANCE_PER_LEVEL = 0.005;
+/** The gems Super Gems can drop, picked with equal odds. */
+const GEM_IDS = ['minecraft:diamond', 'minecraft:emerald'];
 /** Extra damage per Smite / Bane of Arthropods level above V, against their families. */
 const SMITE_PER_LEVEL = 2.5;
 /** Arrow damage multiplier gained per Power level above V (vanilla is +25% per level). */
@@ -121,6 +130,7 @@ const BURSTS_MAX = 4;
 const EXCLUDED_IDS = new Set(['binding', 'vanishing']);
 const MELEE_TAGS = ['minecraft:is_sword', 'minecraft:is_axe'];
 const MELEE_TYPES = new Set(['minecraft:mace', 'minecraft:trident']);
+const RANGED_TYPES = new Set(['minecraft:bow', 'minecraft:crossbow']);
 const ARMOR_SLOTS = [EquipmentSlot.Head, EquipmentSlot.Chest, EquipmentSlot.Legs, EquipmentSlot.Feet];
 
 // ---------- messages ----------
@@ -315,6 +325,14 @@ function isPickaxe(item: ItemStack): boolean {
   return item.hasTag('minecraft:is_pickaxe');
 }
 
+/**
+ * Paxels from the paxel add-on, matched by id so this pack does not depend on
+ * that one: an unknown id simply never matches.
+ */
+function isPaxel(item: ItemStack): boolean {
+  return /^steveo:[a-z]+_paxel$/.test(item.typeId);
+}
+
 function customApplies(id: string, item: ItemStack): boolean {
   switch (id) {
     case POWER_KNOCKBACK:
@@ -322,6 +340,10 @@ function customApplies(id: string, item: ItemStack): boolean {
       return isMelee(item);
     case SUPER_EFFICIENCY:
       return isPickaxe(item);
+    case KEEN_EDGE:
+      return isPaxel(item);
+    case SUPER_GEMS:
+      return isMelee(item) || RANGED_TYPES.has(item.typeId);
     default:
       return false;
   }
@@ -480,7 +502,7 @@ world.beforeEvents.itemUse.subscribe((event) => {
   if (facingFountain(event.source)) event.cancel = true;
 });
 
-// ---------- damage: super Sharpness/Smite/Bane/Power, super Protection ----------
+// ---------- damage: super Sharpness/Smite/Bane/Power, Keen Edge, super Protection ----------
 
 function hasFamily(entity: Entity, family: string): boolean {
   try {
@@ -494,7 +516,7 @@ function attackBonus(attacker: Player, victim: Entity, source: EntityDamageSourc
   const weapon = heldItem(attacker);
   if (weapon === undefined) return damage;
   if (source.cause === EntityDamageCause.entityAttack) {
-    let bonus = SHARPNESS_PER_LEVEL * surplus(weapon, 'sharpness');
+    let bonus = SHARPNESS_PER_LEVEL * surplus(weapon, 'sharpness') + KEEN_EDGE_PER_LEVEL * totalLevel(weapon, KEEN_EDGE);
     if (hasFamily(victim, 'undead')) bonus += SMITE_PER_LEVEL * surplus(weapon, 'smite');
     if (hasFamily(victim, 'arthropod')) bonus += SMITE_PER_LEVEL * surplus(weapon, 'bane_of_arthropods');
     return damage + bonus;
@@ -535,6 +557,26 @@ world.beforeEvents.entityHurt.subscribe((event) => {
   if (attacker instanceof Player) damage = attackBonus(attacker, event.hurtEntity, event.damageSource, damage);
   if (event.hurtEntity instanceof Player) damage *= protectionFactor(event.hurtEntity, event.damageSource);
   if (damage !== event.damage) event.damage = damage;
+});
+
+// ---------- kills: Super Gems ----------
+
+world.afterEvents.entityDie.subscribe((event) => {
+  const killer = event.damageSource.damagingEntity;
+  const victim = event.deadEntity;
+  if (!(killer instanceof Player) || victim instanceof Player) return;
+  // For an arrow kill this is the bow still in hand, which is what we want.
+  const level = totalLevel(heldItem(killer), SUPER_GEMS);
+  if (level === 0 || Math.random() > SUPER_GEMS_BASE_CHANCE + SUPER_GEMS_CHANCE_PER_LEVEL * level) return;
+  const gem = GEM_IDS[Math.floor(Math.random() * GEM_IDS.length)];
+  if (gem === undefined) return;
+  try {
+    const { dimension, location } = victim;
+    dimension.spawnItem(new ItemStack(gem, 1), location);
+    dimension.playSound('random.orb', location);
+  } catch (err) {
+    log.warn(`could not drop a gem for ${victim.typeId}: ${String(err)}`);
+  }
 });
 
 // ---------- melee hits: Knockback, Power Knockback, Fire Aspect ----------

@@ -49,6 +49,8 @@ super_enchantments.enchant.wind_burst=Wind Burst
 super_enchantments.enchant.power_knockback=Power Knockback
 super_enchantments.enchant.extra_hit=Extra Hit
 super_enchantments.enchant.super_efficiency=Super Efficiency
+super_enchantments.enchant.keen_edge=Keen Edge
+super_enchantments.enchant.super_gems=Super Gems
 
 ## The fountain menu
 super_enchantments.fountain.title=Super Enchantment Fountain

@@ -1,0 +1,38 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Paxel BP",
+    "description": "A craftable Paxel in every tool material: one tool that digs like a shovel, chops like an axe, mines like a pickaxe, and hits like a sword.",
+    "uuid": "5ee384ca-bb67-459d-9325-1170e8175d72",
+    "version": [1, 0, 0],
+    "min_engine_version": [1, 26, 40]
+  },
+  "modules": [
+    {
+      "type": "data",
+      "uuid": "05e8b144-d54b-4672-ad7d-af6df4a78675",
+      "version": [1, 0, 0]
+    },
+    {
+      "type": "script",
+      "language": "javascript",
+      "entry": "scripts/main.js",
+      "uuid": "663eb411-410d-4f82-bbea-9c36b28885b2",
+      "version": [1, 0, 0]
+    }
+  ],
+  "dependencies": [
+    {
+      "uuid": "21d01a94-7835-425c-b6ad-eea1ef5095a3",
+      "version": [1, 0, 1]
+    },
+    {
+      "module_name": "@minecraft/server",
+      "version": "2.9.0"
+    }
+  ],
+  "metadata": {
+    "authors": ["Steven Le"],
+    "license": "MIT"
+  }
+}

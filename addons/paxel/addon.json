@@ -1,0 +1,5 @@
+{
+  "$schema": "../../tools/schemas/addon.schema.json",
+  "name": "Paxel",
+  "description": "A craftable Paxel in every tool material: one tool that digs like a shovel, chops like an axe, mines like a pickaxe, and hits like a sword."
+}
