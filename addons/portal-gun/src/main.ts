@@ -67,8 +67,12 @@ const PORTAL_PROP = 'steveo:portal';
 const COOLDOWN_CATEGORY = 'steveo_portal_gun';
 const COOLDOWN_TICKS = 5;
 
-/** How far the gun reaches, in blocks. */
-const MAX_RANGE = 64;
+/**
+ * How far the gun reaches, in blocks. Beyond the Realm's simulation distance
+ * the portal still places (the chunk is loaded) but only starts working once
+ * a player comes close enough for its chunk to tick.
+ */
+const MAX_RANGE = 128;
 /** Portal entity fuse (seconds) in entities/portal.json, and how often to reset it. */
 const FUSE_SECONDS = 30;
 const REFRESH_INTERVAL_TICKS = 100;
@@ -433,11 +437,16 @@ function tracer(player: Player, hit: BlockRaycastHit, color: Color): void {
 }
 
 function fire(player: Player, color: Color): void {
-  const hit = player.getBlockFromViewDirection({
-    maxDistance: MAX_RANGE,
-    includeLiquidBlocks: false,
-    includePassableBlocks: false,
-  });
+  let hit: BlockRaycastHit | undefined;
+  try {
+    hit = player.getBlockFromViewDirection({
+      maxDistance: MAX_RANGE,
+      includeLiquidBlocks: false,
+      includePassableBlocks: false,
+    });
+  } catch {
+    // At long range the ray can run into an unloaded chunk; treat it as a miss.
+  }
   if (!hit) {
     fizzle(player, 'portal_gun.miss');
     return;

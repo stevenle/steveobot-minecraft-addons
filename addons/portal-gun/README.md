@@ -20,7 +20,10 @@ The gun has no durability, so there is nothing to repair.
 
 ## Using it
 
-Hold the gun and aim at a block within 64 blocks.
+Hold the gun and aim at a block within 128 blocks. Past your render
+distance there is nothing loaded to hit, so the shot fizzles. A portal placed
+beyond the Realm's simulation distance appears but only starts teleporting
+once someone is close enough for its chunk to be active.
 
 | Input | Effect |
 |---|---|
