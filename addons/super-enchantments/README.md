@@ -1,6 +1,6 @@
 # Super Enchantments
 
-Every enchantment goes up to level 20, five new enchantments join the
+Every enchantment goes up to level 20, six new enchantments join the
 list, and the place to get them is the Super Enchantment Fountain at the
 top of an Enchantment Tower.
 
@@ -103,6 +103,20 @@ on top of its normal loot. Level I is a 2.5% chance; each level adds 0.5%,
 so level XX is 12%. For arrow kills, the bow or crossbow in your hand when
 the mob dies is the one that counts. Players never drop gems.
 
+**Ender Blinding** (any helmet, including the X-Ray Helmet and Ender
+Armor): endermen cannot see you, as if you wore a carved pumpkin. Looking
+an enderman in the eye no longer provokes it. Hitting one still does, and
+an enderman that is already angry stays angry until it calms down on its
+own. Level I is all it takes; higher levels are cosmetic. The effect
+switches on or off within a second of putting the helmet on or taking it
+off.
+
+This one works by replacing the vanilla enderman's behavior file, so it
+conflicts with any other pack that also overrides `enderman.json`. The
+vanilla copy in `assets/vanilla/enderman.json` is from Mojang's
+`bedrock-samples` v1.26.50.4; when the game updates, refresh that file and
+rerun the generator.
+
 ## Debug commands
 
 Chat is the only console on a Realm, so the add-on answers to a script event:
@@ -114,6 +128,7 @@ Chat is the only console on a Realm, so the add-on answers to a script event:
 /scriptevent steveo:enchant bedrock             # put a bedrock block on the block you are looking at
 /scriptevent steveo:enchant letters             # the enchantment-letter burst, at you
 /scriptevent steveo:enchant info                # every enchantment on the held item, with levels
+/scriptevent steveo:enchant blind               # whether endermen can see you right now
 /scriptevent steveo:enchant apply sharpness 20  # enchant the held item for free
 /scriptevent steveo:enchant apply extra_hit 5   # the new ones work by name too
 ```
@@ -125,13 +140,14 @@ Chat is the only console on a Realm, so the add-on answers to a script event:
 | `behavior_pack/blocks/enchantment_fountain.json` | The fountain block: glow, hardness, custom model |
 | `behavior_pack/features/` and `feature_rules/` | Scatters the tower across Overworld land biomes |
 | `behavior_pack/structures/steveo/enchantment_tower.mcstructure` | The tower itself (generated) |
+| `behavior_pack/entities/enderman.json` | Vanilla enderman whose stare ignores Ender Blinding wearers (generated) |
 | `resource_pack/models/blocks/enchantment_fountain.geo.json` | Pedestal, stem, basin, and glowing pool |
 | `resource_pack/particles/enchantment_letters.json` | The letter burst, sampling 16 glyphs from one sheet |
 | `resource_pack/textures/` | Fountain texture and glyph sheet (generated) |
 | `resource_pack/texts/en_US.lang` | Every player-facing string, including all enchantment names |
 | `src/main.ts` | The fountain menu, the super-level record, every effect, and the debug command |
 
-Regenerate the icons, textures, and the tower with
+Regenerate the icons, textures, the tower, and `enderman.json` with
 `node addons/super-enchantments/assets/generate.mjs addons/super-enchantments`.
 The tower is laid out in that script; edit it there, rerun, and commit the
 new `.mcstructure`.
@@ -145,3 +161,4 @@ The tower places, the fountain menu works, and the lore lines render
   placement and biome filter), as opposed to the debug command.
 - The letter particle.
 - `entityHitBlock` firing on bedrock for the Super Efficiency timer.
+- Ender Blinding: the patched enderman's `has_tag` stare filter.

@@ -51,6 +51,7 @@ super_enchantments.enchant.extra_hit=Extra Hit
 super_enchantments.enchant.super_efficiency=Super Efficiency
 super_enchantments.enchant.keen_edge=Keen Edge
 super_enchantments.enchant.super_gems=Super Gems
+super_enchantments.enchant.ender_blinding=Ender Blinding
 
 ## The fountain menu
 super_enchantments.fountain.title=Super Enchantment Fountain
@@ -71,7 +72,7 @@ super_enchantments.fountain.done=The fountain grants §d%s %s§r to your %s for 
 
 ## Enchantment effects
 super_enchantments.efficiency.start=Super Efficiency bites into the bedrock. Keep mining for %s.
-super_enchantments.efficiency.progress=Mining bedrock %s §7%s%% · %s left
+super_enchantments.efficiency.progress=Mining bedrock %s §7%s%% - %s left
 super_enchantments.efficiency.lost=You stopped mining the bedrock. Progress lost.
 super_enchantments.efficiency.done=The bedrock gives way!
 
@@ -90,4 +91,6 @@ super_enchantments.debug.info.empty=  (none)
 super_enchantments.debug.apply=Applied §d%s %s§r to your %s.
 super_enchantments.debug.apply.bad=Usage: apply <enchantment> <1-%s>, for example: apply sharpness 20 or apply extra_hit 5
 super_enchantments.debug.apply.failed=Could not apply %s: %s
-super_enchantments.debug.help=Usage: /scriptevent steveo:enchant <tower|fountain|lapis|bedrock|letters|info|apply <id> <level>>
+super_enchantments.debug.blind.on=Endermen cannot see you: your helmet has Ender Blinding.
+super_enchantments.debug.blind.off=Endermen can see you: no Ender Blinding helmet is being worn.
+super_enchantments.debug.help=Usage: /scriptevent steveo:enchant <tower|fountain|lapis|bedrock|letters|info|blind|apply <id> <level>>

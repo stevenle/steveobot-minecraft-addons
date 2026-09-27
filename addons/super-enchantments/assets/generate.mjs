@@ -4,6 +4,8 @@
 //   - the enchantment-letter particle sheet (16 glyphs, 8×8 each)
 //   - behavior_pack/structures/steveo/enchantment_tower.mcstructure, the
 //     Enchantment Tower that world generation scatters across the Overworld
+//   - behavior_pack/entities/enderman.json: the vanilla enderman from
+//     assets/vanilla/enderman.json, patched so Ender Blinding hides the wearer
 // Run from the repo root:  node addons/super-enchantments/assets/generate.mjs addons/super-enchantments
 // The generated output is what gets committed; this script is for regenerating it.
 import fs from 'node:fs';
@@ -349,3 +351,18 @@ const nbt = nbtWriter();
 nbt.named('', root);
 write('behavior_pack/structures/steveo/enchantment_tower.mcstructure', nbt.bytes());
 console.log(`tower: ${SX}x${SY}x${SZ}, ${palette.length} palette entries`);
+
+// ---------- entities/enderman.json ----------
+// The vanilla enderman (Mojang/bedrock-samples v1.26.50.4) with one change:
+// its stare trigger also ignores players carrying the Ender Blinding tag,
+// which the script keeps on whoever wears an Ender Blinding helmet.
+const ENDER_BLIND_TAG = 'steveo:ender_blind';
+// The vanilla file has trailing // comments; no string in it contains "//".
+const enderman = JSON.parse(fs.readFileSync(path.join(out, 'assets', 'vanilla', 'enderman.json'), 'utf8').replace(/\/\/.*$/gm, ''));
+// Held at min_engine_version so the pack still loads on a 1.26.40 game.
+enderman.format_version = '1.26.40';
+const lookedAt = enderman['minecraft:entity'].components['minecraft:looked_at'];
+lookedAt.filters = {
+  all_of: [lookedAt.filters, { test: 'has_tag', subject: 'other', operator: 'not', value: ENDER_BLIND_TAG }],
+};
+write('behavior_pack/entities/enderman.json', `${JSON.stringify(enderman, null, 2)}\n`);

@@ -1,5 +1,5 @@
 /**
- * Super Enchantments — every enchantment up to level 20, three new ones, and
+ * Super Enchantments — every enchantment up to level 20, six new ones, and
  * an Enchantment Tower to find them in.
  *
  * Bedrock has no data-driven enchantments and `addEnchantment` refuses levels
@@ -9,7 +9,7 @@
  * - The vanilla enchantment is applied natively up to its own max (Sharpness
  *   V, Protection IV, ...), so the game keeps doing what it already does.
  * - The full level (and every custom enchantment) is recorded in an item
- *   dynamic property and rendered as lore lines, e.g. "✦ Sharpness XX".
+ *   dynamic property and rendered as lore lines, e.g. "Sharpness XX".
  * - This script turns the surplus above the vanilla max into an effect: extra
  *   melee/arrow damage, extra knockback, longer burns, damage reduction on
  *   armor, thorns, Haste for Efficiency, water breathing for Respiration, and
@@ -17,9 +17,11 @@
  *   scale (Silk Touch, Mending, Infinity, ...) accept level 20 but the surplus
  *   is cosmetic. README.md lists which is which.
  *
- * The three custom enchantments (Power Knockback, Extra Hit, Super Efficiency)
- * exist only in that property; they are applied by the fountain, shown in lore,
- * and enacted here.
+ * The custom enchantments (Power Knockback, Extra Hit, Super Efficiency, Keen
+ * Edge, Super Gems, Ender Blinding) exist only in that property; they are
+ * applied by the fountain, shown in lore, and enacted here. Ender Blinding
+ * also needs behavior_pack/entities/enderman.json, a vanilla copy whose stare
+ * trigger skips players with ENDER_BLIND_TAG.
  *
  * The Super Enchantment Fountain is a custom block; world generation plants an
  * Enchantment Tower (behavior_pack/structures/, from assets/generate.mjs) in
@@ -73,7 +75,10 @@ const EXTRA_HIT = 'steveo:extra_hit';
 const SUPER_EFFICIENCY = 'steveo:super_efficiency';
 const KEEN_EDGE = 'steveo:keen_edge';
 const SUPER_GEMS = 'steveo:super_gems';
-const CUSTOM_IDS = [POWER_KNOCKBACK, EXTRA_HIT, SUPER_EFFICIENCY, KEEN_EDGE, SUPER_GEMS] as const;
+const ENDER_BLINDING = 'steveo:ender_blinding';
+const CUSTOM_IDS = [POWER_KNOCKBACK, EXTRA_HIT, SUPER_EFFICIENCY, KEEN_EDGE, SUPER_GEMS, ENDER_BLINDING] as const;
+/** Player tag the patched enderman.json checks; must match assets/generate.mjs. */
+const ENDER_BLIND_TAG = 'steveo:ender_blind';
 
 // ---------- tuning ----------
 
@@ -333,6 +338,11 @@ function isPaxel(item: ItemStack): boolean {
   return /^steveo:[a-z]+_paxel$/.test(item.typeId);
 }
 
+/** Any helmet, vanilla or from another add-on (the X-Ray Helmet, Ender Armor), matched by id. */
+function isHelmet(item: ItemStack): boolean {
+  return item.typeId.endsWith('_helmet');
+}
+
 function customApplies(id: string, item: ItemStack): boolean {
   switch (id) {
     case POWER_KNOCKBACK:
@@ -344,6 +354,8 @@ function customApplies(id: string, item: ItemStack): boolean {
       return isPaxel(item);
     case SUPER_GEMS:
       return isMelee(item) || RANGED_TYPES.has(item.typeId);
+    case ENDER_BLINDING:
+      return isHelmet(item);
     default:
       return false;
   }
@@ -824,17 +836,30 @@ system.runInterval(() => {
   }
 }, BEDROCK_TICK_STEP);
 
-// ---------- passive effects: super Efficiency (Haste), Respiration, Unbreaking ----------
+// ---------- passive effects: super Efficiency (Haste), Respiration, Ender Blinding, Unbreaking ----------
+
+/**
+ * Keeps ENDER_BLIND_TAG on exactly the players wearing an Ender Blinding
+ * helmet. The patched enderman ignores their stare, as with a carved pumpkin;
+ * hitting one still angers it, and an already angry one stays angry.
+ */
+function updateEnderBlind(player: Player, helmet: ItemStack | undefined): void {
+  const blind = totalLevel(helmet, ENDER_BLINDING) > 0;
+  if (blind === player.hasTag(ENDER_BLIND_TAG)) return;
+  if (blind) player.addTag(ENDER_BLIND_TAG);
+  else player.removeTag(ENDER_BLIND_TAG);
+}
 
 system.runInterval(() => {
   for (const player of world.getAllPlayers()) {
+    const helmet = player.getComponent('minecraft:equippable')?.getEquipment(EquipmentSlot.Head);
+    updateEnderBlind(player, helmet);
     const tool = heldItem(player);
     const haste = surplus(tool, 'efficiency');
     if (haste > 0) {
       player.addEffect('haste', PASSIVE_TICKS * 2, { amplifier: Math.min(4, Math.ceil(haste / 5) - 1), showParticles: false });
     }
     if (player.isInWater) {
-      const helmet = player.getComponent('minecraft:equippable')?.getEquipment(EquipmentSlot.Head);
       if (surplus(helmet, 'respiration') > 0) {
         player.addEffect('water_breathing', PASSIVE_TICKS * 2, { amplifier: 0, showParticles: false });
       }
@@ -867,7 +892,7 @@ system.runInterval(() => {
   }
 }, REPAIR_TICKS);
 
-// ---------- debug: /scriptevent steveo:enchant <tower|fountain|lapis|bedrock|letters|info|apply id level> ----------
+// ---------- debug: /scriptevent steveo:enchant <tower|fountain|lapis|bedrock|letters|info|blind|apply id level> ----------
 
 function lookedAtBlock(player: Player): Block | undefined {
   try {
@@ -980,6 +1005,9 @@ system.afterEvents.scriptEventReceive.subscribe(
         break;
       case 'info':
         debugInfo(player);
+        break;
+      case 'blind':
+        say(player, player.hasTag(ENDER_BLIND_TAG) ? 'super_enchantments.debug.blind.on' : 'super_enchantments.debug.blind.off');
         break;
       case 'apply':
         debugApply(player, arg1, arg2);
