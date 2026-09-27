@@ -1,0 +1,32 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "steveo:firebrand_recipe"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "FF",
+      "FR",
+      " R"
+    ],
+    "key": {
+      "F": {
+        "item": "minecraft:fire_charge"
+      },
+      "R": {
+        "item": "minecraft:blaze_rod"
+      }
+    },
+    "unlock": [
+      {
+        "item": "minecraft:blaze_rod"
+      }
+    ],
+    "result": {
+      "item": "steveo:firebrand"
+    }
+  }
+}

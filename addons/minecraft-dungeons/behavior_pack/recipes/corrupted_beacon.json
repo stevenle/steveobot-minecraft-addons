@@ -1,0 +1,35 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "steveo:corrupted_beacon_recipe"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "CEC",
+      "EBE",
+      "CEC"
+    ],
+    "key": {
+      "C": {
+        "item": "minecraft:crying_obsidian"
+      },
+      "E": {
+        "item": "minecraft:ender_eye"
+      },
+      "B": {
+        "item": "minecraft:beacon"
+      }
+    },
+    "unlock": [
+      {
+        "item": "minecraft:beacon"
+      }
+    ],
+    "result": {
+      "item": "steveo:corrupted_beacon"
+    }
+  }
+}

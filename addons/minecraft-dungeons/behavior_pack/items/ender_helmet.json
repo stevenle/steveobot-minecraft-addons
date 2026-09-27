@@ -1,0 +1,33 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:item": {
+    "description": {
+      "identifier": "steveo:ender_helmet",
+      "menu_category": {
+        "category": "equipment",
+        "group": "minecraft:itemGroup.name.helmet"
+      }
+    },
+    "components": {
+      "minecraft:icon": "steveo_ender_helmet",
+      "minecraft:display_name": {
+        "value": "item.steveo:ender_helmet.name"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:rarity": "epic",
+      "minecraft:wearable": {
+        "slot": "slot.armor.head",
+        "protection": 3
+      },
+      "minecraft:enchantable": {
+        "slot": "armor_head",
+        "value": 15
+      },
+      "minecraft:tags": {
+        "tags": [
+          "minecraft:is_armor"
+        ]
+      }
+    }
+  }
+}

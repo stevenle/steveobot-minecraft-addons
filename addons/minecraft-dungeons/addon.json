@@ -1,0 +1,5 @@
+{
+  "$schema": "../../tools/schemas/addon.schema.json",
+  "name": "Minecraft Dungeons",
+  "description": "Heroes' gear from Minecraft Dungeons: the Firebrand axe, the Ender Armor set, the Corrupted Beacon, and Tim, a dancing companion."
+}

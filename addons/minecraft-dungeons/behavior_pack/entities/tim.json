@@ -1,0 +1,230 @@
+{
+  "format_version": "1.21.0",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "steveo:tim",
+      "is_spawnable": true,
+      "is_summonable": true,
+      "properties": {
+        "steveo:dancing": {
+          "type": "bool",
+          "default": false,
+          "client_sync": true
+        }
+      }
+    },
+    "component_groups": {
+      "steveo:wild": {
+        "minecraft:type_family": {
+          "family": [
+            "steveo_tim",
+            "mob"
+          ]
+        },
+        "minecraft:tameable": {
+          "probability": 0.34,
+          "tame_items": [
+            "minecraft:cookie"
+          ],
+          "tame_event": {
+            "event": "steveo:on_tame",
+            "target": "self"
+          }
+        },
+        "minecraft:behavior.random_stroll": {
+          "priority": 7,
+          "speed_multiplier": 0.8,
+          "xz_dist": 6
+        }
+      },
+      "steveo:tamed": {
+        "minecraft:type_family": {
+          "family": [
+            "steveo_tim",
+            "steveo_tim_tamed",
+            "mob"
+          ]
+        },
+        "minecraft:is_tamed": {},
+        "minecraft:sittable": {},
+        "minecraft:behavior.stay_while_sitting": {
+          "priority": 1
+        },
+        "minecraft:behavior.owner_hurt_by_target": {
+          "priority": 1
+        },
+        "minecraft:behavior.owner_hurt_target": {
+          "priority": 2
+        },
+        "minecraft:behavior.nearest_attackable_target": {
+          "priority": 4,
+          "must_see": true,
+          "reselect_targets": true,
+          "within_radius": 16,
+          "entity_types": [
+            {
+              "filters": {
+                "all_of": [
+                  {
+                    "test": "is_family",
+                    "subject": "other",
+                    "value": "monster"
+                  },
+                  {
+                    "test": "is_family",
+                    "subject": "other",
+                    "operator": "!=",
+                    "value": "creeper"
+                  }
+                ]
+              },
+              "max_dist": 16
+            }
+          ]
+        },
+        "minecraft:behavior.follow_owner": {
+          "priority": 5,
+          "speed_multiplier": 1.1,
+          "start_distance": 6,
+          "stop_distance": 2.5,
+          "can_teleport": true,
+          "post_teleport_distance": 1
+        },
+        "minecraft:behavior.random_stroll": {
+          "priority": 8,
+          "speed_multiplier": 0.7,
+          "xz_dist": 3
+        }
+      }
+    },
+    "components": {
+      "minecraft:type_family": {
+        "family": [
+          "steveo_tim",
+          "mob"
+        ]
+      },
+      "minecraft:health": {
+        "value": 40,
+        "max": 40
+      },
+      "minecraft:attack": {
+        "damage": 6
+      },
+      "minecraft:collision_box": {
+        "width": 0.6,
+        "height": 1.8
+      },
+      "minecraft:movement": {
+        "value": 0.3
+      },
+      "minecraft:navigation.walk": {
+        "can_path_over_water": true,
+        "avoid_water": true,
+        "avoid_damage_blocks": true,
+        "can_open_doors": true
+      },
+      "minecraft:movement.basic": {},
+      "minecraft:jump.static": {},
+      "minecraft:can_climb": {},
+      "minecraft:annotation.open_door": {},
+      "minecraft:breathable": {
+        "total_supply": 15,
+        "suffocate_time": 0
+      },
+      "minecraft:physics": {},
+      "minecraft:pushable": {
+        "is_pushable": true,
+        "is_pushable_by_piston": true
+      },
+      "minecraft:persistent": {},
+      "minecraft:nameable": {},
+      "minecraft:leashable": {
+        "soft_distance": 4,
+        "hard_distance": 6,
+        "max_distance": 10
+      },
+      "minecraft:healable": {
+        "items": [
+          {
+            "item": "minecraft:bread",
+            "heal_amount": 6
+          },
+          {
+            "item": "minecraft:cake",
+            "heal_amount": 20
+          }
+        ]
+      },
+      "minecraft:damage_sensor": {
+        "triggers": [
+          {
+            "cause": "fall",
+            "deals_damage": "no"
+          }
+        ]
+      },
+      "minecraft:hurt_on_condition": {
+        "damage_conditions": [
+          {
+            "filters": {
+              "test": "in_lava",
+              "subject": "self",
+              "operator": "==",
+              "value": true
+            },
+            "cause": "lava",
+            "damage_per_tick": 4
+          }
+        ]
+      },
+      "minecraft:conditional_bandwidth_optimization": {},
+      "minecraft:behavior.float": {
+        "priority": 0
+      },
+      "minecraft:behavior.hurt_by_target": {
+        "priority": 2
+      },
+      "minecraft:behavior.melee_attack": {
+        "priority": 3,
+        "speed_multiplier": 1.2,
+        "track_target": true
+      },
+      "minecraft:behavior.look_at_player": {
+        "priority": 9,
+        "look_distance": 8,
+        "probability": 0.05
+      },
+      "minecraft:behavior.random_look_around": {
+        "priority": 10
+      }
+    },
+    "events": {
+      "minecraft:entity_spawned": {
+        "add": {
+          "component_groups": [
+            "steveo:wild"
+          ]
+        }
+      },
+      "steveo:on_tame": {
+        "sequence": [
+          {
+            "remove": {
+              "component_groups": [
+                "steveo:wild"
+              ]
+            }
+          },
+          {
+            "add": {
+              "component_groups": [
+                "steveo:tamed"
+              ]
+            }
+          }
+        ]
+      }
+    }
+  }
+}
