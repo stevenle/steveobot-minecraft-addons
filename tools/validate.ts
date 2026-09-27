@@ -157,6 +157,33 @@ function checkPackDependencies(addon: Addon, ctx: Context): void {
   }
 }
 
+/** Any character outside ASCII, except a § format code, which the game strips before drawing. */
+const NON_ASCII_RE = /(?!§)[^\x00-\x7f]/u;
+
+/**
+ * Bedrock draws a string in its pixel font only while every character is
+ * ASCII; one stray character (a middle dot, an em dash, a ✦) switches the whole
+ * line to a different font family.
+ */
+function checkLangText(addon: Addon, ctx: Context): void {
+  const texts = addon.resourcePack && path.join(addon.resourcePack.dir, 'texts');
+  if (!texts || !fs.existsSync(texts)) return;
+  for (const name of fs.readdirSync(texts).filter((f) => f.endsWith('.lang'))) {
+    const file = path.join(texts, name);
+    fs.readFileSync(file, 'utf8')
+      .split('\n')
+      .forEach((line, i) => {
+        if (line.startsWith('##')) return;
+        const match = NON_ASCII_RE.exec(line);
+        if (match) {
+          ctx.errors.push(
+            `${rel(file)}:${i + 1}: non-ASCII character ${JSON.stringify(match[0])} switches the line to a fallback font`,
+          );
+        }
+      });
+  }
+}
+
 function main(): void {
   const args = parseArgs();
 
@@ -178,6 +205,7 @@ function main(): void {
       checkPack(addon, pack, ctx);
     }
     checkPackDependencies(addon, ctx);
+    checkLangText(addon, ctx);
   }
 
   for (const warning of ctx.warnings) log.warn(warning);
