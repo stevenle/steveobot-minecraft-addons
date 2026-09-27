@@ -1,0 +1,21 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Minecraft Dungeons RP",
+    "description": "Heroes' gear from Minecraft Dungeons: the Firebrand axe, the Ender Armor set, the Corrupted Beacon, and Tim, a dancing companion.",
+    "uuid": "69164009-e67d-4111-bfc8-36261edd6488",
+    "version": [1, 0, 1],
+    "min_engine_version": [1, 26, 40]
+  },
+  "modules": [
+    {
+      "type": "resources",
+      "uuid": "773c1914-d030-4cc5-b4d1-19c31afa8c8b",
+      "version": [1, 0, 1]
+    }
+  ],
+  "metadata": {
+    "authors": ["Steven Le"],
+    "license": "MIT"
+  }
+}

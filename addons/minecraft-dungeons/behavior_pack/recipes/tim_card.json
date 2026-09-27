@@ -1,0 +1,35 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "steveo:tim_card_recipe"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "RPR",
+      "PNP",
+      "RPR"
+    ],
+    "key": {
+      "R": {
+        "item": "minecraft:red_dye"
+      },
+      "P": {
+        "item": "minecraft:paper"
+      },
+      "N": {
+        "item": "minecraft:jukebox"
+      }
+    },
+    "unlock": [
+      {
+        "item": "minecraft:jukebox"
+      }
+    ],
+    "result": {
+      "item": "steveo:tim_card"
+    }
+  }
+}

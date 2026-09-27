@@ -1,0 +1,27 @@
+## Strings for the Minecraft Dungeons add-on.
+## Client-side translations live in the resource pack; the behavior pack
+## references them by key with RawMessage { translate: ... }.
+
+item.steveo:firebrand.name=Firebrand
+item.steveo:ender_helmet.name=Ender Helmet
+item.steveo:ender_chestplate.name=Ender Chestplate
+item.steveo:ender_leggings.name=Ender Leggings
+item.steveo:ender_boots.name=Ender Boots
+item.steveo:corrupted_beacon.name=Corrupted Beacon
+item.steveo:tim_card.name=Tim's Card
+
+entity.steveo:tim.name=Tim
+item.spawn_egg.entity.steveo:tim.name=Spawn Tim
+
+dungeons.beacon.firing=§dCorrupted Beacon: %s s
+dungeons.beacon.recharging=§7Corrupted Beacon recharging: %s s
+
+dungeons.tim.summoned=Tim has joined you! Tim follows you, fights monsters, and dances when things are calm. Tap Tim to make them sit or stand.
+dungeons.tim.failed=Tim could not appear here. Try somewhere with more room.
+
+dungeons.debug.given=Firebrand, Ender Armor, Corrupted Beacon, and three of Tim's Cards are in your inventory.
+dungeons.debug.status=Ender pieces: %s/%s. Health Boost: %s. Max health: %s. Beacon cooldown: %s s, beams firing: %s. Tims loaded: %s (%s tamed).
+dungeons.debug.blink=Blinked.
+dungeons.debug.blink.none=No safe spot to blink to nearby.
+dungeons.debug.beam.hold=Hold the Corrupted Beacon in your main hand first.
+dungeons.debug.help=Usage: /scriptevent steveo:dungeons <give|status|blink|beam|tim>

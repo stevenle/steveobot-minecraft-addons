@@ -1,0 +1,38 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Minecraft Dungeons BP",
+    "description": "Heroes' gear from Minecraft Dungeons: the Firebrand axe, the Ender Armor set, the Corrupted Beacon, and Tim, a dancing companion.",
+    "uuid": "718f0c0f-900e-4df3-be69-8851541e042a",
+    "version": [1, 0, 1],
+    "min_engine_version": [1, 26, 40]
+  },
+  "modules": [
+    {
+      "type": "data",
+      "uuid": "4095e1e3-afbc-459c-879c-6aecdd58b426",
+      "version": [1, 0, 1]
+    },
+    {
+      "type": "script",
+      "language": "javascript",
+      "entry": "scripts/main.js",
+      "uuid": "58cd16aa-941b-4532-88dc-efd30efc08f5",
+      "version": [1, 0, 1]
+    }
+  ],
+  "dependencies": [
+    {
+      "uuid": "69164009-e67d-4111-bfc8-36261edd6488",
+      "version": [1, 0, 1]
+    },
+    {
+      "module_name": "@minecraft/server",
+      "version": "2.9.0"
+    }
+  ],
+  "metadata": {
+    "authors": ["Steven Le"],
+    "license": "MIT"
+  }
+}

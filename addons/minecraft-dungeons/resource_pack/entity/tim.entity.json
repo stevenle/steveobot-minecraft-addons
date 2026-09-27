@@ -1,0 +1,48 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "steveo:tim",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/tim"
+      },
+      "geometry": {
+        "default": "geometry.steveo_tim"
+      },
+      "animations": {
+        "look_at_target": "animation.steveo_tim.look_at_target",
+        "walk": "animation.steveo_tim.walk",
+        "attack": "animation.steveo_tim.attack",
+        "sit": "animation.steveo_tim.sit",
+        "dance": "animation.steveo_tim.dance"
+      },
+      "scripts": {
+        "animate": [
+          {
+            "look_at_target": "!query.property('steveo:dancing')"
+          },
+          {
+            "walk": "!query.is_sitting"
+          },
+          "attack",
+          {
+            "sit": "query.is_sitting"
+          },
+          {
+            "dance": "query.property('steveo:dancing') && !query.is_sitting"
+          }
+        ]
+      },
+      "render_controllers": [
+        "controller.render.steveo_tim"
+      ],
+      "spawn_egg": {
+        "base_color": "#4A2C1E",
+        "overlay_color": "#C8202A"
+      }
+    }
+  }
+}

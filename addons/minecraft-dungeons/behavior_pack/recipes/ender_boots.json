@@ -1,0 +1,35 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "steveo:ender_boots_recipe"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "OPO",
+      "PAP",
+      "OPO"
+    ],
+    "key": {
+      "O": {
+        "item": "minecraft:obsidian"
+      },
+      "P": {
+        "item": "minecraft:ender_pearl"
+      },
+      "A": {
+        "item": "minecraft:diamond_boots"
+      }
+    },
+    "unlock": [
+      {
+        "item": "minecraft:ender_pearl"
+      }
+    ],
+    "result": {
+      "item": "steveo:ender_boots"
+    }
+  }
+}

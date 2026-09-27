@@ -1,0 +1,27 @@
+{
+  "resource_pack_name": "minecraft-dungeons",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "steveo_firebrand": {
+      "textures": "textures/items/firebrand"
+    },
+    "steveo_corrupted_beacon": {
+      "textures": "textures/items/corrupted_beacon"
+    },
+    "steveo_tim_card": {
+      "textures": "textures/items/tim_card"
+    },
+    "steveo_ender_helmet": {
+      "textures": "textures/items/ender_helmet"
+    },
+    "steveo_ender_chestplate": {
+      "textures": "textures/items/ender_chestplate"
+    },
+    "steveo_ender_leggings": {
+      "textures": "textures/items/ender_leggings"
+    },
+    "steveo_ender_boots": {
+      "textures": "textures/items/ender_boots"
+    }
+  }
+}
