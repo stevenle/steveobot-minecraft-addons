@@ -1,0 +1,17 @@
+{
+  "resource_pack_name": "uncrafting",
+  "texture_name": "atlas.terrain",
+  "padding": 8,
+  "num_mip_levels": 4,
+  "texture_data": {
+    "steveo_uncrafting_table_top": {
+      "textures": "textures/blocks/uncrafting_table_top"
+    },
+    "steveo_uncrafting_table_side": {
+      "textures": "textures/blocks/uncrafting_table_side"
+    },
+    "steveo_uncrafting_table_bottom": {
+      "textures": "textures/blocks/uncrafting_table_bottom"
+    }
+  }
+}

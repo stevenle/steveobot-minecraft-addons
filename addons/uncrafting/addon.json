@@ -1,0 +1,5 @@
+{
+  "$schema": "../../tools/schemas/addon.schema.json",
+  "name": "Uncrafting",
+  "description": "An Uncrafting Table that breaks crafted items back down into the ingredients used to make them."
+}
