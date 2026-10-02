@@ -1,13 +1,15 @@
 /**
  * Potato Gun — a crossbow and a rocket launcher that fire potatoes, plus
  * "Explosive" and "Poison" enchantments that change what the potatoes do on
- * impact.
+ * impact, and a TNT Launcher that lobs a block of TNT that blows up on impact.
  *
  * Both guns are custom items with unlimited ammo. Using one spawns a
  * `steveo:potato` entity at the player's eyes and flies it along the player's
  * view; nothing is consumed and nothing wears out. The crossbow potato is
  * quick and arcs like an arrow; the launcher potato is bigger, slower, flies
- * almost straight, and hits harder.
+ * almost straight, and hits harder. The TNT Launcher fires the same entity
+ * dressed as a TNT block (`mark_variant` 2): heavy, arcing, and always
+ * explosive, with a TNT-sized blast.
  *
  * Neither enchantment is a real enchantment — Bedrock has no custom
  * enchantments — so each is modelled the way players will experience it: an
@@ -15,6 +17,8 @@
  * table into a variant of that gun. The variants glint and carry a lore line.
  * Explosive potatoes detonate on impact via `createExplosion`, credited to the
  * shooter; block damage follows the `mobGriefing` game rule, like a creeper.
+ * The TNT Launcher's blast follows `tntExplodes` instead, like real TNT, so
+ * it still breaks blocks on a world that turns mob griefing off.
  * Poison potatoes hurt and poison the mob they hit, and never harm players.
  *
  * The flight is simulated here, not by the engine. The potato entity has no
@@ -24,6 +28,14 @@
  * the engine's projectile physics changed underneath this add-on on 1.26.50
  * (`isolated_physics` stopped script-launched potatoes moving at all, and
  * the legacy path it was moved back to flew oddly). See `step()`.
+ *
+ * Hits are tested against each mob's bounding box widened by the potato's
+ * radius, not a hair-thin ray, so a potato that visibly clips a mob hurts it.
+ * A hit does not take effect the tick it is detected: the script looks a
+ * whole tick of travel ahead, and the client draws entities a little behind
+ * the server, so removing the potato at once made it vanish short of its
+ * target. Instead it is steered onto the impact point and held there for
+ * `LANDING_TICKS` before the damage, splat, and explosion land.
  *
  * Potatoes have an 8-second fuse in entities/potato.json, and the sweep
  * removes any potato the script is not flying (after a script reload, say),
@@ -37,6 +49,7 @@ import {
   Player,
   system,
   world,
+  type AABB,
   type Block,
   type Container,
   type Dimension,
@@ -64,16 +77,21 @@ const SWEEP_INTERVAL_TICKS = 100;
 const HOLD_CHECK_TICKS = 10;
 /** How far in front of the eyes the potato entity appears, so it is not drawn inside the camera. */
 const MUZZLE_OFFSET = 0.5;
-/** Half the potato's width; rays reach this far past each step so grazing hits count. */
-const POTATO_RADIUS = 0.125;
 /** Ticks during which a potato cannot hit its shooter, as with vanilla arrows. */
 const OWNER_GRACE_TICKS = 5;
 /** Velocity multiplier per tick while the potato is in water or lava. */
 const LIQUID_DRAG = 0.6;
 /** How strongly the entity is pulled back onto the simulated path each tick (0..1). */
 const TRACK_GAIN = 0.5;
+/**
+ * Ticks a potato sits on its impact point before the hit lands: one to get
+ * there, and the rest for the client, which draws it a couple of ticks late.
+ */
+const LANDING_TICKS = 3;
+/** How far beyond a mob's feet to look for its hitbox; covers mobs up to a ghast. */
+const MOB_REACH = 5;
 
-type Kind = 'crossbow' | 'launcher';
+type Kind = 'crossbow' | 'launcher' | 'tnt';
 type Effect = 'plain' | 'explosive' | 'poison';
 
 interface Ballistics {
@@ -87,6 +105,8 @@ interface Ballistics {
   drag: number;
   /** Impact damage (2 per heart). */
   damage: number;
+  /** Half the projectile's drawn width, for hit tests. */
+  radius: number;
   /** Explosion radius for explosive potatoes (TNT is 4, a creeper 3). */
   blastRadius: number;
   /** Poison applied by poison potatoes. Amplifier 0 is Poison I. */
@@ -97,14 +117,20 @@ interface Ballistics {
 
 const BALLISTICS: Readonly<Record<Kind, Ballistics>> = {
   crossbow: {
-    speed: 2.4, spread: 1, gravity: 0.05, drag: 0.99, damage: 6, blastRadius: 1.8,
+    speed: 2.4, spread: 1, gravity: 0.05, drag: 0.99, damage: 6, radius: 0.125, blastRadius: 1.8,
     poison: { ticks: 140, amplifier: 0 },
     sound: 'random.bow', pitch: 0.7,
   },
   launcher: {
-    speed: 1.6, spread: 0, gravity: 0.012, drag: 0.995, damage: 12, blastRadius: 3,
+    speed: 1.6, spread: 0, gravity: 0.012, drag: 0.995, damage: 12, radius: 0.225, blastRadius: 3,
     poison: { ticks: 140, amplifier: 1 },
     sound: 'firework.launch', pitch: 0.6,
+  },
+  // A lobbed block: slow and arcing, so it can be dropped behind cover. The blast is TNT's own.
+  tnt: {
+    speed: 1.3, spread: 0, gravity: 0.04, drag: 0.99, damage: 8, radius: 0.3, blastRadius: 4,
+    poison: { ticks: 0, amplifier: 0 },
+    sound: 'random.fuse', pitch: 1,
   },
 };
 
@@ -115,15 +141,19 @@ interface Gun {
   spawnEvent: string;
 }
 
-/** Item id -> gun, for every kind × effect: `steveo:potato_crossbow_poison` etc. */
-const GUNS: ReadonlyMap<string, Gun> = new Map(
-  (['crossbow', 'launcher'] as const).flatMap((kind) =>
+/**
+ * Item id -> gun: every potato gun kind × effect (`steveo:potato_crossbow_poison`
+ * etc.), plus the TNT Launcher, which is always explosive and takes no enchantment.
+ */
+const GUNS: ReadonlyMap<string, Gun> = new Map([
+  ...(['crossbow', 'launcher'] as const).flatMap((kind) =>
     (['plain', 'explosive', 'poison'] as const).map((effect): [string, Gun] => {
       const suffix = effect === 'plain' ? '' : `_${effect}`;
       return [`steveo:potato_${kind}${suffix}`, { kind, effect, spawnEvent: `steveo:${kind}${suffix}` }];
     }),
   ),
-);
+  ['steveo:tnt_launcher', { kind: 'tnt', effect: 'explosive', spawnEvent: 'steveo:tnt' }],
+]);
 
 /** Enchantment items -> the hint shown the first time one is held. */
 const ENCHANTMENTS: ReadonlyMap<string, string> = new Map([
@@ -131,7 +161,7 @@ const ENCHANTMENTS: ReadonlyMap<string, string> = new Map([
   ['steveo:poison_enchantment', 'potato_gun.hint.poison_enchantment'],
 ]);
 
-/** Gray, like a vanilla enchantment line under the item name. */
+/** Gray, like a vanilla enchantment line under the item name. Only enchanted potato guns get one. */
 const LORE: Readonly<Record<Effect, string | undefined>> = {
   plain: undefined,
   explosive: `${Format.gray}Explosive`,
@@ -153,6 +183,15 @@ interface Shot {
   /** Set when impulses do not move the entity; it is then teleported along the path instead. */
   teleport: boolean;
   lastActual: Vector3;
+  /** Set once the potato has hit something and is settling onto the impact point. */
+  landing: Landing | undefined;
+}
+
+interface Landing {
+  impact: Impact;
+  /** Where the entity is held: touching what it hit, not inside it. */
+  hold: Vector3;
+  ticksLeft: number;
 }
 
 /** Potatoes in flight, keyed by entity id. */
@@ -237,7 +276,7 @@ function launch(player: Player, gun: Gun): Entity | undefined {
   // closer than the muzzle is still hit rather than skipped.
   const shot: Shot = {
     gun, shooterId: player.id, potato, dimension: player.dimension,
-    pos: head, vel, age: 0, steppedTick: -1, teleport: false, lastActual: potato.location,
+    pos: head, vel, age: 0, steppedTick: -1, teleport: false, lastActual: potato.location, landing: undefined,
   };
   shots.set(potato.id, shot);
   player.dimension.playSound(b.sound, head, { pitch: b.pitch });
@@ -267,9 +306,37 @@ function canHit(entity: Entity, shot: Shot): boolean {
 
 type Impact = { at: Vector3; entity?: Entity; block?: Block };
 
+/**
+ * Distance along the ray `from + t·dir` (dir normalized) at which it enters
+ * `box` grown by `pad` on every side, if it does so within `maxDistance`.
+ * The slab method: intersect the ray's entry/exit interval on each axis.
+ */
+function rayBoxDistance(from: Vector3, dir: Vector3, box: AABB, pad: number, maxDistance: number): number | undefined {
+  let enter = 0;
+  let exit = maxDistance;
+  for (const axis of ['x', 'y', 'z'] as const) {
+    const lo = box.center[axis] - box.extent[axis] - pad;
+    const hi = box.center[axis] + box.extent[axis] + pad;
+    const o = from[axis];
+    const d = dir[axis];
+    if (Math.abs(d) < 1e-9) {
+      if (o < lo || o > hi) return undefined;
+      continue;
+    }
+    let t1 = (lo - o) / d;
+    let t2 = (hi - o) / d;
+    if (t1 > t2) [t1, t2] = [t2, t1];
+    enter = Math.max(enter, t1);
+    exit = Math.min(exit, t2);
+    if (enter > exit) return undefined;
+  }
+  return enter;
+}
+
 /** The first thing the potato touches travelling `distance` along `dir` from `from`. */
 function sweep(shot: Shot, from: Vector3, dir: Vector3, distance: number): Impact | undefined {
-  const reach = distance + POTATO_RADIUS;
+  const { radius } = BALLISTICS[shot.gun.kind];
+  const reach = distance + radius;
   let best: Impact | undefined;
   let bestDist = Infinity;
 
@@ -284,14 +351,25 @@ function sweep(shot: Shot, from: Vector3, dir: Vector3, distance: number): Impac
     best = { at, block: block.block };
   }
 
-  const entities = shot.dimension.getEntitiesFromRay(from, dir, {
-    maxDistance: reach,
+  // Mobs are tested against their hitbox widened by the potato's radius, so
+  // a potato that visibly clips a mob's edge counts. A plain entity raycast
+  // is a hair-thin line and let grazing shots pass through.
+  const nearby = shot.dimension.getEntities({
+    location: add(from, scale(dir, distance / 2)),
+    maxDistance: distance / 2 + radius + MOB_REACH,
     excludeFamilies: [POTATO_FAMILY],
   });
-  for (const hit of entities) {
-    if (hit.distance >= bestDist || !canHit(hit.entity, shot)) continue;
-    bestDist = hit.distance;
-    best = { at: add(from, scale(dir, hit.distance)), entity: hit.entity };
+  for (const entity of nearby) {
+    if (!canHit(entity, shot)) continue;
+    let hitDist: number | undefined;
+    try {
+      hitDist = rayBoxDistance(from, dir, entity.getAABB(), radius, reach);
+    } catch {
+      continue;
+    }
+    if (hitDist === undefined || hitDist >= bestDist) continue;
+    bestDist = hitDist;
+    best = { at: add(from, scale(dir, hitDist)), entity };
   }
   return best;
 }
@@ -305,11 +383,19 @@ function sweep(shot: Shot, from: Vector3, dir: Vector3, distance: number): Impac
  * than teleported, because the client interpolates velocity-driven movement
  * but snaps on teleports. If impulses turn out not to move it at all, the
  * shot falls back to teleporting so the potato is at least visible.
+ *
+ * A hit found along the step does not land yet: the potato is moved onto the
+ * impact point and `settle()` lands it `LANDING_TICKS` later.
  */
 function step(shot: Shot): void {
   const tick = system.currentTick;
   if (shot.steppedTick === tick) return;
   shot.steppedTick = tick;
+
+  if (shot.landing) {
+    settle(shot, shot.landing);
+    return;
+  }
 
   const { potato } = shot;
   if (!potato.isValid || shot.age >= MAX_FLIGHT_TICKS) {
@@ -323,9 +409,14 @@ function step(shot: Shot): void {
   try {
     inLiquid = shot.dimension.getBlock(shot.pos)?.isLiquid ?? false;
     if (distance > 0) {
-      const impact = sweep(shot, shot.pos, scale(shot.vel, 1 / distance), distance);
+      const dir = scale(shot.vel, 1 / distance);
+      const impact = sweep(shot, shot.pos, dir, distance);
       if (impact) {
-        land(shot, impact);
+        // A mob's hitbox was already widened by the radius; a block face was not.
+        const hold = impact.entity ? impact.at : sub(impact.at, scale(dir, b.radius));
+        const landing: Landing = { impact, hold, ticksLeft: LANDING_TICKS };
+        shot.landing = landing;
+        settle(shot, landing);
         return;
       }
     }
@@ -362,6 +453,27 @@ function step(shot: Shot): void {
   shot.age++;
 }
 
+/** Holds a potato that has hit something on its impact point, then lands the hit. */
+function settle(shot: Shot, landing: Landing): void {
+  const { potato } = shot;
+  if (landing.ticksLeft <= 0 || !potato.isValid) {
+    land(shot, landing.impact);
+    return;
+  }
+  landing.ticksLeft--;
+  try {
+    if (shot.teleport) {
+      potato.teleport(landing.hold);
+    } else {
+      // Exactly the remaining distance: it arrives in one tick, then the impulse is zero.
+      potato.clearVelocity();
+      potato.applyImpulse(sub(landing.hold, potato.location));
+    }
+  } catch {
+    // The entity is going away; the hit still lands next tick.
+  }
+}
+
 /** Ends a flight without an impact. */
 function finish(shot: Shot): void {
   shots.delete(shot.potato.id);
@@ -371,6 +483,8 @@ function finish(shot: Shot): void {
 // ---------- hits ----------
 
 function splat(dimension: Dimension, location: Vector3, gun: Gun): void {
+  // A TNT block does not splat; the explosion is the effect.
+  if (gun.kind === 'tnt') return;
   try {
     dimension.spawnParticle(SPLAT_PARTICLE, location);
     if (gun.effect === 'poison') dimension.spawnParticle(POISON_PARTICLE, location);
@@ -380,10 +494,15 @@ function splat(dimension: Dimension, location: Vector3, gun: Gun): void {
   }
 }
 
-function explode(dimension: Dimension, location: Vector3, radius: number, shooter: Entity | undefined): void {
+/** Whether this gun's explosions break blocks: TNT follows TNT's rule, potatoes a creeper's. */
+function breaksBlocks(gun: Gun): boolean {
+  return gun.kind === 'tnt' ? world.gameRules.tntExplodes : world.gameRules.mobGriefing;
+}
+
+function explode(dimension: Dimension, location: Vector3, gun: Gun, shooter: Entity | undefined): void {
   try {
-    dimension.createExplosion(location, radius, {
-      breaksBlocks: world.gameRules.mobGriefing,
+    dimension.createExplosion(location, BALLISTICS[gun.kind].blastRadius, {
+      breaksBlocks: breaksBlocks(gun),
       causesFire: false,
       ...(shooter ? { source: shooter } : {}),
     });
@@ -410,7 +529,13 @@ function hurt(target: Entity, shot: Shot, shooter: Entity | undefined): HitResul
       ...(shooter ? { damagingEntity: shooter } : {}),
     });
   } catch {
-    // Fall back to a plain projectile hit if the potato entity is not accepted as the source.
+    // Retried below.
+  }
+  if (!damaged && target.isValid) {
+    // The potato has no minecraft:projectile component, so the game may reject
+    // it as a damage source, by throwing or by quietly returning false. Retry
+    // as a plain projectile hit. A hit refused for a real reason (creative,
+    // the flash after a recent hit) is refused again, so nothing doubles up.
     try {
       damaged = target.applyDamage(b.damage, {
         cause: EntityDamageCause.projectile,
@@ -441,7 +566,7 @@ const hitReports = new Set<string>();
 function reportHit(shooter: Entity | undefined, shot: Shot, impact: Impact, result: HitResult | undefined): void {
   if (!(shooter instanceof Player) || !hitReports.has(shooter.id)) return;
   try {
-    const gun: RawMessage = { translate: `potato_gun.debug.gun.${shot.gun.effect}` };
+    const gun: RawMessage = { translate: `potato_gun.debug.gun.${shot.gun.kind === 'tnt' ? 'tnt' : shot.gun.effect}` };
     const message: RawMessage = impact.entity && result
       ? {
         translate: 'potato_gun.debug.hit.entity',
@@ -466,13 +591,14 @@ function reportHit(shooter: Entity | undefined, shot: Shot, impact: Impact, resu
 
 function land(shot: Shot, impact: Impact): void {
   const shooter = world.getEntity(shot.shooterId);
-  const result = impact.entity ? hurt(impact.entity, shot, shooter) : undefined;
+  // The mob may have died or despawned while the potato settled.
+  const result = impact.entity?.isValid ? hurt(impact.entity, shot, shooter) : undefined;
   reportHit(shooter, shot, impact, result);
   // Remove after damage: the potato is the damage source, so it must still exist.
   finish(shot);
   splat(shot.dimension, impact.at, shot.gun);
   if (shot.gun.effect === 'explosive') {
-    explode(shot.dimension, impact.at, BALLISTICS[shot.gun.kind].blastRadius, shooter);
+    explode(shot.dimension, impact.at, shot.gun, shooter);
   }
 }
 
@@ -521,7 +647,7 @@ system.runInterval(() => {
     const enchantmentHint = ENCHANTMENTS.get(held.typeId);
     if (!gun && !enchantmentHint) continue;
 
-    const lore = gun ? LORE[gun.effect] : undefined;
+    const lore = gun && gun.kind !== 'tnt' ? LORE[gun.effect] : undefined;
     if (lore && held.getLore().length === 0) {
       held.setLore([lore]);
       equippable.setEquipment(EquipmentSlot.Mainhand, held);
@@ -572,6 +698,7 @@ system.afterEvents.scriptEventReceive.subscribe(
                   { text: `${shots.size}` },
                   { text: `${teleporting}` },
                   { translate: world.gameRules.mobGriefing ? 'potato_gun.debug.status.on' : 'potato_gun.debug.status.off' },
+                  { translate: world.gameRules.tntExplodes ? 'potato_gun.debug.status.on' : 'potato_gun.debug.status.tnt_off' },
                 ],
               },
             },

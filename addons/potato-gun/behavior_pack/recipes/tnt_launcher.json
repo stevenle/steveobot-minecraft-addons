@@ -1,0 +1,20 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "steveo:tnt_launcher_recipe"
+    },
+    "tags": ["crafting_table"],
+    "pattern": ["ITI"],
+    "key": {
+      "I": { "item": "minecraft:iron_ingot" },
+      "T": { "item": "minecraft:tnt" }
+    },
+    "unlock": [
+      { "item": "minecraft:tnt" }
+    ],
+    "result": {
+      "item": "steveo:tnt_launcher"
+    }
+  }
+}

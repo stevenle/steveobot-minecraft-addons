@@ -20,6 +20,10 @@
       "steveo:poison": {
         "minecraft:variant": { "value": 2 }
       },
+      "steveo:tnt": {
+        "minecraft:mark_variant": { "value": 2 },
+        "minecraft:variant": { "value": 3 }
+      },
       "steveo:fuse": {
         "minecraft:timer": {
           "time": 8,
@@ -59,6 +63,7 @@
       "steveo:launcher_poison": {
         "add": { "component_groups": ["steveo:fuse", "steveo:launcher", "steveo:poison"] }
       },
+      "steveo:tnt": { "add": { "component_groups": ["steveo:fuse", "steveo:tnt"] } },
       "steveo:despawn": { "add": { "component_groups": ["steveo:gone"] } }
     }
   }
