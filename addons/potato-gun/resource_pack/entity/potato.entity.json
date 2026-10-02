@@ -9,10 +9,12 @@
       "textures": {
         "plain": "textures/entity/potato",
         "explosive": "textures/entity/potato_explosive",
-        "poison": "textures/entity/potato_poison"
+        "poison": "textures/entity/potato_poison",
+        "tnt": "textures/entity/tnt_shell"
       },
       "geometry": {
-        "default": "geometry.steveo_potato"
+        "default": "geometry.steveo_potato",
+        "tnt": "geometry.steveo_tnt_shell"
       },
       "particle_effects": {
         "smoke": "minecraft:basic_smoke_particle",
@@ -21,16 +23,18 @@
       },
       "animations": {
         "spin": "animation.steveo_potato.spin",
+        "tumble": "animation.steveo_potato.tumble",
         "fuse_trail": "animation.steveo_potato.fuse_trail",
         "rocket_trail": "animation.steveo_potato.rocket_trail",
         "poison_trail": "animation.steveo_potato.poison_trail"
       },
       "scripts": {
         "animate": [
-          "spin",
-          { "fuse_trail": "query.variant == 1" },
+          { "spin": "query.mark_variant != 2" },
+          { "tumble": "query.mark_variant == 2" },
+          { "fuse_trail": "query.variant == 1 || query.variant == 3" },
           { "poison_trail": "query.variant == 2" },
-          { "rocket_trail": "query.mark_variant == 1" }
+          { "rocket_trail": "query.mark_variant >= 1" }
         ]
       },
       "render_controllers": ["controller.render.steveo_potato"]

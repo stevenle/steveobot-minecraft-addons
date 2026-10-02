@@ -9,6 +9,14 @@
         }
       }
     },
+    "animation.steveo_potato.tumble": {
+      "loop": true,
+      "bones": {
+        "potato": {
+          "rotation": ["query.life_time * 240", "query.life_time * 90", 0]
+        }
+      }
+    },
     "animation.steveo_potato.fuse_trail": {
       "loop": true,
       "animation_length": 0.1,

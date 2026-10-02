@@ -1,4 +1,4 @@
-// Generates the item icons, the potato entity textures, and the pack icons for this add-on.
+// Generates the item icons, the potato and TNT shell entity textures, and the pack icons for this add-on.
 // Run from the repo root:  node addons/potato-gun/assets/generate.mjs addons/potato-gun
 // It overwrites the generated files under resource_pack/ and behavior_pack/;
 // the generated output is what gets committed, this script is for regenerating it.
@@ -227,6 +227,68 @@ function paintBook(variant) {
     : { R: P.redDark, r: P.red, f: P.fuse, e: P.ember, P: P.paper });
 }
 
+// ---------- TNT Launcher icon and TNT shell texture ----------
+function tntLauncherRows() {
+  return [
+    '................',
+    '..........RrRrR.',
+    '..........WWWWW.',
+    '..........WkkkW.',
+    '.........sWWWWW.',
+    '........sSRrRrR.',
+    '.......sSSSD....',
+    '......sSSSD.....',
+    '.....sSSSD......',
+    '....sSSSD.G.....',
+    '...sSSSD..G.....',
+    '..sSSSD..GG.....',
+    '.sSSSD..........',
+    '.SSSD...........',
+    '..DD............',
+    '................',
+  ];
+}
+
+function paintTntLauncher() {
+  return paintRows(tntLauncherRows(), {
+    R: P.red, r: P.redDark, W: P.paper, k: P.fuse,
+    s: hex('#D8DDE3'), S: P.iron, D: P.steel, G: P.wood,
+  });
+}
+
+/** 3x5 letters for the TNT label. */
+const GLYPHS = {
+  T: ['###', '.#.', '.#.', '.#.', '.#.'],
+  N: ['#..#', '##.#', '#.##', '#..#', '#..#'],
+};
+
+/** 48x16: side, top, bottom tiles side by side, as tnt_shell.geo.json maps them. */
+function paintTntShell() {
+  const c = canvas(48, 16);
+  const rand = rng(11);
+  const stripe = (x) => (x % 4 === 3 ? P.redDark : P.red);
+  // Side: red with darker vertical stripes, a white band with "TNT" across the middle.
+  for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) {
+    c.set(x, y, y >= 4 && y <= 10 ? P.paper : stripe(x));
+  }
+  let gx = 2;
+  for (const letter of ['T', 'N', 'T']) {
+    const glyph = GLYPHS[letter];
+    glyph.forEach((row, dy) => [...row].forEach((ch, dx) => { if (ch === '#') c.set(gx + dx, 5 + dy, P.fuse); }));
+    gx += glyph[0].length + 1;
+  }
+  // Top: red rim around a dark centre with the fuse sticking out.
+  for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) {
+    const rim = x < 2 || y < 2 || x > 13 || y > 13;
+    c.set(16 + x, y, rim ? P.redDark : mix(P.red, P.redDark, rand() * 0.5));
+  }
+  for (const [x, y] of [[7, 7], [8, 7], [7, 8], [8, 8]]) c.set(16 + x, y, P.fuse);
+  c.set(16 + 8, 6, P.ember);
+  // Bottom: plain dark red.
+  for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) c.set(32 + x, y, mix(P.redDark, P.red, rand() * 0.3));
+  return c;
+}
+
 // ---------- Pack icon: 128x128 ----------
 // A vanilla-style potato item: a 16x16 sprite lit from the top left, drawn
 // at 6x with hard pixel edges, plus a lit fuse on its tip for the explosive half.
@@ -293,7 +355,9 @@ fs.writeFileSync(path.join(items, 'poison_enchantment.png'), paintBook('poison')
 fs.writeFileSync(path.join(rp, 'textures', 'entity', 'potato.png'), paintPotatoTile('plain').png());
 fs.writeFileSync(path.join(rp, 'textures', 'entity', 'potato_explosive.png'), paintPotatoTile('hot').png());
 fs.writeFileSync(path.join(rp, 'textures', 'entity', 'potato_poison.png'), paintPotatoTile('poison').png());
+fs.writeFileSync(path.join(items, 'tnt_launcher.png'), paintTntLauncher().png());
+fs.writeFileSync(path.join(rp, 'textures', 'entity', 'tnt_shell.png'), paintTntShell().png());
 const icon = paintPackIcon().png();
 fs.writeFileSync(path.join(rp, 'pack_icon.png'), icon);
 fs.writeFileSync(path.join(out, 'behavior_pack', 'pack_icon.png'), icon);
-console.log('wrote item icons, potato textures, and pack icons to', out);
+console.log('wrote item icons, potato and TNT shell textures, and pack icons to', out);

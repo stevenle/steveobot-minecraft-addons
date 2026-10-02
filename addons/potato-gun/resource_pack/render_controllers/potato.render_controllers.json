@@ -4,10 +4,13 @@
     "controller.render.steveo_potato": {
       "arrays": {
         "textures": {
-          "array.skins": ["texture.plain", "texture.explosive", "texture.poison"]
+          "array.skins": ["texture.plain", "texture.explosive", "texture.poison", "texture.tnt"]
+        },
+        "geometries": {
+          "array.shapes": ["geometry.default", "geometry.default", "geometry.tnt"]
         }
       },
-      "geometry": "geometry.default",
+      "geometry": "array.shapes[query.mark_variant]",
       "materials": [{ "*": "material.default" }],
       "textures": ["array.skins[query.variant]"]
     }
