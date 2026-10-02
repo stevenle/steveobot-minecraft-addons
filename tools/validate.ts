@@ -184,6 +184,56 @@ function checkLangText(addon: Addon, ctx: Context): void {
   }
 }
 
+function readJson(file: string): unknown {
+  try {
+    return JSON.parse(fs.readFileSync(file, 'utf8'));
+  } catch {
+    return undefined;
+  }
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+/**
+ * A custom block's look comes from `minecraft:material_instances` only when
+ * it also names a `minecraft:geometry`. Without one the game falls back to
+ * the legacy cube, which takes its textures from blocks.json, and draws the
+ * missing-texture tile (a dirt block with a question mark) when those are
+ * absent (uncrafting, 2026-10-01). Also checks that every texture a material
+ * instance names is defined in terrain_texture.json, which fails the same way.
+ */
+function checkBlocks(addon: Addon, ctx: Context): void {
+  const blocks = addon.behaviorPack && path.join(addon.behaviorPack.dir, 'blocks');
+  if (!blocks || !fs.existsSync(blocks)) return;
+  const terrainFile = addon.resourcePack && path.join(addon.resourcePack.dir, 'textures', 'terrain_texture.json');
+  const terrain = terrainFile === undefined ? undefined : readJson(terrainFile);
+  const textureData = isRecord(terrain) && isRecord(terrain.texture_data) ? terrain.texture_data : {};
+
+  for (const name of fs.readdirSync(blocks).filter((f) => f.endsWith('.json'))) {
+    const file = path.join(blocks, name);
+    const json = readJson(file);
+    const block = isRecord(json) ? json['minecraft:block'] : undefined;
+    const components = isRecord(block) ? block.components : undefined;
+    if (!isRecord(components)) continue;
+    const instances = components['minecraft:material_instances'];
+    if (!isRecord(instances)) continue;
+    if (components['minecraft:geometry'] === undefined) {
+      ctx.errors.push(
+        `${rel(file)}: has minecraft:material_instances but no minecraft:geometry, so it renders as the missing-texture tile ` +
+          '(use "minecraft:geometry.full_block" for a plain cube)',
+      );
+    }
+    for (const [face, instance] of Object.entries(instances)) {
+      const texture = isRecord(instance) ? instance.texture : undefined;
+      if (typeof texture === 'string' && !(texture in textureData)) {
+        ctx.errors.push(`${rel(file)}: material instance "${face}" uses texture "${texture}", which terrain_texture.json does not define`);
+      }
+    }
+  }
+}
+
 function main(): void {
   const args = parseArgs();
 
@@ -206,6 +256,7 @@ function main(): void {
     }
     checkPackDependencies(addon, ctx);
     checkLangText(addon, ctx);
+    checkBlocks(addon, ctx);
   }
 
   for (const warning of ctx.warnings) log.warn(warning);

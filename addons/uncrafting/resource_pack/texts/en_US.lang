@@ -1,0 +1,25 @@
+## Strings for the Uncrafting add-on.
+## Client-side translations live in the resource pack; the behavior pack
+## references them by key with RawMessage { translate: ... }.
+
+tile.steveo:uncrafting_table.name=Uncrafting Table
+
+## The table menu
+uncrafting.form.enchanted=§cThe enchantments on this item will be lost.§r
+uncrafting.form.once=Uncraft once
+uncrafting.form.all=Uncraft all %s
+uncrafting.hold=Hold the item you want to uncraft, then use the table.
+uncrafting.unknown=The table does not know how to uncraft %s.
+uncrafting.too_few=You need at least %s %s to uncraft it.
+uncrafting.changed=You switched items. Hold the item you chose and try again.
+uncrafting.done=Uncrafted %s %s.
+
+## Debug (/scriptevent steveo:uncraft ...)
+uncrafting.debug.table=An Uncrafting Table has been placed on the block you are looking at.
+uncrafting.debug.look=Look at a block within reach first.
+uncrafting.debug.check=%s recipes, %s distinct item ids, %s unknown to this game version.
+uncrafting.debug.missing=Unknown item ids: %s
+uncrafting.debug.held=%s %s uncrafts into:
+uncrafting.debug.held.line=  §e%sx§r %s
+uncrafting.debug.held.none=Hold an item the table knows how to uncraft.
+uncrafting.debug.help=Usage: /scriptevent steveo:uncraft <table|check|held>

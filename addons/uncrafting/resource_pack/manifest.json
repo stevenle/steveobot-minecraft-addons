@@ -1,0 +1,21 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Uncrafting RP",
+    "description": "An Uncrafting Table that breaks crafted items back down into the ingredients used to make them.",
+    "uuid": "1e6d8204-2a25-4b68-8e65-b25f45c65366",
+    "version": [1, 0, 3],
+    "min_engine_version": [1, 26, 40]
+  },
+  "modules": [
+    {
+      "type": "resources",
+      "uuid": "b3e3e4d6-b18d-4cc4-ba73-2ca4b06f9e16",
+      "version": [1, 0, 3]
+    }
+  ],
+  "metadata": {
+    "authors": ["Steven Le"],
+    "license": "MIT"
+  }
+}
