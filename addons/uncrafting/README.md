@@ -16,10 +16,12 @@ ICI
 
 Hold the item you want to take apart and use the table. Using it never uses
 the item itself, so armor stays in your hand instead of equipping and food is
-not eaten. A menu shows what one uncraft gives back, with a button to uncraft
-once and, when you hold a stack, another to uncraft the whole stack. The
-ingredients go into your inventory; anything that does not fit drops on top
-of the table.
+not eaten. The menu is a crafting table run backwards: your item on the left,
+an arrow, and a 3×3 grid showing the ingredients where a crafting table would
+hold them. Below are **Uncraft once** and, when you hold a stack, **Uncraft
+all**. The ingredients go into your inventory; anything that does not fit
+drops on top of the table. Items cannot be dragged in or out of the grid; it
+always shows the item in your hand.
 
 Items that craft in batches have to be uncrafted in the same batches: four
 torches give back one coal and one stick, sixteen rails give back six iron
@@ -27,10 +29,9 @@ ingots and a stick.
 
 ## Rules
 
-- **Wear counts.** Damaged tools and armor give back ingredients in
-  proportion to the durability left, rounded down. A half-worn diamond
-  pickaxe returns one diamond and one stick; a badly worn one may return
-  nothing, and the table says so instead of eating it.
+- **Wear does not count.** Tools and armor give back their full recipe
+  however damaged they are, so a nearly broken diamond pickaxe still returns
+  three diamonds and two sticks.
 - **Enchantments are lost.** The menu warns before you uncraft an enchanted
   item.
 - **Any-wood and any-stone recipes give back the plain one.** A spruce
@@ -42,7 +43,8 @@ ingots and a stick.
 ## What it can uncraft
 
 The Script API cannot read the game's recipe book, so the table knows a
-fixed list, written out in `RECIPES` in `src/main.ts`:
+fixed list, written out with their crafting-grid shapes in `RECIPES` in
+`src/recipes.ts` and checked against Mojang's `bedrock-samples` recipes:
 
 - Wooden, stone, iron, golden, diamond and netherite swords, pickaxes, axes,
   shovels and hoes
@@ -58,7 +60,26 @@ fixed list, written out in `RECIPES` in `src/main.ts`:
 - Torch, lantern, golden apple, golden carrot, eye of ender, stick
 
 Anything else gets "The table does not know how to uncraft ...". To add an
-item, add a line to `RECIPES`.
+item, add its recipe to `RECIPES` and its icon to `ICONS`.
+
+## The menu layout
+
+Bedrock add-ons cannot open a custom slot-based screen for a block, so the
+menu is a script form that `resource_pack/ui/server_form.json` redraws.
+It redefines the vanilla `long_form` as a wrapper holding two dialogs: the
+vanilla one, copied from Mojang's 1.26.50 `server_form.json`, and the
+crafting layout. A form whose title starts with the invisible marker
+`§u§n§c§r` gets the crafting layout; every other form, from any add-on,
+gets the vanilla one. The button order is the contract between that file
+and `src/main.ts` (`SLOT`): 0 is the held item, 1-9 the grid in reading
+order, 10 Uncraft once, 11 Uncraft all.
+
+Two things to know:
+
+- Another pack that also redefines `long_form` (some marketplace UI packs
+  do) will fight this one; whichever loads last wins.
+- If a game update changes the vanilla `long_form`, re-copy its fields from
+  `bedrock-samples` into `vanilla_long_form`.
 
 ## Debug
 

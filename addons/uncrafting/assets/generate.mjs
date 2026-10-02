@@ -1,5 +1,6 @@
-// Generates the Uncrafting Table textures (16×16 top/side/bottom) and the
-// 128×128 pack icons. Run from the repo root:
+// Generates the Uncrafting Table textures (16×16 top/side/bottom, after the
+// Twilight Forest table) and the 128×128 pack icons, an isometric render of
+// the block. Run from the repo root:
 //   node addons/uncrafting/assets/generate.mjs addons/uncrafting
 // The generated output is what gets committed; this script is for regenerating it.
 import fs from 'node:fs';
@@ -62,103 +63,137 @@ function write(rel, data) {
 }
 
 // ---------- palette ----------
-// Dark oak planks with an amethyst-purple work surface: a crafting table run
-// in reverse.
-const PLANK = hex('#5a3a22');
-const PLANK_DARK = hex('#3e2716');
-const PLANK_LIGHT = hex('#71492b');
-const PURPLE = hex('#8a4fb8');
-const PURPLE_DARK = hex('#5b2f80');
-const PURPLE_LIGHT = hex('#c08ae6');
-const IRON = hex('#d8d8d8');
-const IRON_DARK = hex('#8f8f8f');
-const HANDLE = hex('#8a6237');
+// The Twilight Forest look: a red cloth with a 3×3 grid laid over a purple
+// table, draping down each side to a point, on grey stone legs.
+const PALETTE = {
+  K: hex('#1b0d17'), // outline
+  P: hex('#4b2575'), // purple
+  p: hex('#331650'), // purple, shadowed
+  Q: hex('#5e3290'), // purple, lit
+  R: hex('#b32222'), // cloth
+  r: hex('#8a1818'), // cloth, shadowed
+  H: hex('#c93434'), // cloth, lit
+  D: hex('#3a0c18'), // cloth hem
+  S: hex('#2a1236'), // centre post
+  G: hex('#c6c6c6'), // stone
+  g: hex('#a2a2a2'), // stone, shadowed
+  h: hex('#7c7c7c'), // stone seam
+};
 
-/** Horizontal planks with seams every 4 rows and a little grain. */
-function planks(c) {
-  for (let y = 0; y < 16; y++) {
-    for (let x = 0; x < 16; x++) {
-      const seam = y % 4 === 3;
-      const grain = (x * 7 + y * 3) % 11 === 0;
-      const end = (y >> 2) % 2 === 0 ? x === 5 : x === 12;
-      c.set(x, y, seam || end ? PLANK_DARK : grain ? PLANK_LIGHT : PLANK);
-    }
-  }
+/** A 16×16 texture from 16 strings of palette letters. */
+function sprite(rows) {
+  if (rows.length !== 16 || rows.some((row) => row.length !== 16)) throw new Error('sprites are 16×16');
+  const c = canvas(16, 16);
+  rows.forEach((row, y) => [...row].forEach((ch, x) => {
+    const col = PALETTE[ch];
+    if (!col) throw new Error(`unknown palette letter ${ch}`);
+    c.set(x, y, col);
+  }));
+  return c;
 }
 
-/** A frame of iron around the edge, like the crafting table's rim. */
-function rim(c) {
-  for (let i = 0; i < 16; i++) {
-    c.set(i, 0, IRON_DARK); c.set(i, 15, IRON_DARK);
-    c.set(0, i, IRON_DARK); c.set(15, i, IRON_DARK);
-  }
-}
-
-// ---------- top: a 3×3 grid with an arrow curling back ----------
+// ---------- top: the cloth and its grid ----------
 function top() {
-  const c = canvas(16, 16);
-  planks(c);
-  c.fill(2, 2, 12, 12, PURPLE_DARK);
-  for (let gy = 0; gy < 3; gy++) {
-    for (let gx = 0; gx < 3; gx++) c.fill(3 + gx * 4, 3 + gy * 4, 3, 3, PURPLE);
-  }
-  // Counter-clockwise arrow around the centre cell: down the left, along the
-  // bottom, up the right, with the head pointing left along the top.
-  const arrow = [
-    [5, 5], [5, 6], [5, 7], [5, 8], [5, 9], [5, 10],
-    [6, 10], [7, 10], [8, 10], [9, 10], [10, 10],
-    [10, 9], [10, 8], [10, 7], [10, 6], [10, 5],
-    [9, 5], [8, 5], [7, 5],
-    [8, 4], [8, 6],
-  ];
-  for (const [x, y] of arrow) c.set(x, y, PURPLE_LIGHT);
-  rim(c);
-  return c;
-}
-
-// ---------- side: a pickaxe taken apart, head and handle split ----------
-function side() {
-  const c = canvas(16, 16);
-  planks(c);
-  c.fill(1, 1, 14, 14, PLANK);
-  for (let y = 1; y < 15; y++) if (y % 4 === 3) c.fill(1, y, 14, 1, PLANK_DARK);
-  // Pickaxe head, lifted away from the handle.
-  const head = [[3, 3], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 3]];
-  for (const [x, y] of head) c.set(x, y, IRON);
-  for (const [x, y] of [[4, 3], [11, 3], [7, 3], [8, 3]]) c.set(x, y, IRON_DARK);
-  // Handle, standing on its own below the gap.
-  for (let y = 6; y < 14; y++) { c.set(7, y, HANDLE); c.set(8, y, shade(HANDLE, 0.75)); }
-  // Purple sparks in the gap: the uncrafting.
-  for (const [x, y] of [[6, 4], [9, 4], [7, 5], [8, 4], [5, 5], [10, 5]]) c.set(x, y, PURPLE_LIGHT);
-  rim(c);
-  return c;
-}
-
-// ---------- bottom: plain planks ----------
-function bottom() {
-  const c = canvas(16, 16);
-  planks(c);
-  return c;
-}
-
-/** Nearest-neighbour upscale for the pack icon, on a purple backdrop. */
-function icon(src) {
-  const c = canvas(128, 128);
-  c.fill(0, 0, 128, 128, PURPLE_DARK);
+  const rows = [];
   for (let y = 0; y < 16; y++) {
+    let row = '';
     for (let x = 0; x < 16; x++) {
-      const i = (y * 16 + x) * 4;
-      const col = [src.buf[i], src.buf[i + 1], src.buf[i + 2]];
-      c.fill(8 + x * 7, 8 + y * 7, 7, 7, col);
+      // Distance into the nearest corner, for the purple corner triangles.
+      const cx = Math.min(x, 15 - x);
+      const cy = Math.min(y, 15 - y);
+      const inGrid = x >= 3 && x <= 12 && y >= 3 && y <= 12;
+      const gridLine = inGrid && ((x - 3) % 3 === 0 || (y - 3) % 3 === 0);
+      if (cx + cy <= 2) row += cx + cy === 0 ? 'K' : cx + cy === 1 ? 'Q' : 'P';
+      else if (cx + cy === 3) row += 'K';
+      else if (gridLine) row += 'K';
+      else if (inGrid) row += 'H';
+      else if (cx === 0 || cy === 0) row += 'r';
+      else if (cx === 2 || cy === 2) row += 'r';
+      else row += 'R';
+    }
+    rows.push(row);
+  }
+  return sprite(rows);
+}
+
+// ---------- side: purple, the cloth draping to a point, stone below ----------
+function side() {
+  return sprite([
+    'KRRRRRRRRRRRRRRK',
+    'KPRRRRRRRRRRRRPK',
+    'KPQDRRRRRRRRDQPK',
+    'KPPPDRRRRRRDPPPK',
+    'KPQPPDRRRRDPPQPK',
+    'KPPPPPDRRDPPPPPK',
+    'KpPPPPKDDKPPPPpK',
+    'KpPPPKGSSGKPPPpK',
+    'KpPPKGGSSGGKPPpK',
+    'KpPKGGGSSGGGKPpK',
+    'KpKGGGGSSGGGGKpK',
+    'KpGGGGgSSgGGGGpK',
+    'KphhhhhSShhhhhpK',
+    'KpGGGGGSSGGGGGpK',
+    'KpgggggSSgggggpK',
+    'KKKKKKKKKKKKKKKK',
+  ]);
+}
+
+// ---------- bottom: shadowed purple boards ----------
+function bottom() {
+  return sprite([
+    'KKKKKKKKKKKKKKKK',
+    'KppppppppppppppK',
+    'KPPPPPPPPPPPPPPK',
+    'KKKKKKKKKKKKKKKK',
+    'KppppppppppppppK',
+    'KPPPPPPPPPPPPPPK',
+    'KppppppppppppppK',
+    'KKKKKKKKKKKKKKKK',
+    'KPPPPPPPPPPPPPPK',
+    'KppppppppppppppK',
+    'KPPPPPPPPPPPPPPK',
+    'KKKKKKKKKKKKKKKK',
+    'KppppppppppppppK',
+    'KPPPPPPPPPPPPPPK',
+    'KppppppppppppppK',
+    'KKKKKKKKKKKKKKKK',
+  ]);
+}
+
+// ---------- pack icon: the block drawn as an isometric cube ----------
+function icon(topTex, sideTex) {
+  const c = canvas(128, 128);
+  // Each face is an affine map from texture space [0,1)² onto the icon:
+  // origin, the u axis (texture x) and the v axis (texture y), plus a shade.
+  const faces = [
+    { tex: topTex, o: [64, 8], u: [56, 28], v: [-56, 28], light: 1 },
+    { tex: sideTex, o: [8, 36], u: [56, 28], v: [0, 56], light: 0.8 },
+    { tex: sideTex, o: [64, 64], u: [56, -28], v: [0, 56], light: 0.62 },
+  ];
+  for (let py = 0; py < 128; py++) {
+    for (let px = 0; px < 128; px++) {
+      for (const f of faces) {
+        const dx = px + 0.5 - f.o[0];
+        const dy = py + 0.5 - f.o[1];
+        const det = f.u[0] * f.v[1] - f.u[1] * f.v[0];
+        const a = (dx * f.v[1] - dy * f.v[0]) / det;
+        const b = (f.u[0] * dy - f.u[1] * dx) / det;
+        if (a < 0 || a >= 1 || b < 0 || b >= 1) continue;
+        const i = (Math.floor(b * 16) * 16 + Math.floor(a * 16)) * 4;
+        const col = [f.tex.buf[i], f.tex.buf[i + 1], f.tex.buf[i + 2]];
+        c.set(px, py, shade(col, f.light));
+        break;
+      }
     }
   }
   return c;
 }
 
 const topTex = top();
+const sideTex = side();
 write('resource_pack/textures/blocks/uncrafting_table_top.png', topTex.png());
-write('resource_pack/textures/blocks/uncrafting_table_side.png', side().png());
+write('resource_pack/textures/blocks/uncrafting_table_side.png', sideTex.png());
 write('resource_pack/textures/blocks/uncrafting_table_bottom.png', bottom().png());
-const packIcon = icon(topTex).png();
+const packIcon = icon(topTex, sideTex).png();
 write('behavior_pack/pack_icon.png', packIcon);
 write('resource_pack/pack_icon.png', packIcon);

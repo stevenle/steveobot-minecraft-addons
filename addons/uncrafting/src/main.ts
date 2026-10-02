@@ -2,20 +2,21 @@
  * Uncrafting — the Uncrafting Table breaks a crafted item back down into the
  * ingredients its crafting recipe used.
  *
- * Hold an item and use the table: a menu shows what one craft's worth of the
- * item returns, with a button to uncraft once and, for stacks, another to
- * uncraft as many as the stack allows. The items are taken from the held
- * stack and the ingredients go into the inventory (any overflow drops on the
- * table).
+ * Hold an item and use the table: a menu laid out like a crafting table run
+ * backwards shows the held item on the left, an arrow, and the 3×3 grid of
+ * ingredients it breaks into, with a button to uncraft once and, for stacks,
+ * another to uncraft as many as the stack allows. The items are taken from
+ * the held stack and the ingredients go into the inventory (any overflow
+ * drops on the table).
  *
- * The Script API cannot read the game's recipe book, so the recipes live in
- * RECIPES below, written out by hand from the vanilla crafting recipes. Where
- * a recipe accepts any of several items (any planks, any cobblestone-like
- * stone), the table gives back the plain one: oak planks, cobblestone.
+ * The menu is an ActionForm. resource_pack/ui/server_form.json redraws any
+ * form whose title starts with FORM_MARKER as that crafting layout, and
+ * leaves every other add-on's forms on the vanilla layout. The button order
+ * is the contract between the two files: see SLOT below.
  *
- * Damaged gear returns ingredients in proportion to the durability left,
- * rounded down, so uncrafting can never repair anything. Enchantments are
- * lost; the menu warns before that happens.
+ * Recipes and icons live in recipes.ts. Gear gives back its full recipe
+ * however worn it is. Enchantments are lost; the menu warns before that
+ * happens.
  */
 import {
   ItemStack,
@@ -33,6 +34,8 @@ import { ActionFormData } from '@minecraft/server-ui';
 import { createLogger } from '@shared/log';
 import { Format } from '@shared/chat';
 
+import { RECIPES, allItemIds, grid, iconFor, ingredients, type Recipe } from './recipes';
+
 const log = createLogger('uncrafting');
 const PREFIX: RawMessage = { text: `${Format.gray}[Uncrafting]${Format.reset} ` };
 
@@ -41,155 +44,21 @@ const TABLE_ID = 'steveo:uncrafting_table';
 /** How far away the table can be tapped; matches the game's block reach. */
 const TABLE_REACH = 7;
 
-// ---------- the recipes ----------
+/**
+ * Starts the title of the uncrafting menu so server_form.json can tell it
+ * from other forms. Formatting codes only, so it never shows; keep it in step
+ * with the string in server_form.json.
+ */
+const FORM_MARKER = '§u§n§c§r';
 
-interface Recipe {
-  /** How many of the item one craft produces, and so how many one uncraft takes. */
-  makes: number;
-  /** Ingredients returned per uncraft, by item id. */
-  gives: Record<string, number>;
-}
-
-function recipe(gives: Record<string, number>, makes = 1): Recipe {
-  return { makes, gives };
-}
-
-const RECIPES: Record<string, Recipe> = {};
-
-/** Swords, pickaxes, axes, shovels and hoes made from one material and sticks. */
-function toolSet(prefix: string, material: string): void {
-  RECIPES[`minecraft:${prefix}_sword`] = recipe({ [material]: 2, 'minecraft:stick': 1 });
-  RECIPES[`minecraft:${prefix}_pickaxe`] = recipe({ [material]: 3, 'minecraft:stick': 2 });
-  RECIPES[`minecraft:${prefix}_axe`] = recipe({ [material]: 3, 'minecraft:stick': 2 });
-  RECIPES[`minecraft:${prefix}_shovel`] = recipe({ [material]: 1, 'minecraft:stick': 2 });
-  RECIPES[`minecraft:${prefix}_hoe`] = recipe({ [material]: 2, 'minecraft:stick': 2 });
-}
-
-/** Helmet, chestplate, leggings and boots made from one material. */
-function armorSet(prefix: string, material: string): void {
-  RECIPES[`minecraft:${prefix}_helmet`] = recipe({ [material]: 5 });
-  RECIPES[`minecraft:${prefix}_chestplate`] = recipe({ [material]: 8 });
-  RECIPES[`minecraft:${prefix}_leggings`] = recipe({ [material]: 7 });
-  RECIPES[`minecraft:${prefix}_boots`] = recipe({ [material]: 4 });
-}
-
-/** Netherite gear: the smithing table's diamond piece, ingot, and template. */
-function netheriteSet(pieces: readonly string[]): void {
-  for (const piece of pieces) {
-    RECIPES[`minecraft:netherite_${piece}`] = recipe({
-      [`minecraft:diamond_${piece}`]: 1,
-      'minecraft:netherite_ingot': 1,
-      'minecraft:netherite_upgrade_smithing_template': 1,
-    });
-  }
-}
-
-/** Nine-of-a-kind storage blocks. */
-function storageBlock(block: string, item: string, count = 9): void {
-  RECIPES[`minecraft:${block}`] = recipe({ [`minecraft:${item}`]: count });
-}
-
-toolSet('wooden', 'minecraft:oak_planks');
-toolSet('stone', 'minecraft:cobblestone');
-toolSet('iron', 'minecraft:iron_ingot');
-toolSet('golden', 'minecraft:gold_ingot');
-toolSet('diamond', 'minecraft:diamond');
-
-armorSet('leather', 'minecraft:leather');
-armorSet('iron', 'minecraft:iron_ingot');
-armorSet('golden', 'minecraft:gold_ingot');
-armorSet('diamond', 'minecraft:diamond');
-
-netheriteSet(['sword', 'pickaxe', 'axe', 'shovel', 'hoe', 'helmet', 'chestplate', 'leggings', 'boots']);
-
-storageBlock('iron_block', 'iron_ingot');
-storageBlock('gold_block', 'gold_ingot');
-storageBlock('diamond_block', 'diamond');
-storageBlock('emerald_block', 'emerald');
-storageBlock('lapis_block', 'lapis_lazuli');
-storageBlock('redstone_block', 'redstone');
-storageBlock('coal_block', 'coal');
-storageBlock('copper_block', 'copper_ingot');
-storageBlock('netherite_block', 'netherite_ingot');
-storageBlock('raw_iron_block', 'raw_iron');
-storageBlock('raw_gold_block', 'raw_gold');
-storageBlock('raw_copper_block', 'raw_copper');
-storageBlock('hay_block', 'wheat');
-storageBlock('slime', 'slime_ball');
-storageBlock('bone_block', 'bone_meal');
-storageBlock('dried_kelp_block', 'dried_kelp');
-storageBlock('honey_block', 'honey_bottle', 4);
-
-Object.assign(RECIPES, {
-  // Weapons and tools
-  'minecraft:bow': recipe({ 'minecraft:stick': 3, 'minecraft:string': 3 }),
-  'minecraft:crossbow': recipe({
-    'minecraft:stick': 3,
-    'minecraft:string': 2,
-    'minecraft:iron_ingot': 1,
-    'minecraft:tripwire_hook': 1,
-  }),
-  'minecraft:shield': recipe({ 'minecraft:oak_planks': 6, 'minecraft:iron_ingot': 1 }),
-  'minecraft:mace': recipe({ 'minecraft:heavy_core': 1, 'minecraft:breeze_rod': 1 }),
-  'minecraft:fishing_rod': recipe({ 'minecraft:stick': 3, 'minecraft:string': 2 }),
-  'minecraft:flint_and_steel': recipe({ 'minecraft:iron_ingot': 1, 'minecraft:flint': 1 }),
-  'minecraft:shears': recipe({ 'minecraft:iron_ingot': 2 }),
-  'minecraft:brush': recipe({ 'minecraft:feather': 1, 'minecraft:copper_ingot': 1, 'minecraft:stick': 1 }),
-  'minecraft:spyglass': recipe({ 'minecraft:amethyst_shard': 1, 'minecraft:copper_ingot': 2 }),
-  'minecraft:bucket': recipe({ 'minecraft:iron_ingot': 3 }),
-  'minecraft:compass': recipe({ 'minecraft:iron_ingot': 4, 'minecraft:redstone': 1 }),
-  'minecraft:clock': recipe({ 'minecraft:gold_ingot': 4, 'minecraft:redstone': 1 }),
-
-  // Workstations and furniture
-  'minecraft:crafting_table': recipe({ 'minecraft:oak_planks': 4 }),
-  'minecraft:chest': recipe({ 'minecraft:oak_planks': 8 }),
-  'minecraft:furnace': recipe({ 'minecraft:cobblestone': 8 }),
-  'minecraft:blast_furnace': recipe({
-    'minecraft:iron_ingot': 5,
-    'minecraft:furnace': 1,
-    'minecraft:smooth_stone': 3,
-  }),
-  'minecraft:smoker': recipe({ 'minecraft:furnace': 1, 'minecraft:oak_log': 4 }),
-  'minecraft:anvil': recipe({ 'minecraft:iron_block': 3, 'minecraft:iron_ingot': 4 }),
-  'minecraft:cauldron': recipe({ 'minecraft:iron_ingot': 7 }),
-  'minecraft:hopper': recipe({ 'minecraft:iron_ingot': 5, 'minecraft:chest': 1 }),
-  'minecraft:bookshelf': recipe({ 'minecraft:oak_planks': 6, 'minecraft:book': 3 }),
-  'minecraft:book': recipe({ 'minecraft:paper': 3, 'minecraft:leather': 1 }),
-  'minecraft:enchanting_table': recipe({
-    'minecraft:book': 1,
-    'minecraft:diamond': 2,
-    'minecraft:obsidian': 4,
-  }),
-  'minecraft:jukebox': recipe({ 'minecraft:oak_planks': 8, 'minecraft:diamond': 1 }),
-  'minecraft:beacon': recipe({
-    'minecraft:glass': 5,
-    'minecraft:nether_star': 1,
-    'minecraft:obsidian': 3,
-  }),
-
-  // Redstone and rails
-  'minecraft:piston': recipe({
-    'minecraft:oak_planks': 3,
-    'minecraft:cobblestone': 4,
-    'minecraft:iron_ingot': 1,
-    'minecraft:redstone': 1,
-  }),
-  'minecraft:sticky_piston': recipe({ 'minecraft:piston': 1, 'minecraft:slime_ball': 1 }),
-  'minecraft:tnt': recipe({ 'minecraft:gunpowder': 5, 'minecraft:sand': 4 }),
-  'minecraft:minecart': recipe({ 'minecraft:iron_ingot': 5 }),
-  'minecraft:rail': recipe({ 'minecraft:iron_ingot': 6, 'minecraft:stick': 1 }, 16),
-  'minecraft:iron_bars': recipe({ 'minecraft:iron_ingot': 6 }, 16),
-
-  // Light
-  'minecraft:torch': recipe({ 'minecraft:coal': 1, 'minecraft:stick': 1 }, 4),
-  'minecraft:lantern': recipe({ 'minecraft:iron_nugget': 8, 'minecraft:torch': 1 }),
-
-  // Food and odds and ends
-  'minecraft:golden_apple': recipe({ 'minecraft:gold_ingot': 8, 'minecraft:apple': 1 }),
-  'minecraft:golden_carrot': recipe({ 'minecraft:gold_nugget': 8, 'minecraft:carrot': 1 }),
-  'minecraft:ender_eye': recipe({ 'minecraft:ender_pearl': 1, 'minecraft:blaze_powder': 1 }),
-  'minecraft:stick': recipe({ 'minecraft:oak_planks': 2 }, 4),
-});
+/** Button indices the custom layout in server_form.json places by position. */
+const SLOT = {
+  input: 0,
+  /** The nine grid cells are buttons 1 to 9, in reading order. */
+  grid: 1,
+  once: 10,
+  all: 11,
+} as const;
 
 // ---------- chat and item helpers ----------
 
@@ -217,27 +86,12 @@ function heldItem(player: Player): ItemStack | undefined {
   }
 }
 
-/** Share of the item's durability left, 1 for items that do not wear. */
-function condition(item: ItemStack): number {
-  const durability = item.getComponent('minecraft:durability');
-  if (durability === undefined || durability.maxDurability <= 0) return 1;
-  return Math.max(0, (durability.maxDurability - durability.damage) / durability.maxDurability);
-}
-
 function isEnchanted(item: ItemStack): boolean {
   try {
     return (item.getComponent('minecraft:enchantable')?.getEnchantments().length ?? 0) > 0;
   } catch {
     return false;
   }
-}
-
-/** Ingredients for `batches` uncrafts of this item, scaled down for wear. */
-function yieldOf(item: ItemStack, entry: Recipe, batches: number): [string, number][] {
-  const share = condition(item);
-  return Object.entries(entry.gives)
-    .map(([id, count]): [string, number] => [id, Math.floor(count * share) * batches])
-    .filter(([, count]) => count > 0);
 }
 
 /** Puts `count` of an item into the inventory, dropping what does not fit at `spill`. */
@@ -255,11 +109,26 @@ function give(player: Player, typeId: string, count: number, spill: Vector3): vo
 
 // ---------- the table ----------
 
-function yieldLines(items: [string, number][]): RawMessage[] {
-  return items.flatMap(([id, count]): RawMessage[] => [
-    { text: '\n' },
-    { translate: 'uncrafting.form.line', with: { rawtext: [{ text: String(count) }, nameOf(id)] } },
-  ]);
+function menu(item: ItemStack, entry: Recipe, cells: readonly (string | undefined)[], most: number): ActionFormData {
+  const notes: RawMessage[] = [];
+  if (isEnchanted(item)) notes.push({ translate: 'uncrafting.form.enchanted' });
+  const body: RawMessage[] = notes.flatMap((note, i) => (i === 0 ? [note] : [{ text: '\n' }, note]));
+
+  const form = new ActionFormData()
+    .title({ rawtext: [{ text: FORM_MARKER }, { translate: 'tile.steveo:uncrafting_table.name' }] })
+    .body({ rawtext: body.length > 0 ? body : [{ text: '' }] });
+
+  // SLOT.input: the held item, labelled with how many one uncraft takes.
+  form.button(entry.makes > 1 ? String(entry.makes) : '', iconFor(item.typeId));
+  // SLOT.grid ... SLOT.grid + 8: the ingredients where a crafting table would hold them.
+  for (const id of cells) {
+    if (id === undefined) form.button('');
+    else form.button('', iconFor(id));
+  }
+  form.button({ translate: 'uncrafting.form.once' });
+  // SLOT.all is always sent so the indices stay fixed; the layout hides it when blank.
+  form.button(most > 1 ? { translate: 'uncrafting.form.all', with: [String(most * entry.makes)] } : '');
+  return form;
 }
 
 async function openTable(player: Player, table: Block): Promise<void> {
@@ -277,29 +146,16 @@ async function openTable(player: Player, table: Block): Promise<void> {
     say(player, 'uncrafting.too_few', String(entry.makes), nameOf(item.typeId));
     return;
   }
-  const once = yieldOf(item, entry, 1);
-  if (once.length === 0) {
-    say(player, 'uncrafting.worn', nameOf(item.typeId));
-    return;
-  }
+  const cells = grid(entry);
 
   const most = Math.floor(item.amount / entry.makes);
-  const body: RawMessage[] = [
-    { translate: 'uncrafting.form.body', with: { rawtext: [{ text: String(entry.makes) }, nameOf(item.typeId)] } },
-    ...yieldLines(once),
-  ];
-  if (condition(item) < 1) body.push({ text: '\n\n' }, { translate: 'uncrafting.form.damaged' });
-  if (isEnchanted(item)) body.push({ text: '\n\n' }, { translate: 'uncrafting.form.enchanted' });
-
-  const form = new ActionFormData()
-    .title({ translate: 'tile.steveo:uncrafting_table.name' })
-    .body({ rawtext: body })
-    .button({ translate: 'uncrafting.form.once' });
-  if (most > 1) form.button({ translate: 'uncrafting.form.all', with: [String(most), String(most * entry.makes)] });
-
-  const response = await form.show(player);
-  if (response.canceled || response.selection === undefined) return;
-  const batches = response.selection === 1 ? most : 1;
+  const response = await menu(item, entry, cells, most).show(player);
+  if (response.canceled) return;
+  // The ingredient slots are buttons too; tapping one does nothing.
+  let batches: number;
+  if (response.selection === SLOT.once) batches = 1;
+  else if (response.selection === SLOT.all && most > 1) batches = most;
+  else return;
 
   // The menu was open for a while; uncraft only what is in hand now.
   const now = heldItem(player);
@@ -307,7 +163,7 @@ async function openTable(player: Player, table: Block): Promise<void> {
     say(player, 'uncrafting.changed');
     return;
   }
-  const items = yieldOf(now, entry, batches);
+  const items = ingredients(grid(entry));
   const inventory = inventoryOf(player);
   const remaining = now.amount - batches * entry.makes;
   if (remaining > 0) {
@@ -318,7 +174,7 @@ async function openTable(player: Player, table: Block): Promise<void> {
   }
 
   const spill = { x: table.location.x + 0.5, y: table.location.y + 1.1, z: table.location.z + 0.5 };
-  for (const [id, count] of items) give(player, id, count, spill);
+  for (const [id, count] of items) give(player, id, count * batches, spill);
   try {
     table.dimension.playSound('block.grindstone.use', spill);
   } catch {
@@ -371,15 +227,11 @@ function debugTable(player: Player): void {
   say(player, 'uncrafting.debug.table');
 }
 
-/** Every item id in RECIPES must exist in this game version; reports any that do not. */
+/** Every item id in the recipes must exist in this game version; reports any that do not. */
 function debugCheck(player: Player): void {
-  const ids = new Set<string>();
-  for (const [id, entry] of Object.entries(RECIPES)) {
-    ids.add(id);
-    for (const ingredient of Object.keys(entry.gives)) ids.add(ingredient);
-  }
-  const missing = [...ids].filter((id) => ItemTypes.get(id) === undefined).sort();
-  say(player, 'uncrafting.debug.check', String(Object.keys(RECIPES).length), String(ids.size), String(missing.length));
+  const ids = allItemIds();
+  const missing = ids.filter((id) => ItemTypes.get(id) === undefined);
+  say(player, 'uncrafting.debug.check', String(Object.keys(RECIPES).length), String(ids.length), String(missing.length));
   if (missing.length > 0) say(player, 'uncrafting.debug.missing', missing.join(', '));
 }
 
@@ -390,14 +242,18 @@ function debugHeld(player: Player): void {
     say(player, 'uncrafting.debug.held.none');
     return;
   }
+  const lines = [...ingredients(grid(entry))].flatMap(([id, count]): RawMessage[] => [
+    { text: '\n' },
+    { translate: 'uncrafting.debug.held.line', with: { rawtext: [{ text: String(count) }, nameOf(id)] } },
+  ]);
   player.sendMessage({
     rawtext: [
       PREFIX,
       {
         translate: 'uncrafting.debug.held',
-        with: { rawtext: [{ text: String(entry.makes) }, nameOf(item.typeId), { text: String(Math.round(condition(item) * 100)) }] },
+        with: { rawtext: [{ text: String(entry.makes) }, nameOf(item.typeId)] },
       },
-      ...yieldLines(yieldOf(item, entry, 1)),
+      ...lines,
     ],
   });
 }

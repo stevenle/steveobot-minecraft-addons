@@ -5,16 +5,12 @@
 tile.steveo:uncrafting_table.name=Uncrafting Table
 
 ## The table menu
-uncrafting.form.body=Uncrafting %s %s gives back:
-uncrafting.form.line=  §e%sx§r %s
-uncrafting.form.damaged=§6This item is worn, so you get back only part of what it took to make.§r
 uncrafting.form.enchanted=§cThe enchantments on this item will be lost.§r
 uncrafting.form.once=Uncraft once
-uncrafting.form.all=Uncraft all (%s times, %s items)
+uncrafting.form.all=Uncraft all %s
 uncrafting.hold=Hold the item you want to uncraft, then use the table.
 uncrafting.unknown=The table does not know how to uncraft %s.
 uncrafting.too_few=You need at least %s %s to uncraft it.
-uncrafting.worn=That %s is too worn to give anything back.
 uncrafting.changed=You switched items. Hold the item you chose and try again.
 uncrafting.done=Uncrafted %s %s.
 
@@ -23,6 +19,7 @@ uncrafting.debug.table=An Uncrafting Table has been placed on the block you are 
 uncrafting.debug.look=Look at a block within reach first.
 uncrafting.debug.check=%s recipes, %s distinct item ids, %s unknown to this game version.
 uncrafting.debug.missing=Unknown item ids: %s
-uncrafting.debug.held=%s %s (%s%% durability) uncrafts into:
+uncrafting.debug.held=%s %s uncrafts into:
+uncrafting.debug.held.line=  §e%sx§r %s
 uncrafting.debug.held.none=Hold an item the table knows how to uncraft.
 uncrafting.debug.help=Usage: /scriptevent steveo:uncraft <table|check|held>

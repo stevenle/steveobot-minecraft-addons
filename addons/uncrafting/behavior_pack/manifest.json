@@ -4,27 +4,27 @@
     "name": "Uncrafting BP",
     "description": "An Uncrafting Table that breaks crafted items back down into the ingredients used to make them.",
     "uuid": "a0c302b6-b145-4673-9526-25a0e1728a9a",
-    "version": [1, 0, 0],
+    "version": [1, 0, 1],
     "min_engine_version": [1, 26, 40]
   },
   "modules": [
     {
       "type": "data",
       "uuid": "d69752b4-e919-4107-bcf1-05ee676536c2",
-      "version": [1, 0, 0]
+      "version": [1, 0, 1]
     },
     {
       "type": "script",
       "language": "javascript",
       "entry": "scripts/main.js",
       "uuid": "fd9e3c0f-7396-41ed-bbe1-63ac44915240",
-      "version": [1, 0, 0]
+      "version": [1, 0, 1]
     }
   ],
   "dependencies": [
     {
       "uuid": "1e6d8204-2a25-4b68-8e65-b25f45c65366",
-      "version": [1, 0, 0]
+      "version": [1, 0, 1]
     },
     {
       "module_name": "@minecraft/server",
