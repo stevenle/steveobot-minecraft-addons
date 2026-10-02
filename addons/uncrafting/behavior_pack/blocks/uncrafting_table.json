@@ -9,6 +9,7 @@
     },
     "components": {
       "minecraft:display_name": "tile.steveo:uncrafting_table.name",
+      "minecraft:geometry": "minecraft:geometry.full_block",
       "minecraft:material_instances": {
         "*": {
           "texture": "steveo_uncrafting_table_side",
