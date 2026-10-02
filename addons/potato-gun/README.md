@@ -54,7 +54,9 @@ Potatoes splat into chunks where they land. An explosive potato also
 detonates, and the blast is credited to whoever fired it. Whether the blast
 breaks blocks follows the `mobGriefing` game rule, the same as creepers, so
 `/gamerule mobGriefing false` makes explosive potatoes hurt mobs and players
-without cratering the world. Explosions never start fires.
+without cratering the world. The TNT Launcher's blast follows the
+`tntExplodes` game rule instead, the same as real TNT, so it still breaks
+blocks with `mobGriefing` off. Explosions never start fires.
 
 Using a gun on a chest, bed, door, lever, crafting table, or anything else
 you can click opens or uses that block instead of firing. The same goes for
@@ -105,7 +107,7 @@ content log.
 | Command | What it does |
 |---|---|
 | `/scriptevent steveo:potato give` | Puts all six potato guns, the TNT Launcher, and both enchantments in your inventory. |
-| `/scriptevent steveo:potato status` | Reports potatoes in flight, how many are on the teleport fallback, and whether explosions break blocks. |
+| `/scriptevent steveo:potato status` | Reports potatoes in flight, how many are on the teleport fallback, and whether explosions break blocks (potatoes and TNT separately). |
 | `/scriptevent steveo:potato hits` | Toggles a chat report for every potato you fire: what it hit, whether the damage landed, and whether the poison took. |
 | `/scriptevent steveo:potato demo` | Fires a crossbow potato from your view with no gun, to check the projectile renders. |
 | `/scriptevent steveo:potato` | Prints the usage line. |
@@ -134,8 +136,9 @@ Messages from the add-on are prefixed `[Potato Gun]`.
 - **Potatoes hang in the air**: the script stopped. They are cleared within
   5 seconds of it starting again, and their 8-second fuse removes them
   either way.
-- **Explosions do not break blocks**: `mobGriefing` is off. That is a
-  choice, not a bug.
+- **Explosions do not break blocks**: for explosive potatoes, `mobGriefing`
+  is off; for the TNT Launcher, `tntExplodes` is off. `status` shows both.
+  That is a choice, not a bug.
 - **No "Explosive" or "Poison" line on a freshly crafted gun**: it appears
   the first time you hold the gun, not in the crafting output slot.
 - **Pack icons missing in the Realm's Edit World screen**: expected on

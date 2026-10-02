@@ -23,9 +23,10 @@ potato_gun.hint.poison=Use to fire a poison potato. It poisons the mob it hits, 
 potato_gun.hint.tnt=Use to launch a block of TNT. It arcs, and blows up as soon as it hits something. Stand back!
 
 potato_gun.debug.given=All six potato guns (plain, explosive, and poison), the TNT Launcher, and both enchantments are in your inventory.
-potato_gun.debug.status=Potatoes in flight: %s (%s moved by teleport fallback). Block damage from explosions: %s.
+potato_gun.debug.status=Potatoes in flight: %s (%s moved by teleport fallback). Block damage from explosive potatoes: %s; from the TNT Launcher: %s.
 potato_gun.debug.status.on=on
 potato_gun.debug.status.off=off (mobGriefing is false)
+potato_gun.debug.status.tnt_off=off (tntExplodes is false)
 potato_gun.debug.demo=Fired a demo potato from your view without a gun. If you cannot see it fly, the resource pack is not rendering.
 potato_gun.debug.hits.on=Hit reports on. Every potato you fire will say what it hit and what it did. Run it again to turn them off.
 potato_gun.debug.hits.off=Hit reports off.

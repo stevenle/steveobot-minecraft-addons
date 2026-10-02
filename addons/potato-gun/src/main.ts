@@ -17,6 +17,8 @@
  * table into a variant of that gun. The variants glint and carry a lore line.
  * Explosive potatoes detonate on impact via `createExplosion`, credited to the
  * shooter; block damage follows the `mobGriefing` game rule, like a creeper.
+ * The TNT Launcher's blast follows `tntExplodes` instead, like real TNT, so
+ * it still breaks blocks on a world that turns mob griefing off.
  * Poison potatoes hurt and poison the mob they hit, and never harm players.
  *
  * The flight is simulated here, not by the engine. The potato entity has no
@@ -492,10 +494,15 @@ function splat(dimension: Dimension, location: Vector3, gun: Gun): void {
   }
 }
 
-function explode(dimension: Dimension, location: Vector3, radius: number, shooter: Entity | undefined): void {
+/** Whether this gun's explosions break blocks: TNT follows TNT's rule, potatoes a creeper's. */
+function breaksBlocks(gun: Gun): boolean {
+  return gun.kind === 'tnt' ? world.gameRules.tntExplodes : world.gameRules.mobGriefing;
+}
+
+function explode(dimension: Dimension, location: Vector3, gun: Gun, shooter: Entity | undefined): void {
   try {
-    dimension.createExplosion(location, radius, {
-      breaksBlocks: world.gameRules.mobGriefing,
+    dimension.createExplosion(location, BALLISTICS[gun.kind].blastRadius, {
+      breaksBlocks: breaksBlocks(gun),
       causesFire: false,
       ...(shooter ? { source: shooter } : {}),
     });
@@ -591,7 +598,7 @@ function land(shot: Shot, impact: Impact): void {
   finish(shot);
   splat(shot.dimension, impact.at, shot.gun);
   if (shot.gun.effect === 'explosive') {
-    explode(shot.dimension, impact.at, BALLISTICS[shot.gun.kind].blastRadius, shooter);
+    explode(shot.dimension, impact.at, shot.gun, shooter);
   }
 }
 
@@ -691,6 +698,7 @@ system.afterEvents.scriptEventReceive.subscribe(
                   { text: `${shots.size}` },
                   { text: `${teleporting}` },
                   { translate: world.gameRules.mobGriefing ? 'potato_gun.debug.status.on' : 'potato_gun.debug.status.off' },
+                  { translate: world.gameRules.tntExplodes ? 'potato_gun.debug.status.on' : 'potato_gun.debug.status.tnt_off' },
                 ],
               },
             },
