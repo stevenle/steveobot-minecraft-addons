@@ -71,8 +71,11 @@ vanilla one, copied from Mojang's 1.26.50 `server_form.json`, and the
 crafting layout. A form whose title starts with the invisible marker
 `§u§n§c§r` gets the crafting layout; every other form, from any add-on,
 gets the vanilla one. The button order is the contract between that file
-and `src/main.ts` (`SLOT`): 0 is the held item, 1-9 the grid in reading
-order, 10 Uncraft once, 11 Uncraft all.
+and `src/main.ts` (`SLOT`): 0-8 the grid in reading order, 9 the held item,
+10 Uncraft once, 11 Uncraft all. The grid comes first because it is drawn
+with a JSON UI `grid`, which always starts at the first button; the other
+slots are placed by `collection_index` and need a `collection_details`
+binding for their icons to resolve.
 
 Two things to know:
 

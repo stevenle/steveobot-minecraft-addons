@@ -65,7 +65,7 @@
           "controls": [
             {
               "steveo_input@server_form.steveo_slot": {
-                "collection_index": 0,
+                "collection_index": 9,
                 "size": [26, 26],
                 "anchor_from": "left_middle",
                 "anchor_to": "left_middle",
@@ -84,23 +84,15 @@
             },
             {
               "steveo_grid": {
-                "type": "panel",
+                "type": "grid",
                 "size": [54, 54],
                 "anchor_from": "left_middle",
                 "anchor_to": "left_middle",
                 "offset": [90, 0],
-                "collection_name": "form_buttons",
-                "controls": [
-                  { "cell_1@server_form.steveo_cell": { "collection_index": 1, "offset": [0, 0] } },
-                  { "cell_2@server_form.steveo_cell": { "collection_index": 2, "offset": [18, 0] } },
-                  { "cell_3@server_form.steveo_cell": { "collection_index": 3, "offset": [36, 0] } },
-                  { "cell_4@server_form.steveo_cell": { "collection_index": 4, "offset": [0, 18] } },
-                  { "cell_5@server_form.steveo_cell": { "collection_index": 5, "offset": [18, 18] } },
-                  { "cell_6@server_form.steveo_cell": { "collection_index": 6, "offset": [36, 18] } },
-                  { "cell_7@server_form.steveo_cell": { "collection_index": 7, "offset": [0, 36] } },
-                  { "cell_8@server_form.steveo_cell": { "collection_index": 8, "offset": [18, 36] } },
-                  { "cell_9@server_form.steveo_cell": { "collection_index": 9, "offset": [36, 36] } }
-                ]
+                "grid_dimensions": [3, 3],
+                "maximum_grid_items": 9,
+                "grid_item_template": "server_form.steveo_cell",
+                "collection_name": "form_buttons"
               }
             }
           ]
@@ -150,14 +142,18 @@
   },
 
   "steveo_cell@server_form.steveo_slot": {
-    "size": [18, 18],
-    "anchor_from": "top_left",
-    "anchor_to": "top_left"
+    "size": [18, 18]
   },
 
   "steveo_slot": {
     "type": "panel",
     "size": [18, 18],
+    "bindings": [
+      {
+        "binding_type": "collection_details",
+        "binding_collection_name": "form_buttons"
+      }
+    ],
     "controls": [
       {
         "background": {

@@ -53,9 +53,9 @@ const FORM_MARKER = '§u§n§c§r';
 
 /** Button indices the custom layout in server_form.json places by position. */
 const SLOT = {
-  input: 0,
-  /** The nine grid cells are buttons 1 to 9, in reading order. */
-  grid: 1,
+  /** The nine grid cells are buttons 0 to 8, in reading order. */
+  grid: 0,
+  input: 9,
   once: 10,
   all: 11,
 } as const;
@@ -118,13 +118,15 @@ function menu(item: ItemStack, entry: Recipe, cells: readonly (string | undefine
     .title({ rawtext: [{ text: FORM_MARKER }, { translate: 'tile.steveo:uncrafting_table.name' }] })
     .body({ rawtext: body.length > 0 ? body : [{ text: '' }] });
 
-  // SLOT.input: the held item, labelled with how many one uncraft takes.
-  form.button(entry.makes > 1 ? String(entry.makes) : '', iconFor(item.typeId));
   // SLOT.grid ... SLOT.grid + 8: the ingredients where a crafting table would hold them.
+  // They come first because the layout draws them with a grid, which always
+  // starts at the first button.
   for (const id of cells) {
     if (id === undefined) form.button('');
     else form.button('', iconFor(id));
   }
+  // SLOT.input: the held item, labelled with how many one uncraft takes.
+  form.button(entry.makes > 1 ? String(entry.makes) : '', iconFor(item.typeId));
   form.button({ translate: 'uncrafting.form.once' });
   // SLOT.all is always sent so the indices stay fixed; the layout hides it when blank.
   form.button(most > 1 ? { translate: 'uncrafting.form.all', with: [String(most * entry.makes)] } : '');
