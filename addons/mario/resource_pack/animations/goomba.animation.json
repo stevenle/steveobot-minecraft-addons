@@ -1,0 +1,43 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.steveo_goomba.walk": {
+      "loop": true,
+      "bones": {
+        "foot_l": {
+          "rotation": [
+            "math.cos(query.modified_distance_moved * 38.17) * 50.0 * query.modified_move_speed",
+            0,
+            0
+          ]
+        },
+        "foot_r": {
+          "rotation": [
+            "-math.cos(query.modified_distance_moved * 38.17) * 50.0 * query.modified_move_speed",
+            0,
+            0
+          ]
+        },
+        "body": {
+          "rotation": [
+            0,
+            0,
+            "math.sin(query.modified_distance_moved * 38.17) * 6.0 * query.modified_move_speed"
+          ]
+        }
+      }
+    },
+    "animation.steveo_goomba.look_at_target": {
+      "loop": true,
+      "bones": {
+        "head": {
+          "rotation": [
+            0,
+            "query.target_y_rotation * 0.5",
+            0
+          ]
+        }
+      }
+    }
+  }
+}

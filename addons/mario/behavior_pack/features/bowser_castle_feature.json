@@ -1,0 +1,14 @@
+{
+  "format_version": "1.13.0",
+  "minecraft:structure_template_feature": {
+    "description": {
+      "identifier": "steveo:bowser_castle_feature"
+    },
+    "structure_name": "steveo:bowser_castle",
+    "adjustment_radius": 8,
+    "facing_direction": "random",
+    "constraints": {
+      "unburied": {}
+    }
+  }
+}

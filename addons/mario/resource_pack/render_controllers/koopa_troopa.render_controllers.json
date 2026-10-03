@@ -1,0 +1,33 @@
+{
+  "format_version": "1.10.0",
+  "render_controllers": {
+    "controller.render.steveo_koopa_troopa": {
+      "geometry": "geometry.default",
+      "materials": [
+        {
+          "*": "material.default"
+        }
+      ],
+      "textures": [
+        "texture.default"
+      ],
+      "part_visibility": [
+        {
+          "*": true
+        },
+        {
+          "body": "query.mark_variant == 0"
+        },
+        {
+          "leg_l": "query.mark_variant == 0"
+        },
+        {
+          "leg_r": "query.mark_variant == 0"
+        },
+        {
+          "shell_only": "query.mark_variant == 1"
+        }
+      ]
+    }
+  }
+}

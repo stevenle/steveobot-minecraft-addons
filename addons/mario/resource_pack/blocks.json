@@ -1,0 +1,13 @@
+{
+  "format_version": [
+    1,
+    1,
+    0
+  ],
+  "steveo:question_block": {
+    "sound": "wood"
+  },
+  "steveo:bowser_seal": {
+    "sound": "stone"
+  }
+}

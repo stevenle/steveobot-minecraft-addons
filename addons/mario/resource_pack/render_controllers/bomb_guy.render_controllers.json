@@ -1,0 +1,22 @@
+{
+  "format_version": "1.10.0",
+  "render_controllers": {
+    "controller.render.steveo_bomb_guy": {
+      "geometry": "geometry.default",
+      "materials": [
+        {
+          "*": "material.default"
+        }
+      ],
+      "textures": [
+        "texture.default"
+      ],
+      "overlay_color": {
+        "r": "variable.flash",
+        "g": "variable.flash",
+        "b": "variable.flash",
+        "a": "variable.flash * 0.5"
+      }
+    }
+  }
+}

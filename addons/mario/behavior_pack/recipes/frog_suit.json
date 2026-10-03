@@ -1,0 +1,32 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "steveo:frog_suit_recipe"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "S S",
+      "SPS",
+      "SSS"
+    ],
+    "key": {
+      "S": {
+        "item": "minecraft:slime_ball"
+      },
+      "P": {
+        "item": "minecraft:pufferfish"
+      }
+    },
+    "unlock": [
+      {
+        "item": "minecraft:pufferfish"
+      }
+    ],
+    "result": {
+      "item": "steveo:frog_suit"
+    }
+  }
+}
