@@ -1,0 +1,73 @@
+{
+  "format_version": "1.21.0",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "steveo:koopa_troopa",
+      "is_spawnable": true,
+      "is_summonable": true
+    },
+    "component_groups": {
+      "steveo:walking": {
+        "minecraft:mark_variant": { "value": 0 },
+        "minecraft:movement": { "value": 0.22 },
+        "minecraft:collision_box": { "width": 0.7, "height": 1.1 },
+        "minecraft:behavior.melee_attack": { "priority": 2, "speed_multiplier": 1.1, "track_target": true },
+        "minecraft:behavior.nearest_attackable_target": {
+          "priority": 2,
+          "must_see": true,
+          "reselect_targets": true,
+          "entity_types": [
+            {
+              "filters": { "test": "is_family", "subject": "other", "value": "player" },
+              "max_dist": 16
+            }
+          ]
+        },
+        "minecraft:behavior.random_stroll": { "priority": 6, "speed_multiplier": 0.9 },
+        "minecraft:behavior.look_at_player": { "priority": 7, "look_distance": 8 },
+        "minecraft:behavior.random_look_around": { "priority": 8 }
+      },
+      "steveo:shelled": {
+        "minecraft:mark_variant": { "value": 1 },
+        "minecraft:movement": { "value": 0 },
+        "minecraft:knockback_resistance": { "value": 1 },
+        "minecraft:collision_box": { "width": 0.7, "height": 0.4 },
+        "minecraft:timer": {
+          "time": 8,
+          "looping": false,
+          "time_down_event": { "event": "steveo:leave_shell" }
+        }
+      }
+    },
+    "components": {
+      "minecraft:type_family": { "family": ["steveo_koopa_troopa", "steveo_stompable", "monster", "mob"] },
+      "minecraft:health": { "value": 20, "max": 40 },
+      "minecraft:attack": { "damage": 3 },
+      "minecraft:movement.basic": {},
+      "minecraft:navigation.walk": { "can_path_over_water": true, "avoid_damage_blocks": true },
+      "minecraft:jump.static": {},
+      "minecraft:can_climb": {},
+      "minecraft:physics": {},
+      "minecraft:pushable": { "is_pushable": true, "is_pushable_by_piston": true },
+      "minecraft:breathable": { "total_supply": 15, "suffocate_time": 0, "breathes_water": true },
+      "minecraft:nameable": {},
+      "minecraft:follow_range": { "value": 16, "max": 16 },
+      "minecraft:despawn": { "despawn_from_distance": {} },
+      "minecraft:loot": { "table": "loot_tables/entities/koopa_troopa.json" },
+      "minecraft:experience_reward": { "on_death": "query.last_hit_by_player ? 5 : 0" },
+      "minecraft:behavior.float": { "priority": 0 },
+      "minecraft:behavior.hurt_by_target": { "priority": 1 }
+    },
+    "events": {
+      "minecraft:entity_spawned": { "add": { "component_groups": ["steveo:walking"] } },
+      "steveo:hide_in_shell": {
+        "remove": { "component_groups": ["steveo:walking"] },
+        "add": { "component_groups": ["steveo:shelled"] }
+      },
+      "steveo:leave_shell": {
+        "remove": { "component_groups": ["steveo:shelled"] },
+        "add": { "component_groups": ["steveo:walking"] }
+      }
+    }
+  }
+}

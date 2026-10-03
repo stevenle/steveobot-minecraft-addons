@@ -1,0 +1,38 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "steveo:koopa_troopa",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/koopa_troopa"
+      },
+      "geometry": {
+        "default": "geometry.steveo_koopa_troopa"
+      },
+      "animations": {
+        "walk": "animation.steveo_koopa_troopa.walk",
+        "look_at_target": "animation.steveo_koopa_troopa.look_at_target"
+      },
+      "scripts": {
+        "animate": [
+          {
+            "walk": "query.mark_variant == 0"
+          },
+          {
+            "look_at_target": "query.mark_variant == 0"
+          }
+        ]
+      },
+      "render_controllers": [
+        "controller.render.steveo_koopa_troopa"
+      ],
+      "spawn_egg": {
+        "base_color": "#2E9E34",
+        "overlay_color": "#F4D23C"
+      }
+    }
+  }
+}

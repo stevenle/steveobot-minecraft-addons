@@ -1,0 +1,56 @@
+{
+  "entity_sounds": {
+    "entities": {
+      "steveo:goomba": {
+        "volume": 0.8,
+        "pitch": [
+          1.2,
+          1.4
+        ],
+        "events": {
+          "hurt": "mob.silverfish.hit",
+          "death": "mob.silverfish.kill",
+          "step": "mob.silverfish.step"
+        }
+      },
+      "steveo:koopa_troopa": {
+        "volume": 0.9,
+        "pitch": [
+          1.1,
+          1.3
+        ],
+        "events": {
+          "ambient": "mob.turtle.ambient",
+          "hurt": "mob.turtle.hurt",
+          "death": "mob.turtle.death"
+        }
+      },
+      "steveo:bomb_guy": {
+        "volume": 1.0,
+        "pitch": [
+          0.9,
+          1.1
+        ],
+        "events": {
+          "fuse": "random.fuse",
+          "hurt": "mob.creeper.say",
+          "death": "mob.creeper.death"
+        }
+      },
+      "steveo:bowser": {
+        "volume": 1.0,
+        "pitch": [
+          0.6,
+          0.7
+        ],
+        "events": {
+          "ambient": "mob.ravager.ambient",
+          "hurt": "mob.ravager.hurt",
+          "death": "mob.enderdragon.death",
+          "step": "mob.ravager.step",
+          "attack": "mob.ravager.bite"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "format_version": "1.16.0",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "steveo:fireball",
+      "is_spawnable": false,
+      "is_summonable": true
+    },
+    "component_groups": {
+      "steveo:small": {
+        "minecraft:mark_variant": { "value": 0 }
+      },
+      "steveo:big": {
+        "minecraft:mark_variant": { "value": 1 },
+        "minecraft:scale": { "value": 2 }
+      },
+      "steveo:fuse": {
+        "minecraft:timer": {
+          "time": 6,
+          "looping": false,
+          "time_down_event": { "event": "steveo:despawn" }
+        }
+      },
+      "steveo:gone": {
+        "minecraft:instant_despawn": {}
+      }
+    },
+    "components": {
+      "minecraft:type_family": { "family": ["steveo_fireball", "inanimate"] },
+      "minecraft:collision_box": { "width": 0.25, "height": 0.25 },
+      "minecraft:physics": { "has_gravity": false, "has_collision": false },
+      "minecraft:pushable": { "is_pushable": false, "is_pushable_by_piston": false },
+      "minecraft:fire_immune": {},
+      "minecraft:damage_sensor": {
+        "triggers": [{ "cause": "all", "deals_damage": false }]
+      },
+      "minecraft:mark_variant": { "value": 0 }
+    },
+    "events": {
+      "minecraft:entity_spawned": { "add": { "component_groups": ["steveo:fuse"] } },
+      "steveo:small": { "add": { "component_groups": ["steveo:fuse", "steveo:small"] } },
+      "steveo:big": { "add": { "component_groups": ["steveo:fuse", "steveo:big"] } },
+      "steveo:despawn": { "add": { "component_groups": ["steveo:gone"] } }
+    }
+  }
+}
