@@ -46,7 +46,7 @@
         "events": {
           "ambient": "mob.ravager.ambient",
           "hurt": "mob.ravager.hurt",
-          "death": "mob.enderdragon.death",
+          "death": "mob.ravager.death",
           "step": "mob.ravager.step",
           "attack": "mob.ravager.bite"
         }

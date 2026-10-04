@@ -133,7 +133,7 @@ world.afterEvents.entityDie.subscribe(
     nextBreath.delete(bowser.id);
     try {
       const location = bowser.location;
-      bowser.dimension.playSound('random.levelup', location, { volume: 2 });
+      bowser.dimension.playSound('random.levelup', location, { volume: 0.7 });
       for (const player of bowser.dimension.getPlayers({ location, maxDistance: ANNOUNCE_RANGE })) {
         player.sendMessage({ rawtext: [PREFIX, { translate: 'mario.bowser.defeated' }] });
       }
