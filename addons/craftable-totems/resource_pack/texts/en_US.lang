@@ -1,0 +1,5 @@
+## Strings for the Craftable Totems add-on.
+## Client-side translations live in the resource pack; the behavior pack
+## references them by key with RawMessage { translate: ... }.
+
+craftable_totems.debug.status=§7[Craftable Totems]§r Loaded. Craft a Totem of Undying from eight gold ingots around an emerald block.

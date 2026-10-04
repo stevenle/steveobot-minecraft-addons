@@ -1,0 +1,21 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Craftable Totems RP",
+    "description": "Craft a Totem of Undying from eight gold ingots around an emerald block.",
+    "uuid": "4aaadb16-0b4e-4cad-a0cf-4c5770059d75",
+    "version": [1, 0, 0],
+    "min_engine_version": [1, 26, 40]
+  },
+  "modules": [
+    {
+      "type": "resources",
+      "uuid": "fb5f9551-3e7d-4b6a-a33d-1558f07770e8",
+      "version": [1, 0, 0]
+    }
+  ],
+  "metadata": {
+    "authors": ["Steven Le"],
+    "license": "MIT"
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "$schema": "../../tools/schemas/addon.schema.json",
+  "name": "Craftable Totems",
+  "description": "Craft a Totem of Undying from eight gold ingots around an emerald block."
+}
