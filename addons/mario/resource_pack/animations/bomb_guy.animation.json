@@ -1,0 +1,48 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.steveo_bomb_guy.walk": {
+      "loop": true,
+      "bones": {
+        "foot_l": {
+          "rotation": [
+            "math.cos(query.modified_distance_moved * 38.17) * 50.0 * query.modified_move_speed",
+            0,
+            0
+          ]
+        },
+        "foot_r": {
+          "rotation": [
+            "-math.cos(query.modified_distance_moved * 38.17) * 50.0 * query.modified_move_speed",
+            0,
+            0
+          ]
+        }
+      }
+    },
+    "animation.steveo_bomb_guy.key": {
+      "loop": true,
+      "bones": {
+        "key": {
+          "rotation": [
+            0,
+            0,
+            "query.life_time * 180.0"
+          ]
+        }
+      }
+    },
+    "animation.steveo_bomb_guy.swelling": {
+      "loop": true,
+      "bones": {
+        "body": {
+          "scale": [
+            "variable.swelling_scale1",
+            "variable.swelling_scale2",
+            "variable.swelling_scale1"
+          ]
+        }
+      }
+    }
+  }
+}

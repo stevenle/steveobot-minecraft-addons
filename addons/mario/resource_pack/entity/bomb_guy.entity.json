@@ -1,0 +1,42 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "steveo:bomb_guy",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/bomb_guy"
+      },
+      "geometry": {
+        "default": "geometry.steveo_bomb_guy"
+      },
+      "animations": {
+        "walk": "animation.steveo_bomb_guy.walk",
+        "key": "animation.steveo_bomb_guy.key",
+        "swelling": "animation.steveo_bomb_guy.swelling"
+      },
+      "scripts": {
+        "pre_animation": [
+          "variable.wobble = Math.sin(query.swell_amount * 5730) * query.swell_amount * 0.01 + 1.0;",
+          "variable.swelling_scale1 = (Math.pow(Math.clamp(query.swell_amount, 0.0, 1.0), 4.0) * 0.4 + 1.0) * variable.wobble;",
+          "variable.swelling_scale2 = (1.0 + Math.clamp(query.swell_amount, 0.0, 1.0) * 0.1) / variable.wobble;",
+          "variable.flash = Math.mod(Math.round(query.swell_amount * 10.0), 2.0);"
+        ],
+        "animate": [
+          "walk",
+          "key",
+          "swelling"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.steveo_bomb_guy"
+      ],
+      "spawn_egg": {
+        "base_color": "#24242C",
+        "overlay_color": "#F0A020"
+      }
+    }
+  }
+}

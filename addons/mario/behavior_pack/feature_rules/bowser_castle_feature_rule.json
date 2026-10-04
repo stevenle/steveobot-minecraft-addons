@@ -1,0 +1,82 @@
+{
+  "format_version": "1.13.0",
+  "minecraft:feature_rules": {
+    "description": {
+      "identifier": "steveo:overworld_surface_bowser_castle_feature",
+      "places_feature": "steveo:bowser_castle_feature"
+    },
+    "conditions": {
+      "placement_pass": "surface_pass",
+      "minecraft:biome_filter": [
+        {
+          "test": "has_biome_tag",
+          "operator": "==",
+          "value": "overworld"
+        },
+        {
+          "test": "has_biome_tag",
+          "operator": "!=",
+          "value": "ocean"
+        },
+        {
+          "test": "has_biome_tag",
+          "operator": "!=",
+          "value": "deep"
+        },
+        {
+          "test": "has_biome_tag",
+          "operator": "!=",
+          "value": "river"
+        },
+        {
+          "test": "has_biome_tag",
+          "operator": "!=",
+          "value": "beach"
+        },
+        {
+          "any_of": [
+            {
+              "test": "has_biome_tag",
+              "operator": "==",
+              "value": "plains"
+            },
+            {
+              "test": "has_biome_tag",
+              "operator": "==",
+              "value": "desert"
+            },
+            {
+              "test": "has_biome_tag",
+              "operator": "==",
+              "value": "savanna"
+            },
+            {
+              "test": "has_biome_tag",
+              "operator": "==",
+              "value": "mesa"
+            }
+          ]
+        }
+      ]
+    },
+    "distribution": {
+      "iterations": 1,
+      "scatter_chance": 0.25,
+      "x": {
+        "distribution": "uniform",
+        "extent": [
+          0,
+          15
+        ]
+      },
+      "y": "query.heightmap(variable.worldx, variable.worldz) - 4",
+      "z": {
+        "distribution": "uniform",
+        "extent": [
+          0,
+          15
+        ]
+      }
+    }
+  }
+}

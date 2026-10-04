@@ -1,0 +1,18 @@
+{
+  "format_version": "1.13.0",
+  "minecraft:structure_template_feature": {
+    "description": {
+      "identifier": "steveo:question_row_feature"
+    },
+    "structure_name": "steveo:question_row",
+    "adjustment_radius": 0,
+    "facing_direction": "random",
+    "constraints": {
+      "block_intersection": {
+        "block_allowlist": [
+          "minecraft:air"
+        ]
+      }
+    }
+  }
+}

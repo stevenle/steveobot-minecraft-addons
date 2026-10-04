@@ -1,0 +1,32 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "steveo:squirrel_suit_recipe"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "L L",
+      "LPL",
+      "LLL"
+    ],
+    "key": {
+      "L": {
+        "item": "minecraft:leather"
+      },
+      "P": {
+        "item": "minecraft:phantom_membrane"
+      }
+    },
+    "unlock": [
+      {
+        "item": "minecraft:phantom_membrane"
+      }
+    ],
+    "result": {
+      "item": "steveo:squirrel_suit"
+    }
+  }
+}

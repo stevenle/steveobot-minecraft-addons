@@ -1,0 +1,15 @@
+{
+  "resource_pack_name": "mario",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "steveo_fire_flower": {
+      "textures": "textures/items/fire_flower"
+    },
+    "steveo_squirrel_suit": {
+      "textures": "textures/items/squirrel_suit"
+    },
+    "steveo_frog_suit": {
+      "textures": "textures/items/frog_suit"
+    }
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "$schema": "../../tools/schemas/addon.schema.json",
+  "name": "Mario",
+  "description": "Goombas, Koopa Troopas, Bob-ombs, Bowser's castle, question blocks, and power-ups: the Squirrel Suit, Frog Suit, and Fire Flower."
+}

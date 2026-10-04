@@ -1,0 +1,36 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "steveo:bowser",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/bowser"
+      },
+      "geometry": {
+        "default": "geometry.steveo_bowser"
+      },
+      "animations": {
+        "walk": "animation.steveo_bowser.walk",
+        "look_at_target": "animation.steveo_bowser.look_at_target",
+        "tail": "animation.steveo_bowser.tail"
+      },
+      "scripts": {
+        "animate": [
+          "walk",
+          "look_at_target",
+          "tail"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.steveo_bowser"
+      ],
+      "spawn_egg": {
+        "base_color": "#2E9E34",
+        "overlay_color": "#E0401C"
+      }
+    }
+  }
+}
