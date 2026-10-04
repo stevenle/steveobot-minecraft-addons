@@ -1,0 +1,38 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Craftable Totems BP",
+    "description": "Craft a Totem of Undying from eight gold ingots around an emerald block.",
+    "uuid": "f7300184-1f74-4f73-aa2e-d0218425dc8e",
+    "version": [1, 0, 0],
+    "min_engine_version": [1, 26, 40]
+  },
+  "modules": [
+    {
+      "type": "data",
+      "uuid": "b4011b12-bbc8-4010-9d49-17192254330f",
+      "version": [1, 0, 0]
+    },
+    {
+      "type": "script",
+      "language": "javascript",
+      "entry": "scripts/main.js",
+      "uuid": "093535a7-5466-4712-bc91-aebb860f62ab",
+      "version": [1, 0, 0]
+    }
+  ],
+  "dependencies": [
+    {
+      "uuid": "4aaadb16-0b4e-4cad-a0cf-4c5770059d75",
+      "version": [1, 0, 0]
+    },
+    {
+      "module_name": "@minecraft/server",
+      "version": "2.9.0"
+    }
+  ],
+  "metadata": {
+    "authors": ["Steven Le"],
+    "license": "MIT"
+  }
+}
