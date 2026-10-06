@@ -1,0 +1,45 @@
+{
+  "format_version": "1.21.0",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "steveo:kart",
+      "is_spawnable": false,
+      "is_summonable": true
+    },
+    "components": {
+      "minecraft:type_family": { "family": ["steveo_kart", "inanimate"] },
+      "minecraft:health": { "value": 6, "max": 6 },
+      "minecraft:collision_box": { "width": 1.2, "height": 0.7 },
+      "minecraft:movement": { "value": 0.4 },
+      "minecraft:movement.basic": {},
+      "minecraft:input_ground_controlled": {},
+      "minecraft:rideable": {
+        "seat_count": 1,
+        "controlling_seat": 0,
+        "crouching_skip_interact": true,
+        "family_types": ["player"],
+        "interact_text": "action.interact.steveo_kart",
+        "pull_in_entities": false,
+        "seats": { "position": [0, 0.35, -0.1] }
+      },
+      "minecraft:variable_max_auto_step": {
+        "base_value": 1.0625,
+        "controlled_value": 1.0625,
+        "jump_prevented_value": 0.5625
+      },
+      "minecraft:physics": {},
+      "minecraft:pushable": { "is_pushable": false, "is_pushable_by_piston": true },
+      "minecraft:knockback_resistance": { "value": 1.0 },
+      "minecraft:breathable": { "breathes_water": true, "total_supply": 15, "suffocate_time": 0 },
+      "minecraft:damage_sensor": {
+        "triggers": [
+          { "cause": "entity_attack", "deals_damage": true },
+          { "cause": "all", "deals_damage": false }
+        ]
+      },
+      "minecraft:loot": { "table": "loot_tables/entities/kart.json" },
+      "minecraft:nameable": {},
+      "minecraft:persistent": {}
+    }
+  }
+}

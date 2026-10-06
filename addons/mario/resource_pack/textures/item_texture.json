@@ -10,6 +10,9 @@
     },
     "steveo_frog_suit": {
       "textures": "textures/items/frog_suit"
+    },
+    "steveo_kart": {
+      "textures": "textures/items/kart"
     }
   }
 }

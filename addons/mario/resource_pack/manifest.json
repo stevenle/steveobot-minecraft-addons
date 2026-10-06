@@ -2,16 +2,16 @@
   "format_version": 2,
   "header": {
     "name": "Mario RP",
-    "description": "Goombas, Koopa Troopas, Bob-ombs, Bowser's castle, question blocks, and power-ups: the Squirrel Suit, Frog Suit, and Fire Flower.",
+    "description": "Goombas, Koopa Troopas, Bob-ombs, Bowser's castle, question blocks, and power-ups: the Squirrel Suit, Frog Suit, and Fire Flower, plus a drivable Mario Kart.",
     "uuid": "aa52a8b2-a047-4bfa-9796-e1821fa01221",
-    "version": [1, 0, 1],
+    "version": [1, 1, 0],
     "min_engine_version": [1, 26, 40]
   },
   "modules": [
     {
       "type": "resources",
       "uuid": "7624f19a-3115-413d-bd59-029197acd892",
-      "version": [1, 0, 1]
+      "version": [1, 1, 0]
     }
   ],
   "metadata": {

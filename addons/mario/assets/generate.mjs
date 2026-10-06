@@ -913,3 +913,98 @@ function makeGrid(SX, SY, SZ) {
     .forEach((b, x) => { grid[x][0][0] = b; });
   writeStructure('behavior_pack/structures/steveo/question_row.mcstructure', grid);
 }
+
+// ---------- Mario Kart ----------
+// Appended last so its draws from the shared grain RNG do not shift the bytes
+// of anything generated above.
+{
+  const kartRed = hex('#D8201C');
+  const kartRedDark = hex('#9E1410');
+  const tire = hex('#1C1C1C');
+  const hub = hex('#D8D8DC');
+  const seat = hex('#2A3A8E');
+  const engine = hex('#7C7C86');
+
+  /** Tire tread on the rolling faces, a white hub on the outer and inner faces. */
+  const wheelSide = (c, x, y, w, h) => {
+    fill(c, x, y, w, h, tire, 0.04);
+    fill(c, x + 1, y + 1, w - 2, h - 2, hub, 0.03);
+    c.set(x + Math.floor(w / 2), y + Math.floor(h / 2), tire);
+  };
+  const tread = (c, x, y, w, h) => {
+    fill(c, x, y, w, h, tire, 0.04);
+    for (let yy = 0; yy < h; yy += 2) fill(c, x, y + yy, w, 1, shade(tire, 1.8), 0);
+  };
+  const wheel = { all: tread, east: wheelSide, west: wheelSide };
+  /** The Mario emblem: a white disc with a red M, on the nose. */
+  const emblem = (c, x, y, w, h) => {
+    fill(c, x, y, w, h, kartRed);
+    const cx = x + Math.floor(w / 2) - 3, cy = y + Math.floor(h / 2) - 3;
+    paintRows(c, [
+      '.WWWW.',
+      'WRWWRW',
+      'WRRRRW',
+      'WRWWRW',
+      'WRWWRW',
+      '.WWWW.',
+    ], { W: P.white, R: kartRed }, cx, cy);
+  };
+
+  buildModel({
+    id: 'kart',
+    bounds: [3, 2],
+    bones: [
+      { name: 'root', pivot: [0, 0, 0] },
+      { name: 'body', parent: 'root', pivot: [0, 3, 0] },
+      { name: 'steering', parent: 'body', pivot: [0, 8, -6], rotation: [-30, 0, 0] },
+      { name: 'wheel_fl', parent: 'root', pivot: [-7.5, 2.5, -7.5] },
+      { name: 'wheel_fr', parent: 'root', pivot: [7.5, 2.5, -7.5] },
+      { name: 'wheel_bl', parent: 'root', pivot: [-7.5, 3, 6] },
+      { name: 'wheel_br', parent: 'root', pivot: [7.5, 3, 6] },
+    ],
+    cubes: [
+      // Chassis and bumpers.
+      { bone: 'body', origin: [-6, 2, -10], size: [12, 4, 19], paint: { all: banded(kartRed, kartRedDark), down: tire } },
+      { bone: 'body', origin: [-7, 2, -12], size: [14, 2, 2], paint: tire },
+      { bone: 'body', origin: [-5, 6, -10], size: [10, 2, 6], paint: { all: kartRed, up: emblem, north: emblem } },
+      // Seat.
+      { bone: 'body', origin: [-4, 6, -1], size: [8, 2, 5], paint: seat },
+      { bone: 'body', origin: [-4, 6, 4], size: [8, 8, 2], paint: { all: seat, south: kartRed } },
+      // Engine and twin exhausts.
+      { bone: 'body', origin: [-5, 4, 6], size: [10, 5, 4], paint: engine },
+      { bone: 'body', origin: [-4, 6, 10], size: [2, 2, 2], paint: hub },
+      { bone: 'body', origin: [2, 6, 10], size: [2, 2, 2], paint: hub },
+      // Steering column and wheel.
+      { bone: 'steering', origin: [-0.5, 6, -6.5], size: [1, 4, 1], paint: tire },
+      { bone: 'steering', origin: [-3, 10, -7], size: [6, 1, 2], paint: tire },
+      { bone: 'steering', origin: [-0.5, 9.5, -6.5], size: [1, 1, 1], paint: P.fireYellow },
+      // Wheels: small in front, big in back.
+      { bone: 'wheel_fl', origin: [-9, 0, -10], size: [3, 5, 5], paint: wheel },
+      { bone: 'wheel_fr', origin: [6, 0, -10], size: [3, 5, 5], paint: wheel },
+      { bone: 'wheel_bl', origin: [-9.5, 0, 3], size: [3.5, 6, 6], paint: wheel },
+      { bone: 'wheel_br', origin: [6, 0, 3], size: [3.5, 6, 6], paint: wheel },
+    ],
+  });
+
+  write('resource_pack/textures/items/kart.png', icon16([
+    '................',
+    '................',
+    '................',
+    '..........BB....',
+    '..........BB....',
+    '....K.....BB....',
+    '.....K....BB....',
+    '..RRRRRRRRRRGG..',
+    '.RRWWRRRRRRRGGG.',
+    '.RRWMRRRRRRRRRR.',
+    '.DDDDDDDDDDDDDD.',
+    '..TTT......TTTT.',
+    '.TTHTT....TTHHTT',
+    '.TTHTT....TTHHTT',
+    '..TTT......TTTT.',
+    '................',
+  ], {
+    R: kartRed, D: kartRedDark, W: P.white, M: kartRed, B: seat, K: tire,
+    G: engine, T: tire, H: hub,
+  }).png());
+}
