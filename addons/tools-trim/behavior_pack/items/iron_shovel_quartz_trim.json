@@ -1,0 +1,65 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:item": {
+    "description": {
+      "identifier": "steveo:iron_shovel_quartz_trim",
+      "menu_category": {
+        "category": "none"
+      }
+    },
+    "components": {
+      "minecraft:icon": "steveo_iron_shovel_quartz_trim",
+      "minecraft:display_name": {
+        "value": "item.steveo:iron_shovel_quartz_trim.name"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:hand_equipped": true,
+      "minecraft:can_destroy_in_creative": true,
+      "minecraft:damage": 3,
+      "minecraft:durability": {
+        "max_durability": 250
+      },
+      "minecraft:enchantable": {
+        "slot": "shovel",
+        "value": 14
+      },
+      "minecraft:repairable": {
+        "repair_items": [
+          {
+            "items": [
+              "minecraft:iron_ingot"
+            ],
+            "repair_amount": "query.max_durability * 0.25"
+          },
+          {
+            "items": [
+              "steveo:iron_shovel_quartz_trim",
+              "minecraft:iron_shovel"
+            ],
+            "repair_amount": "context.other->query.remaining_durability + 0.05 * context.other->query.max_durability"
+          }
+        ]
+      },
+      "minecraft:tags": {
+        "tags": [
+          "minecraft:is_tool",
+          "minecraft:is_shovel",
+          "minecraft:digger",
+          "minecraft:iron_tier",
+          "steveo:trimmed_tool"
+        ]
+      },
+      "minecraft:digger": {
+        "use_efficiency": true,
+        "destroy_speeds": [
+          {
+            "block": {
+              "tags": "query.any_tag('dirt', 'sand', 'gravel', 'grass', 'snow', 'minecraft:is_shovel_item_destructible')"
+            },
+            "speed": 6
+          }
+        ]
+      }
+    }
+  }
+}

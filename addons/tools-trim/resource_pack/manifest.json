@@ -1,0 +1,21 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Tools Trim RP",
+    "description": "Trim your tools like armor: the Better Smithing Table adds a colored trim to any sword, pickaxe, axe, shovel, or hoe, netherite included.",
+    "uuid": "80abcc47-3447-4bf9-be98-8327499c68b0",
+    "version": [1, 0, 0],
+    "min_engine_version": [1, 26, 40]
+  },
+  "modules": [
+    {
+      "type": "resources",
+      "uuid": "0732006c-da30-437c-aee8-c3893da79ee0",
+      "version": [1, 0, 0]
+    }
+  ],
+  "metadata": {
+    "authors": ["Steven Le"],
+    "license": "MIT"
+  }
+}

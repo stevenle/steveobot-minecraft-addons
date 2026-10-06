@@ -1,0 +1,32 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "steveo:better_smithing_table_recipe"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      " G ",
+      "GSG",
+      " G "
+    ],
+    "key": {
+      "G": {
+        "item": "minecraft:gold_ingot"
+      },
+      "S": {
+        "item": "minecraft:smithing_table"
+      }
+    },
+    "unlock": [
+      {
+        "item": "minecraft:smithing_table"
+      }
+    ],
+    "result": {
+      "item": "steveo:better_smithing_table"
+    }
+  }
+}
