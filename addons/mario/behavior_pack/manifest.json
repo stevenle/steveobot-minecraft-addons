@@ -2,29 +2,29 @@
   "format_version": 2,
   "header": {
     "name": "Mario BP",
-    "description": "Goombas, Koopa Troopas, Bob-ombs, Bowser's castle, question blocks, and power-ups: the Squirrel Suit, Frog Suit, and Fire Flower.",
+    "description": "Goombas, Koopa Troopas, Bob-ombs, Bowser's castle, question blocks, and power-ups: the Squirrel Suit, Frog Suit, and Fire Flower, plus a drivable Mario Kart.",
     "uuid": "44129da2-af87-4d3c-8380-4d6887b1d524",
-    "version": [1, 0, 1],
+    "version": [1, 1, 0],
     "min_engine_version": [1, 26, 40]
   },
   "modules": [
     {
       "type": "data",
       "uuid": "364a6c68-91d0-4c21-a6b7-fc7eeb416686",
-      "version": [1, 0, 1]
+      "version": [1, 1, 0]
     },
     {
       "type": "script",
       "language": "javascript",
       "entry": "scripts/main.js",
       "uuid": "67827cf9-2f07-4c35-b520-72183ac686d0",
-      "version": [1, 0, 1]
+      "version": [1, 1, 0]
     }
   ],
   "dependencies": [
     {
       "uuid": "aa52a8b2-a047-4bfa-9796-e1821fa01221",
-      "version": [1, 0, 1]
+      "version": [1, 1, 0]
     },
     {
       "module_name": "@minecraft/server",

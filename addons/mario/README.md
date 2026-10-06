@@ -2,7 +2,8 @@
 
 Mario comes to Minecraft Bedrock: Goombas, Koopa Troopas, and Bob-ombs roam
 at night, Bowser waits in his castle, question blocks float over the land,
-and three power-ups let you fly, swim, and throw fireballs.
+three power-ups let you fly, swim, and throw fireballs, and you can drive
+a Mario Kart.
 
 ## Mobs
 
@@ -77,10 +78,23 @@ The suits are both chestplates, so you wear one at a time. Each gives
 leather-level protection (3), has 240 durability, and can be repaired (the
 Squirrel Suit with leather, the Frog Suit with slime balls).
 
+## Mario Kart
+
+Craft a **Mario Kart** at a crafting table: a lever (steering wheel) on
+top, iron ingot / redstone block / iron ingot across the middle, and coal
+blocks (wheels) in the two bottom corners. Use it on the ground to place
+the kart. Right-click / tap it (**Drive**) to get in.
+
+- Move forward to drive and look where you want to go. It steers like a
+  horse, and it is faster than one.
+- It climbs one-block steps, takes no fall, fire, lava, or drowning
+  damage, and stays where you leave it.
+- Sneak to get out. Punch it a few times to break it back into the item.
+
 ## Debug commands
 
 ```
-/scriptevent steveo:mario give     # Fire Flower, both suits, 8 question blocks
+/scriptevent steveo:mario give     # Fire Flower, both suits, a Mario Kart, 8 question blocks
 /scriptevent steveo:mario castle   # build Bowser's Castle in front of you (gate 2 blocks ahead)
 /scriptevent steveo:mario row      # a question-block row above you
 /scriptevent steveo:mario goomba   # spawn a Goomba in front of you
@@ -89,8 +103,9 @@ Squirrel Suit with leather, the Frog Suit with slime balls).
 /scriptevent steveo:mario bomb     # spawn a Bob-omb
 /scriptevent steveo:mario bowser   # raise Bowser in front of you
 /scriptevent steveo:mario breath   # make the nearest Bowser breathe fire at you
+/scriptevent steveo:mario kart     # place a Mario Kart in front of you
 /scriptevent steveo:mario sunset   # set the time to sunset and spawn a confused Goomba
-/scriptevent steveo:mario status   # nearby mob counts, Bowsers, fireballs, time, your suit
+/scriptevent steveo:mario status   # nearby mob and kart counts, Bowsers, fireballs, time, your suit
 ```
 
 The castle seal only wakes for survival and adventure players. In creative,
@@ -105,7 +120,8 @@ use `bowser` to spawn him directly.
 | `src/fireball.ts` | Script-simulated fireballs (bounce, hit, fizzle) for the Fire Flower and Bowser |
 | `src/suits.ts` | Squirrel Suit flight and fall-damage cancel, Frog Suit effects |
 | `src/items.ts` | Fire Flower throwing, the question block's coin sound |
-| `behavior_pack/entities/` | The four mobs and the fireball |
+| `src/kart.ts` | The Mario Kart's first-ride hint (driving itself is data-driven) |
+| `behavior_pack/entities/` | The four mobs, the fireball, and the kart |
 | `behavior_pack/spawn_rules/` | Night spawning for Goombas, Koopas, and Bob-ombs |
 | `behavior_pack/features/`, `feature_rules/` | Scatters castles and question-block rows |
 | `behavior_pack/structures/steveo/` | The castle and the question row (generated) |
@@ -131,3 +147,7 @@ Everything here has only passed `pnpm check`. Things to check first:
   commands. The rows use a `block_intersection` air-only constraint.
 - Fireball movement (the impulse-steered entity, with a teleport fallback,
   as in potato-gun).
+- The Mario Kart: driving speed (`minecraft:movement` 0.4 in
+  `entities/kart.json`; horses top out near 0.34), where the driver sits
+  (the seat position), which way the wheels roll, and that the item places
+  it.

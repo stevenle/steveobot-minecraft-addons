@@ -8,6 +8,7 @@ entity.steveo:koopa_troopa.name=Koopa Troopa
 entity.steveo:bomb_guy.name=Bob-omb
 entity.steveo:bowser.name=Bowser
 entity.steveo:fireball.name=Fireball
+entity.steveo:kart.name=Mario Kart
 item.spawn_egg.entity.steveo:goomba.name=Spawn Goomba
 item.spawn_egg.entity.steveo:koopa_troopa.name=Spawn Koopa Troopa
 item.spawn_egg.entity.steveo:bomb_guy.name=Spawn Bob-omb
@@ -19,17 +20,20 @@ tile.steveo:bowser_seal.name=Bowser Seal
 item.steveo:fire_flower.name=Fire Flower
 item.steveo:squirrel_suit.name=Squirrel Suit
 item.steveo:frog_suit.name=Frog Suit
+item.steveo:kart.name=Mario Kart
+action.interact.steveo_kart=Drive
 
 ## Chat
 mario.bowser.awakens=§cBowser has awoken! Defeat him to claim his treasure.
 mario.bowser.defeated=§eBowser has been defeated!
 mario.hint.fire_flower=Use the Fire Flower to throw bouncing fireballs. Up to 3 at a time.
 mario.hint.squirrel_suit=Squirrel Suit on! In the air: hold jump to fly up, hold forward to fly where you look, let go to glide, sneak to drop. No fall damage.
+mario.hint.kart=Mario Kart! Move to drive, look to steer. It climbs one-block steps. Sneak to get out, punch it to pick it back up.
 mario.hint.frog_suit=Frog Suit on! You can breathe underwater, and you swim fast and see clearly in water.
 
 ## Debug: /scriptevent steveo:mario <command>
-mario.debug.help=Commands: give, castle, row, goomba, koopa, shell, bomb, bowser, breath, sunset, status
-mario.debug.given=Gave you a Fire Flower, both suits, and 8 question blocks.
+mario.debug.help=Commands: give, castle, row, goomba, koopa, shell, bomb, bowser, breath, kart, sunset, status
+mario.debug.given=Gave you a Fire Flower, both suits, a Mario Kart, and 8 question blocks.
 mario.debug.placed.castle=Bowser's Castle placed in front of you. Walk into the throne room to wake Bowser.
 mario.debug.placed.row=Question blocks placed above you.
 mario.debug.failed=Failed: %s
@@ -38,4 +42,4 @@ mario.debug.shell.none=No Koopa Troopa nearby that still has its shell to hide i
 mario.debug.breath.none=No Bowser within 32 blocks.
 mario.debug.sunset=Set the time to sunset and a confused Goomba wandered in.
 mario.debug.sunset.none=Set the time to sunset, but found nowhere nearby for a Goomba to spawn.
-mario.debug.status=Within 64 blocks: %s Goombas, %s Koopas, %s Bob-ombs. Bowsers loaded: %s. Fireballs in flight: %s. Time %s, sunset: %s. Your suit: %s
+mario.debug.status=Within 64 blocks: %s Goombas, %s Koopas, %s Bob-ombs, %s karts. Bowsers loaded: %s. Fireballs in flight: %s. Time %s, sunset: %s. Your suit: %s

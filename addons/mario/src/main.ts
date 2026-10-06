@@ -10,6 +10,7 @@
  *   fireball.ts the simulated fireballs both Fire Flower and Bowser use
  *   suits.ts    Squirrel Suit flight, Frog Suit effects
  *   items.ts    Fire Flower throwing, the question block's coin sound
+ *   kart.ts     the Mario Kart's first-ride hint (driving is data-driven)
  *
  * Bob-ombs need no script: entities/bomb_guy.json is a creeper.
  */
@@ -21,6 +22,7 @@ import { BOMB_GUY, GOOMBA, hideInShell, isSunset, KOOPA, spawnConfusedGoomba } f
 import { BOWSER, bowserCount, breatheFire, raiseBowser } from './bowser';
 import { FROG_SUIT, SQUIRREL_SUIT, suitOf } from './suits';
 import { FIRE_FLOWER, QUESTION_BLOCK } from './items';
+import { KART } from './kart';
 
 const CASTLE = 'steveo:bowser_castle';
 const QUESTION_ROW = 'steveo:question_row';
@@ -28,7 +30,7 @@ const QUESTION_ROW = 'steveo:question_row';
 const CASTLE_HALF_WIDTH = 11;
 const CASTLE_FLOOR = 4;
 
-// ---------- debug: /scriptevent steveo:mario <give|castle|row|goomba|koopa|shell|bomb|bowser|breath|sunset|status> ----------
+// ---------- debug: /scriptevent steveo:mario <give|castle|row|goomba|koopa|shell|bomb|bowser|breath|kart|sunset|status> ----------
 
 function inFront(player: Player, distance: number): Vector3 {
   const view = player.getViewDirection();
@@ -69,7 +71,7 @@ system.afterEvents.scriptEventReceive.subscribe(
     switch (event.message.trim()) {
       case 'give': {
         const container = player.getComponent('minecraft:inventory')?.container;
-        for (const id of [FIRE_FLOWER, SQUIRREL_SUIT, FROG_SUIT]) container?.addItem(new ItemStack(id, 1));
+        for (const id of [FIRE_FLOWER, SQUIRREL_SUIT, FROG_SUIT, KART]) container?.addItem(new ItemStack(id, 1));
         container?.addItem(new ItemStack(QUESTION_BLOCK, 8));
         say(player, 'mario.debug.given');
         break;
@@ -104,6 +106,9 @@ system.afterEvents.scriptEventReceive.subscribe(
         else say(player, 'mario.debug.breath.none');
         break;
       }
+      case 'kart':
+        spawnInFront(player, KART);
+        break;
       case 'sunset': {
         world.setTimeOfDay(11800);
         const goomba = spawnConfusedGoomba(player);
@@ -114,7 +119,7 @@ system.afterEvents.scriptEventReceive.subscribe(
         const near = (type: string) =>
           `${player.dimension.getEntities({ type, location: player.location, maxDistance: 64 }).length}`;
         say(player, 'mario.debug.status',
-          near(GOOMBA), near(KOOPA), near(BOMB_GUY), `${bowserCount()}`, `${fireballCount()}`,
+          near(GOOMBA), near(KOOPA), near(BOMB_GUY), near(KART), `${bowserCount()}`, `${fireballCount()}`,
           `${world.getTimeOfDay()}`, isSunset() ? 'yes' : 'no', suitOf(player) ?? '-');
         break;
       }

@@ -1,0 +1,14 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.steveo_kart.wheels": {
+      "loop": true,
+      "bones": {
+        "wheel_fl": { "rotation": ["-query.modified_distance_moved * 360.0", 0, 0] },
+        "wheel_fr": { "rotation": ["-query.modified_distance_moved * 360.0", 0, 0] },
+        "wheel_bl": { "rotation": ["-query.modified_distance_moved * 300.0", 0, 0] },
+        "wheel_br": { "rotation": ["-query.modified_distance_moved * 300.0", 0, 0] }
+      }
+    }
+  }
+}
