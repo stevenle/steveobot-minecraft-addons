@@ -1,0 +1,42 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Tools Trim BP",
+    "description": "Trim your tools like armor: the Better Smithing Table adds a colored trim to any sword, pickaxe, axe, shovel, or hoe, netherite included.",
+    "uuid": "884d43a6-045e-46a2-8c3d-7ce68b991d1e",
+    "version": [1, 0, 0],
+    "min_engine_version": [1, 26, 40]
+  },
+  "modules": [
+    {
+      "type": "data",
+      "uuid": "d165c639-14ef-4747-b656-e2b1ec3da4ca",
+      "version": [1, 0, 0]
+    },
+    {
+      "type": "script",
+      "language": "javascript",
+      "entry": "scripts/main.js",
+      "uuid": "a9a9c7e4-3ba8-461f-b8a8-e2fab0ff1402",
+      "version": [1, 0, 0]
+    }
+  ],
+  "dependencies": [
+    {
+      "uuid": "80abcc47-3447-4bf9-be98-8327499c68b0",
+      "version": [1, 0, 0]
+    },
+    {
+      "module_name": "@minecraft/server",
+      "version": "2.9.0"
+    },
+    {
+      "module_name": "@minecraft/server-ui",
+      "version": "2.1.0"
+    }
+  ],
+  "metadata": {
+    "authors": ["Steven Le"],
+    "license": "MIT"
+  }
+}

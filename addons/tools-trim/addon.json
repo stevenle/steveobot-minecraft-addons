@@ -1,0 +1,5 @@
+{
+  "$schema": "../../tools/schemas/addon.schema.json",
+  "name": "Tools Trim",
+  "description": "Trim your tools like armor: the Better Smithing Table adds a colored trim to any sword, pickaxe, axe, shovel, or hoe, netherite included."
+}

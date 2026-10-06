@@ -1,0 +1,20 @@
+{
+  "resource_pack_name": "tools-trim",
+  "texture_name": "atlas.terrain",
+  "padding": 8,
+  "num_mip_levels": 4,
+  "texture_data": {
+    "steveo_better_smithing_table_top": {
+      "textures": "textures/blocks/better_smithing_table_top"
+    },
+    "steveo_better_smithing_table_side": {
+      "textures": "textures/blocks/better_smithing_table_side"
+    },
+    "steveo_better_smithing_table_front": {
+      "textures": "textures/blocks/better_smithing_table_front"
+    },
+    "steveo_better_smithing_table_bottom": {
+      "textures": "textures/blocks/better_smithing_table_bottom"
+    }
+  }
+}
