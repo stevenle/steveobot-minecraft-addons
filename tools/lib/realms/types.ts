@@ -45,6 +45,17 @@ export interface WorldUploadInfo {
   token: string;
 }
 
+/** Result of a world upload POST. */
+export interface UploadResult extends ProbeResult {
+  /**
+   * Every `event:` name in the response's event stream, in order, read from
+   * the full body. `body` is cut to 2000 characters for display, and a long
+   * run of VALIDATION_PROGRESS events pushes the ARCHIVING_* verdict past
+   * that cut (observed 2026-10-06), so the outcome must be judged from this.
+   */
+  events: string[];
+}
+
 /** Result of poking an endpoint whose existence is unknown. */
 export interface ProbeResult {
   method: string;
