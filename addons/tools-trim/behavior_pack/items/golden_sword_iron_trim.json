@@ -20,7 +20,7 @@
         "max_durability": 32
       },
       "minecraft:enchantable": {
-        "slot": "sword",
+        "slot": "melee_spear",
         "value": 22
       },
       "minecraft:repairable": {

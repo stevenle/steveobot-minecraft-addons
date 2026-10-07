@@ -2,7 +2,8 @@
 
 Armor trims, for tools. The Better Smithing Table adds a colored trim to any
 sword, pickaxe, axe, shovel, or hoe, from wood to netherite, using the same
-eleven materials as vanilla armor trims.
+eleven materials as vanilla armor trims. With the Paxel add-on also on, it
+trims paxels too.
 
 ## The Better Smithing Table
 
@@ -23,7 +24,8 @@ trim**, which is free. Re-trimming with a different material costs one of the
 new material. Creative players trim for free.
 
 The trim shows as a binding where the head meets the handle and a wound grip
-on digging tools, and as an inlaid fuller and a colored pommel on swords. As
+on digging tools and paxels, and as an inlaid fuller and a colored pommel on
+swords. As
 with armor, a trim in the tool's own material (gold on a golden pickaxe) uses
 the darker shade of that material.
 
@@ -43,12 +45,17 @@ They also:
   trimmed or not.
 - Upgrade from diamond to netherite at a vanilla smithing table (netherite
   upgrade template + netherite ingot), keeping the trim.
-- Strip logs (axe), make paths (shovel), and till farmland (hoe).
+- Strip logs (axe), make paths (shovel), and till farmland (hoe). A trimmed
+  paxel strips and makes paths.
+
+Trimmed swords enchant in the `melee_spear` slot rather than `sword`: since
+spears were added, Looting only goes on items in that slot, and a `sword`-slot
+trimmed sword refused to take it from the vanilla sword.
 
 ## Why a separate table
 
 Bedrock gives every item type one texture, so a trimmed tool has to be its own
-item: `steveo:<tier>_<tool>_<material>_trim`, 385 of them, hidden from the
+item: `steveo:<tier>_<tool>_<material>_trim`, 462 of them, hidden from the
 creative inventory. The vanilla smithing table cannot make them: its base slot
 only accepts items tagged `minecraft:transformable_items`, vanilla gives that
 tag to diamond tools alone, and an add-on cannot tag vanilla items. The Better
@@ -70,7 +77,9 @@ every tier, change a trim, and remove one.
 The items, recipes, icons, table textures, pack icons, and the item-name block
 of `en_US.lang` are generated from the tables in `assets/generate.mjs`. To
 change a stat or add a material, edit the table (and `src/trims.ts` to match),
-rerun the script, and commit the output:
+rerun the script, and commit the output. Trimmed paxels copy the paxel
+add-on's item JSON, names, and icons, so rerun it after regenerating that
+add-on too:
 
 ```
 node addons/tools-trim/assets/generate.mjs addons/tools-trim
@@ -80,8 +89,8 @@ node addons/tools-trim/assets/generate.mjs addons/tools-trim
 |---|---|
 | `assets/vanilla/` | Unmodified tool textures, trim palettes, and smithing table textures from Mojang/bedrock-samples v1.26.50.4 |
 | `assets/generate.mjs` | Tier, tool, and material tables, trim regions, and the generator |
-| `behavior_pack/items/*_trim.json` | The 385 trimmed tools |
-| `behavior_pack/recipes/` | The table recipe and the 55 trim-keeping netherite upgrades |
+| `behavior_pack/items/*_trim.json` | The 462 trimmed tools (77 of them paxels) |
+| `behavior_pack/recipes/` | The table recipe and the 66 trim-keeping netherite upgrades |
 | `behavior_pack/blocks/better_smithing_table.json` | The table block |
 | `resource_pack/textures/items/trimmed/` | Trimmed tool icons |
 | `resource_pack/texts/en_US.lang` | Chat and menu strings; item names between the generated markers |

@@ -1,6 +1,6 @@
 /**
- * Tools Trim — armor-style trims for swords, pickaxes, axes, shovels, and hoes,
- * applied at the Better Smithing Table.
+ * Tools Trim — armor-style trims for swords, pickaxes, axes, shovels, hoes,
+ * and paxels (from the paxel add-on), applied at the Better Smithing Table.
  *
  * Hold a tool and use the table: a menu lists the eleven trim materials with
  * how many of each you carry, plus "Remove trim" when the tool already has
@@ -401,12 +401,13 @@ world.afterEvents.playerInteractWithBlock.subscribe((event) => {
     if (tool.tool === 'axe') changed = tryStrip(block);
     else if (tool.tool === 'shovel') changed = tryPath(block);
     else if (tool.tool === 'hoe') changed = tryTill(block);
+    else if (tool.tool === 'paxel') changed = tryStrip(block) || tryPath(block);
   } catch (error) {
     log.warn(`could not convert ${block.typeId}: ${String(error)}`);
     return;
   }
   if (!changed) return;
-  event.player.playSound(tool.tool === 'axe' ? 'use.wood' : 'use.gravel', { location: block.location });
+  event.player.playSound(block.typeId.includes('stripped') ? 'use.wood' : 'use.gravel', { location: block.location });
   wear(event.player, event.itemStack, 1);
 });
 
@@ -444,6 +445,10 @@ function debugGive(player: Player, args: readonly string[]): void {
     return;
   }
   const id = idOf({ tier, tool, trim });
+  if (ItemTypes.get(id) === undefined) {
+    say(player, 'tools_trim.debug.missing', id);
+    return;
+  }
   const leftover = inventoryOf(player)?.addItem(new ItemStack(id));
   if (leftover !== undefined) player.dimension.spawnItem(leftover, player.location);
   say(player, 'tools_trim.debug.given', nameOf(id));

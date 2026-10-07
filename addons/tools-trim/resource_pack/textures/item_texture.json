@@ -167,6 +167,39 @@
     "steveo_wooden_hoe_resin_trim": {
       "textures": "textures/items/trimmed/wooden_hoe_resin_trim"
     },
+    "steveo_wooden_paxel_quartz_trim": {
+      "textures": "textures/items/trimmed/wooden_paxel_quartz_trim"
+    },
+    "steveo_wooden_paxel_iron_trim": {
+      "textures": "textures/items/trimmed/wooden_paxel_iron_trim"
+    },
+    "steveo_wooden_paxel_netherite_trim": {
+      "textures": "textures/items/trimmed/wooden_paxel_netherite_trim"
+    },
+    "steveo_wooden_paxel_redstone_trim": {
+      "textures": "textures/items/trimmed/wooden_paxel_redstone_trim"
+    },
+    "steveo_wooden_paxel_copper_trim": {
+      "textures": "textures/items/trimmed/wooden_paxel_copper_trim"
+    },
+    "steveo_wooden_paxel_gold_trim": {
+      "textures": "textures/items/trimmed/wooden_paxel_gold_trim"
+    },
+    "steveo_wooden_paxel_emerald_trim": {
+      "textures": "textures/items/trimmed/wooden_paxel_emerald_trim"
+    },
+    "steveo_wooden_paxel_diamond_trim": {
+      "textures": "textures/items/trimmed/wooden_paxel_diamond_trim"
+    },
+    "steveo_wooden_paxel_lapis_trim": {
+      "textures": "textures/items/trimmed/wooden_paxel_lapis_trim"
+    },
+    "steveo_wooden_paxel_amethyst_trim": {
+      "textures": "textures/items/trimmed/wooden_paxel_amethyst_trim"
+    },
+    "steveo_wooden_paxel_resin_trim": {
+      "textures": "textures/items/trimmed/wooden_paxel_resin_trim"
+    },
     "steveo_stone_sword_quartz_trim": {
       "textures": "textures/items/trimmed/stone_sword_quartz_trim"
     },
@@ -331,6 +364,39 @@
     },
     "steveo_stone_hoe_resin_trim": {
       "textures": "textures/items/trimmed/stone_hoe_resin_trim"
+    },
+    "steveo_stone_paxel_quartz_trim": {
+      "textures": "textures/items/trimmed/stone_paxel_quartz_trim"
+    },
+    "steveo_stone_paxel_iron_trim": {
+      "textures": "textures/items/trimmed/stone_paxel_iron_trim"
+    },
+    "steveo_stone_paxel_netherite_trim": {
+      "textures": "textures/items/trimmed/stone_paxel_netherite_trim"
+    },
+    "steveo_stone_paxel_redstone_trim": {
+      "textures": "textures/items/trimmed/stone_paxel_redstone_trim"
+    },
+    "steveo_stone_paxel_copper_trim": {
+      "textures": "textures/items/trimmed/stone_paxel_copper_trim"
+    },
+    "steveo_stone_paxel_gold_trim": {
+      "textures": "textures/items/trimmed/stone_paxel_gold_trim"
+    },
+    "steveo_stone_paxel_emerald_trim": {
+      "textures": "textures/items/trimmed/stone_paxel_emerald_trim"
+    },
+    "steveo_stone_paxel_diamond_trim": {
+      "textures": "textures/items/trimmed/stone_paxel_diamond_trim"
+    },
+    "steveo_stone_paxel_lapis_trim": {
+      "textures": "textures/items/trimmed/stone_paxel_lapis_trim"
+    },
+    "steveo_stone_paxel_amethyst_trim": {
+      "textures": "textures/items/trimmed/stone_paxel_amethyst_trim"
+    },
+    "steveo_stone_paxel_resin_trim": {
+      "textures": "textures/items/trimmed/stone_paxel_resin_trim"
     },
     "steveo_copper_sword_quartz_trim": {
       "textures": "textures/items/trimmed/copper_sword_quartz_trim"
@@ -497,6 +563,39 @@
     "steveo_copper_hoe_resin_trim": {
       "textures": "textures/items/trimmed/copper_hoe_resin_trim"
     },
+    "steveo_copper_paxel_quartz_trim": {
+      "textures": "textures/items/trimmed/copper_paxel_quartz_trim"
+    },
+    "steveo_copper_paxel_iron_trim": {
+      "textures": "textures/items/trimmed/copper_paxel_iron_trim"
+    },
+    "steveo_copper_paxel_netherite_trim": {
+      "textures": "textures/items/trimmed/copper_paxel_netherite_trim"
+    },
+    "steveo_copper_paxel_redstone_trim": {
+      "textures": "textures/items/trimmed/copper_paxel_redstone_trim"
+    },
+    "steveo_copper_paxel_copper_trim": {
+      "textures": "textures/items/trimmed/copper_paxel_copper_trim"
+    },
+    "steveo_copper_paxel_gold_trim": {
+      "textures": "textures/items/trimmed/copper_paxel_gold_trim"
+    },
+    "steveo_copper_paxel_emerald_trim": {
+      "textures": "textures/items/trimmed/copper_paxel_emerald_trim"
+    },
+    "steveo_copper_paxel_diamond_trim": {
+      "textures": "textures/items/trimmed/copper_paxel_diamond_trim"
+    },
+    "steveo_copper_paxel_lapis_trim": {
+      "textures": "textures/items/trimmed/copper_paxel_lapis_trim"
+    },
+    "steveo_copper_paxel_amethyst_trim": {
+      "textures": "textures/items/trimmed/copper_paxel_amethyst_trim"
+    },
+    "steveo_copper_paxel_resin_trim": {
+      "textures": "textures/items/trimmed/copper_paxel_resin_trim"
+    },
     "steveo_iron_sword_quartz_trim": {
       "textures": "textures/items/trimmed/iron_sword_quartz_trim"
     },
@@ -661,6 +760,39 @@
     },
     "steveo_iron_hoe_resin_trim": {
       "textures": "textures/items/trimmed/iron_hoe_resin_trim"
+    },
+    "steveo_iron_paxel_quartz_trim": {
+      "textures": "textures/items/trimmed/iron_paxel_quartz_trim"
+    },
+    "steveo_iron_paxel_iron_trim": {
+      "textures": "textures/items/trimmed/iron_paxel_iron_trim"
+    },
+    "steveo_iron_paxel_netherite_trim": {
+      "textures": "textures/items/trimmed/iron_paxel_netherite_trim"
+    },
+    "steveo_iron_paxel_redstone_trim": {
+      "textures": "textures/items/trimmed/iron_paxel_redstone_trim"
+    },
+    "steveo_iron_paxel_copper_trim": {
+      "textures": "textures/items/trimmed/iron_paxel_copper_trim"
+    },
+    "steveo_iron_paxel_gold_trim": {
+      "textures": "textures/items/trimmed/iron_paxel_gold_trim"
+    },
+    "steveo_iron_paxel_emerald_trim": {
+      "textures": "textures/items/trimmed/iron_paxel_emerald_trim"
+    },
+    "steveo_iron_paxel_diamond_trim": {
+      "textures": "textures/items/trimmed/iron_paxel_diamond_trim"
+    },
+    "steveo_iron_paxel_lapis_trim": {
+      "textures": "textures/items/trimmed/iron_paxel_lapis_trim"
+    },
+    "steveo_iron_paxel_amethyst_trim": {
+      "textures": "textures/items/trimmed/iron_paxel_amethyst_trim"
+    },
+    "steveo_iron_paxel_resin_trim": {
+      "textures": "textures/items/trimmed/iron_paxel_resin_trim"
     },
     "steveo_golden_sword_quartz_trim": {
       "textures": "textures/items/trimmed/golden_sword_quartz_trim"
@@ -827,6 +959,39 @@
     "steveo_golden_hoe_resin_trim": {
       "textures": "textures/items/trimmed/golden_hoe_resin_trim"
     },
+    "steveo_golden_paxel_quartz_trim": {
+      "textures": "textures/items/trimmed/golden_paxel_quartz_trim"
+    },
+    "steveo_golden_paxel_iron_trim": {
+      "textures": "textures/items/trimmed/golden_paxel_iron_trim"
+    },
+    "steveo_golden_paxel_netherite_trim": {
+      "textures": "textures/items/trimmed/golden_paxel_netherite_trim"
+    },
+    "steveo_golden_paxel_redstone_trim": {
+      "textures": "textures/items/trimmed/golden_paxel_redstone_trim"
+    },
+    "steveo_golden_paxel_copper_trim": {
+      "textures": "textures/items/trimmed/golden_paxel_copper_trim"
+    },
+    "steveo_golden_paxel_gold_trim": {
+      "textures": "textures/items/trimmed/golden_paxel_gold_trim"
+    },
+    "steveo_golden_paxel_emerald_trim": {
+      "textures": "textures/items/trimmed/golden_paxel_emerald_trim"
+    },
+    "steveo_golden_paxel_diamond_trim": {
+      "textures": "textures/items/trimmed/golden_paxel_diamond_trim"
+    },
+    "steveo_golden_paxel_lapis_trim": {
+      "textures": "textures/items/trimmed/golden_paxel_lapis_trim"
+    },
+    "steveo_golden_paxel_amethyst_trim": {
+      "textures": "textures/items/trimmed/golden_paxel_amethyst_trim"
+    },
+    "steveo_golden_paxel_resin_trim": {
+      "textures": "textures/items/trimmed/golden_paxel_resin_trim"
+    },
     "steveo_diamond_sword_quartz_trim": {
       "textures": "textures/items/trimmed/diamond_sword_quartz_trim"
     },
@@ -992,6 +1157,39 @@
     "steveo_diamond_hoe_resin_trim": {
       "textures": "textures/items/trimmed/diamond_hoe_resin_trim"
     },
+    "steveo_diamond_paxel_quartz_trim": {
+      "textures": "textures/items/trimmed/diamond_paxel_quartz_trim"
+    },
+    "steveo_diamond_paxel_iron_trim": {
+      "textures": "textures/items/trimmed/diamond_paxel_iron_trim"
+    },
+    "steveo_diamond_paxel_netherite_trim": {
+      "textures": "textures/items/trimmed/diamond_paxel_netherite_trim"
+    },
+    "steveo_diamond_paxel_redstone_trim": {
+      "textures": "textures/items/trimmed/diamond_paxel_redstone_trim"
+    },
+    "steveo_diamond_paxel_copper_trim": {
+      "textures": "textures/items/trimmed/diamond_paxel_copper_trim"
+    },
+    "steveo_diamond_paxel_gold_trim": {
+      "textures": "textures/items/trimmed/diamond_paxel_gold_trim"
+    },
+    "steveo_diamond_paxel_emerald_trim": {
+      "textures": "textures/items/trimmed/diamond_paxel_emerald_trim"
+    },
+    "steveo_diamond_paxel_diamond_trim": {
+      "textures": "textures/items/trimmed/diamond_paxel_diamond_trim"
+    },
+    "steveo_diamond_paxel_lapis_trim": {
+      "textures": "textures/items/trimmed/diamond_paxel_lapis_trim"
+    },
+    "steveo_diamond_paxel_amethyst_trim": {
+      "textures": "textures/items/trimmed/diamond_paxel_amethyst_trim"
+    },
+    "steveo_diamond_paxel_resin_trim": {
+      "textures": "textures/items/trimmed/diamond_paxel_resin_trim"
+    },
     "steveo_netherite_sword_quartz_trim": {
       "textures": "textures/items/trimmed/netherite_sword_quartz_trim"
     },
@@ -1156,6 +1354,39 @@
     },
     "steveo_netherite_hoe_resin_trim": {
       "textures": "textures/items/trimmed/netherite_hoe_resin_trim"
+    },
+    "steveo_netherite_paxel_quartz_trim": {
+      "textures": "textures/items/trimmed/netherite_paxel_quartz_trim"
+    },
+    "steveo_netherite_paxel_iron_trim": {
+      "textures": "textures/items/trimmed/netherite_paxel_iron_trim"
+    },
+    "steveo_netherite_paxel_netherite_trim": {
+      "textures": "textures/items/trimmed/netherite_paxel_netherite_trim"
+    },
+    "steveo_netherite_paxel_redstone_trim": {
+      "textures": "textures/items/trimmed/netherite_paxel_redstone_trim"
+    },
+    "steveo_netherite_paxel_copper_trim": {
+      "textures": "textures/items/trimmed/netherite_paxel_copper_trim"
+    },
+    "steveo_netherite_paxel_gold_trim": {
+      "textures": "textures/items/trimmed/netherite_paxel_gold_trim"
+    },
+    "steveo_netherite_paxel_emerald_trim": {
+      "textures": "textures/items/trimmed/netherite_paxel_emerald_trim"
+    },
+    "steveo_netherite_paxel_diamond_trim": {
+      "textures": "textures/items/trimmed/netherite_paxel_diamond_trim"
+    },
+    "steveo_netherite_paxel_lapis_trim": {
+      "textures": "textures/items/trimmed/netherite_paxel_lapis_trim"
+    },
+    "steveo_netherite_paxel_amethyst_trim": {
+      "textures": "textures/items/trimmed/netherite_paxel_amethyst_trim"
+    },
+    "steveo_netherite_paxel_resin_trim": {
+      "textures": "textures/items/trimmed/netherite_paxel_resin_trim"
     }
   }
 }

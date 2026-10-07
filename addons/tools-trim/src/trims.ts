@@ -7,12 +7,16 @@
  * be the vanilla item with a flag on it. Each trimmed tool is its own custom
  * item, `steveo:<tier>_<tool>_<material>_trim`, that copies the vanilla tool's
  * stats, and trimming swaps one item for the other.
+ *
+ * The paxel is the one tool that is not vanilla: its untrimmed item is
+ * `steveo:<tier>_paxel` from the paxel add-on, so trimming one needs that
+ * add-on too. The trimmed paxels themselves live here.
  */
 
 export const TIERS = ['wooden', 'stone', 'copper', 'iron', 'golden', 'diamond', 'netherite'] as const;
 export type Tier = (typeof TIERS)[number];
 
-export const TOOLS = ['sword', 'pickaxe', 'axe', 'shovel', 'hoe'] as const;
+export const TOOLS = ['sword', 'pickaxe', 'axe', 'shovel', 'hoe', 'paxel'] as const;
 export type Tool = (typeof TOOLS)[number];
 
 export interface Material {
@@ -45,8 +49,12 @@ export interface TrimmableTool {
   readonly trim: Material | undefined;
 }
 
+/** Tools that come from another add-on, keyed to their untrimmed item's namespace. */
+const CUSTOM: Partial<Record<Tool, string>> = { paxel: 'steveo' };
+
+/** The untrimmed tool: vanilla, or the paxel add-on's item. */
 export function vanillaId(tier: Tier, tool: Tool): string {
-  return `minecraft:${tier}_${tool}`;
+  return `${CUSTOM[tool] ?? 'minecraft'}:${tier}_${tool}`;
 }
 
 export function trimmedId(tier: Tier, tool: Tool, material: Material): string {
@@ -70,6 +78,7 @@ export function isTool(name: string): name is Tool {
 }
 
 const VANILLA = /^minecraft:([a-z]+)_([a-z]+)$/;
+const PAXEL = /^steveo:([a-z]+)_(paxel)$/;
 const TRIMMED = /^steveo:([a-z]+)_([a-z]+)_([a-z]+)_trim$/;
 
 /** Reads an item id as a trimmable tool, or undefined when the table cannot work on it. */
@@ -80,7 +89,7 @@ export function parseTool(typeId: string): TrimmableTool | undefined {
     const trim = findMaterial(material);
     return isTier(tier) && isTool(tool) && trim ? { tier, tool, trim } : undefined;
   }
-  const plain = VANILLA.exec(typeId);
+  const plain = VANILLA.exec(typeId) ?? PAXEL.exec(typeId);
   if (plain) {
     const [, tier = '', tool = ''] = plain;
     return isTier(tier) && isTool(tool) ? { tier, tool, trim: undefined } : undefined;
@@ -88,12 +97,16 @@ export function parseTool(typeId: string): TrimmableTool | undefined {
   return undefined;
 }
 
-/** Every item id the add-on relies on: the vanilla tools, the materials, and every trimmed tool. */
+/**
+ * Every item id the add-on relies on: the vanilla tools, the materials, and
+ * every trimmed tool. Untrimmed paxels are left out; they exist only when the
+ * paxel add-on is on too.
+ */
 export function allItemIds(): string[] {
   const ids: string[] = MATERIALS.map((m) => m.item);
   for (const tier of TIERS) {
     for (const tool of TOOLS) {
-      ids.push(vanillaId(tier, tool));
+      if (CUSTOM[tool] === undefined) ids.push(vanillaId(tier, tool));
       for (const material of MATERIALS) ids.push(trimmedId(tier, tool, material));
     }
   }
