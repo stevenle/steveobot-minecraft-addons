@@ -16,6 +16,7 @@
         "wheels": "animation.steveo_kart.wheels"
       },
       "scripts": {
+        "scale": "1.25",
         "animate": [
           "wheels"
         ]
