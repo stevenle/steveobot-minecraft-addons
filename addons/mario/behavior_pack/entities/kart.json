@@ -9,8 +9,8 @@
     "components": {
       "minecraft:type_family": { "family": ["steveo_kart", "inanimate"] },
       "minecraft:health": { "value": 6, "max": 6 },
-      "minecraft:collision_box": { "width": 1.2, "height": 0.7 },
-      "minecraft:movement": { "value": 0.4 },
+      "minecraft:collision_box": { "width": 1.5, "height": 0.875 },
+      "minecraft:movement": { "value": 0.35 },
       "minecraft:movement.basic": {},
       "minecraft:input_ground_controlled": {},
       "minecraft:rideable": {
@@ -20,7 +20,7 @@
         "family_types": ["player"],
         "interact_text": "action.interact.steveo_kart",
         "pull_in_entities": false,
-        "seats": { "position": [0, 0.35, -0.1] }
+        "seats": { "position": [0, 0.4375, -0.125] }
       },
       "minecraft:variable_max_auto_step": {
         "base_value": 1.0625,

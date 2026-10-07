@@ -147,7 +147,9 @@ Everything here has only passed `pnpm check`. Things to check first:
   commands. The rows use a `block_intersection` air-only constraint.
 - Fireball movement (the impulse-steered entity, with a teleport fallback,
   as in potato-gun).
-- The Mario Kart: driving speed (`minecraft:movement` 0.4 in
-  `entities/kart.json`; horses top out near 0.34), where the driver sits
+- The Mario Kart: driving speed (`minecraft:movement` 0.35 in
+  `entities/kart.json`, down from 0.4 after a Realm test; horses top out
+  near 0.34), its size (the model drawn at 1.25x by `scripts.scale` in
+  `entity/kart.entity.json`, with the collision box and seat scaled to match), where the driver sits
   (the seat position), which way the wheels roll, and that the item places
   it.
