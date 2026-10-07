@@ -33,11 +33,14 @@ interface Harness {
     response: { status: number; json?: unknown; body?: string },
   ) => void;
   clearProbeRoutes: () => void;
+  /** Swaps the world the stub serves; returns the previous one. */
+  setWorldArchive: (archive: Buffer) => Buffer;
   close: () => Promise<void>;
 }
 
 /** Serves a minimal Realms API plus the world archive it points at. */
-async function startRealmsStub(worldArchive: Buffer): Promise<Harness> {
+async function startRealmsStub(initialArchive: Buffer): Promise<Harness> {
+  let worldArchive = initialArchive;
   const requests: string[] = [];
   const probeRoutes = new Map<string, { status: number; json?: unknown; body?: string }>();
   let host = '';
@@ -91,6 +94,11 @@ async function startRealmsStub(worldArchive: Buffer): Promise<Harness> {
     requests,
     setProbeRoute: (methodAndUrl, response) => probeRoutes.set(methodAndUrl, response),
     clearProbeRoutes: () => probeRoutes.clear(),
+    setWorldArchive: (archive) => {
+      const previous = worldArchive;
+      worldArchive = archive;
+      return previous;
+    },
     close: () => new Promise<void>((resolve) => server.close(() => resolve())),
   };
 }
@@ -123,6 +131,23 @@ function makeWorldArchive(): Buffer {
     Buffer.from(JSON.stringify({ header: { uuid: '2bdba555-b0e4-4044-af7f-f9fe3cca6a20' } })),
   );
   return zip.toBuffer();
+}
+
+/**
+ * A world as the Realm serves it when an upload has not been saved yet: it
+ * carries paxel's behavior pack at a version older than the repo's.
+ */
+function makeStaleWorldArchive(): { archive: Buffer; paxelUuid: string } {
+  const manifest = JSON.parse(
+    fs.readFileSync(path.join(repoRoot, 'addons', 'paxel', 'behavior_pack', 'manifest.json'), 'utf8'),
+  ) as { header: { uuid: string } };
+  const paxelUuid = manifest.header.uuid;
+  const zip = new AdmZip();
+  zip.addFile('level.dat', Buffer.from('pretend level.dat'));
+  zip.addFile('levelname.txt', Buffer.from('Steveo Test Realm'));
+  zip.addFile('world_behavior_packs.json', Buffer.from(JSON.stringify([{ pack_id: paxelUuid, version: '[0,0,1]' }])));
+  zip.addFile('behavior_packs/0/manifest.json', Buffer.from(JSON.stringify({ header: { uuid: paxelUuid } })));
+  return { archive: zip.toBuffer(), paxelUuid };
 }
 
 describe('realm.ts against a stand-in Realms service', () => {
@@ -271,6 +296,60 @@ describe('realm.ts against a stand-in Realms service', () => {
     assert.match(stdout, /200/);
     assert.match(stdout, /accepted the archive/);
     assert.match(stdout, /verify the world actually changed/);
+  });
+
+  describe('when the world has an older version of an add-on left out of the run', () => {
+    let original: Buffer;
+    before(() => {
+      original = stub.setWorldArchive(makeStaleWorldArchive().archive);
+    });
+    after(() => {
+      stub.setWorldArchive(original);
+    });
+
+    const uploadRoutes = () => {
+      stub.clearProbeRoutes();
+      stub.requests.length = 0;
+      stub.setProbeRoute(`GET /archive/upload/world/99/${REALM.activeSlot}`, {
+        status: 200,
+        json: { uploadUrl: `${stub.host}/upload-sink`, token: 'up-token' },
+      });
+      stub.setProbeRoute('POST /upload-sink', { status: 200, json: { ok: true } });
+    };
+
+    it('warns but still bakes when not uploading', async () => {
+      const out = path.join(outDir, 'behind-bake.mcworld');
+      const { stdout, stderr } = await cli(['hello-world', '--realm', '99', '--out', out]);
+      const output = stdout + stderr;
+      assert.match(output, /paxel behavior: world v0\.0\.1, repo v\d+\.\d+\.\d+/);
+      assert.match(output, /hello-world paxel/, 'suggests the slug list that would be safe');
+      assert.ok(fs.existsSync(out), 'a bake without --upload is harmless, so it still runs');
+    });
+
+    it('refuses to upload and sends nothing', async () => {
+      uploadRoutes();
+      const out = path.join(outDir, 'behind-upload.mcworld');
+      await assert.rejects(cli(['hello-world', '--realm', '99', '--upload', '--yes', '--out', out]), (err: Error & { stdout: string; stderr: string }) => {
+        assert.match(err.stdout + err.stderr, /--allow-behind/);
+        return true;
+      });
+      assert.ok(!stub.requests.some((r) => r.includes('/archive/upload/') || r.includes('/upload-sink')));
+    });
+
+    it('uploads once the add-on joins the run', async () => {
+      uploadRoutes();
+      const out = path.join(outDir, 'behind-included.mcworld');
+      const { stdout, stderr } = await cli(['hello-world', 'paxel', '--realm', '99', '--upload', '--yes', '--out', out]);
+      assert.doesNotMatch(stdout + stderr, /older versions/);
+      assert.ok(stub.requests.includes('POST /upload-sink'));
+    });
+
+    it('uploads anyway with --allow-behind', async () => {
+      uploadRoutes();
+      const out = path.join(outDir, 'behind-allowed.mcworld');
+      await cli(['hello-world', '--realm', '99', '--upload', '--yes', '--allow-behind', '--out', out]);
+      assert.ok(stub.requests.includes('POST /upload-sink'));
+    });
   });
 
   it('flags a 2xx upload whose event stream reports the swap failed', async () => {
