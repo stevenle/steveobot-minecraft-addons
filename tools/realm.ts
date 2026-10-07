@@ -45,7 +45,7 @@ import { color, fail, log } from './lib/log.ts';
 import { realmDir, rel } from './lib/paths.ts';
 import { authorizeRealms, DEFAULT_CACHE_DIR } from './lib/realms/auth.ts';
 import { RealmsApiError, RealmsClient } from './lib/realms/client.ts';
-import type { ProbeResult, RealmSummary } from './lib/realms/types.ts';
+import type { ProbeResult, RealmSummary, UploadResult } from './lib/realms/types.ts';
 import {
   findWorldRoot,
   packFolder,
@@ -785,7 +785,7 @@ async function uploadWorldFile(args: ParsedArgs, selector: string, file: string)
   let closed = false;
   let failure: unknown;
   let uploadUrl = '';
-  let result: ProbeResult | undefined;
+  let result: UploadResult | undefined;
 
   try {
     if (close) {
@@ -821,7 +821,12 @@ async function uploadWorldFile(args: ParsedArgs, selector: string, file: string)
   log.info('');
   log.info(`  POST ${uploadUrl}  ->  ${result.status} ${result.statusText}`);
   if (result.contentType !== undefined) log.info(`    content-type: ${result.contentType}`);
-  if (result.body) {
+  if (result.events.length > 0) {
+    // The progress events are noise; the rest are the verdict.
+    const progress = result.events.filter((e) => e === 'VALIDATION_PROGRESS').length;
+    const summary = result.events.filter((e) => e !== 'VALIDATION_PROGRESS');
+    log.info(`    events: ${summary.join(', ')}${progress > 0 ? color.dim(` (+${progress} VALIDATION_PROGRESS)`) : ''}`);
+  } else if (result.body) {
     log.info('    body:');
     for (const line of result.body.split('\n')) log.info(`      ${line}`);
   }
@@ -830,11 +835,15 @@ async function uploadWorldFile(args: ParsedArgs, selector: string, file: string)
   // A 201 only means the archive arrived; the event stream carries the real
   // outcome. ARCHIVING_FAILED has been observed live (2026-09-01) when the
   // uploaded world held the same pack uuid under two folders — the world is
-  // NOT swapped in that case.
-  const streamFailed = /event:(VALIDATION|ARCHIVING)_FAILED/.test(result.body ?? '');
+  // NOT swapped in that case. Judge from the events parsed out of the full
+  // body, never from the display-truncated `body`.
+  const streamFailed = result.events.some((e) => /^(VALIDATION|ARCHIVING)_FAILED$/.test(e));
+  const swapped = result.events.includes('ARCHIVING_SUCCEEDED');
 
   if (result.status >= 200 && result.status < 300 && !streamFailed) {
     log.done('The upload host accepted the archive.');
+    if (swapped) log.done('ARCHIVING_SUCCEEDED: the Realm swapped the world in.');
+    else log.warn('The event stream never reported ARCHIVING_SUCCEEDED, so the swap is unconfirmed.');
     log.info('Rejoin the Realm and verify the world actually changed and the packs are');
     log.info('active. If the world is unchanged, an uncaptured follow-up step exists —');
     log.info('send this output back to Claude Code.');

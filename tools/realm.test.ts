@@ -373,6 +373,50 @@ describe('realm.ts against a stand-in Realms service', () => {
     assert.match(stderr, /world swap FAILED/);
   });
 
+  // The real stream sends dozens of VALIDATION_PROGRESS events first, which
+  // push the verdict past the 2000-character display cut of the body.
+  const longStream = (verdict: string) =>
+    'event:VALIDATION_STARTED\ndata:{}\n\n' +
+    'event:VALIDATION_PROGRESS\ndata:{"timestamp":1791339117,"progress":50.0}\n\n'.repeat(60) +
+    `event:VALIDATION_SUCCEEDED\ndata:{}\n\nevent:ARCHIVING_STARTED\ndata:{}\n\nevent:${verdict}\ndata:{}\n\n`;
+
+  for (const [verdict, expectSwapped] of [['ARCHIVING_SUCCEEDED', true], ['ARCHIVING_FAILED', false]] as const) {
+    it(`reads ${verdict} from a stream longer than the display cut`, async () => {
+      stub.clearProbeRoutes();
+      stub.requests.length = 0;
+      stub.setProbeRoute(`GET /archive/upload/world/99/${REALM.activeSlot}`, {
+        status: 200,
+        json: { uploadUrl: `${stub.host}/upload-sink`, token: 'up-token' },
+      });
+      stub.setProbeRoute('POST /upload-sink', { status: 201, body: longStream(verdict) });
+
+      const out = path.join(outDir, `long-${verdict}.mcworld`);
+      const { stdout, stderr } = await cli(['hello-world', '--realm', '99', '--upload', '--yes', '--out', out]);
+      assert.match(stdout, new RegExp(`events: .*${verdict}`));
+      assert.match(stdout, /\+60 VALIDATION_PROGRESS/);
+      if (expectSwapped) {
+        assert.match(stdout, /the Realm swapped the world in/);
+      } else {
+        assert.doesNotMatch(stdout, /accepted the archive\./);
+        assert.match(stderr, /world swap FAILED/);
+      }
+    });
+  }
+
+  it('says the swap is unconfirmed when the stream has no ARCHIVING verdict', async () => {
+    stub.clearProbeRoutes();
+    stub.requests.length = 0;
+    stub.setProbeRoute(`GET /archive/upload/world/99/${REALM.activeSlot}`, {
+      status: 200,
+      json: { uploadUrl: `${stub.host}/upload-sink`, token: 'up-token' },
+    });
+    stub.setProbeRoute('POST /upload-sink', { status: 201, body: 'event:VALIDATION_SUCCEEDED\ndata:{}\n\n' });
+
+    const out = path.join(outDir, 'no-verdict.mcworld');
+    const { stdout, stderr } = await cli(['hello-world', '--realm', '99', '--upload', '--yes', '--out', out]);
+    assert.match(stdout + stderr, /swap is unconfirmed/);
+  });
+
   it('reports an upload rejection verbatim and does not retry', async () => {
     stub.clearProbeRoutes();
     stub.requests.length = 0;

@@ -14,7 +14,7 @@ import fs from 'node:fs';
 import { pipeline } from 'node:stream/promises';
 import { Readable } from 'node:stream';
 
-import type { ProbeResult, RealmSummary, WorldDownload, WorldUploadInfo } from './types.ts';
+import type { ProbeResult, RealmSummary, UploadResult, WorldDownload, WorldUploadInfo } from './types.ts';
 
 export const REALMS_HOST = 'https://pocket.realms.minecraft.net';
 
@@ -197,7 +197,7 @@ export class RealmsClient {
    * not throw on a non-2xx: it reports whatever came back and leaves judgement
    * to the caller, exactly like `probe`.
    */
-  async uploadWorldArchive(info: WorldUploadInfo, archive: Uint8Array): Promise<ProbeResult> {
+  async uploadWorldArchive(info: WorldUploadInfo, archive: Uint8Array): Promise<UploadResult> {
     const response = await this.#fetch(info.uploadUrl, {
       method: 'POST',
       headers: {
@@ -216,6 +216,7 @@ export class RealmsClient {
       allow: response.headers.get('allow') ?? undefined,
       body: text.length > 2000 ? `${text.slice(0, 2000)}... (truncated)` : text,
       networkError: undefined,
+      events: [...text.matchAll(/^event:\s*(\S+)/gm)].map((m) => m[1] ?? ''),
     };
   }
 
