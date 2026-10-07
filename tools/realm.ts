@@ -18,7 +18,7 @@
  * Usage:
  *   node tools/realm.ts <slug...> --world <path> [--out <file>] [--in-place]
  *   node tools/realm.ts <slug...> --realm <id|name> [--out <file>]
- *   node tools/realm.ts <slug...> --realm <id|name> --upload [--close] [--yes]
+ *   node tools/realm.ts <slug...> --realm <id|name> --upload [--close] [--yes] [--allow-behind]
  *   node tools/realm.ts <slug...> --realm <id|name> --remove <uuid[,uuid...]> [--upload ...]
  *   node tools/realm.ts --world <path> --list
  *   node tools/realm.ts --login
@@ -39,7 +39,7 @@ import AdmZip from 'adm-zip';
 
 import { boolFlag, parseArgs, selectedSlugs, stringFlag, type ParsedArgs } from './lib/args.ts';
 import { buildAddon } from './build.ts';
-import { loadAddons, versionString, type Addon, type Pack } from './lib/addons.ts';
+import { loadAddons, versionString, type Addon, type Pack, type PackKind } from './lib/addons.ts';
 import { copyDir, ensureDir, exists, rmrf } from './lib/fsx.ts';
 import { color, fail, log } from './lib/log.ts';
 import { realmDir, rel } from './lib/paths.ts';
@@ -150,6 +150,50 @@ function applyPack(worldRoot: string, pack: Pack): { replaced: boolean } {
   writePackList(worldRoot, pack.kind, entries);
 
   return { replaced };
+}
+
+/** A repo pack that the world carries at an older version than the repo has. */
+interface BehindPack {
+  slug: string;
+  kind: PackKind;
+  world: number[];
+  repo: number[];
+}
+
+/** Orders two version triples; negative when `a` is older. */
+function compareVersions(a: readonly number[], b: readonly number[]): number {
+  for (let i = 0; i < Math.max(a.length, b.length); i++) {
+    const diff = (a[i] ?? 0) - (b[i] ?? 0);
+    if (diff !== 0) return diff;
+  }
+  return 0;
+}
+
+/**
+ * Finds repo add-ons left out of this run that the world has at an older
+ * version than the repo. A world downloaded before the Realm saved the last
+ * upload looks exactly like this, and uploading it would revert that upload.
+ */
+function packsBehind(worldRoot: string, applying: readonly Addon[]): BehindPack[] {
+  const skip = new Set(applying.map((a) => a.slug));
+  const lists: Record<PackKind, WorldPackEntry[]> = {
+    behavior: readPackList(worldRoot, 'behavior'),
+    resource: readPackList(worldRoot, 'resource'),
+  };
+  const behind: BehindPack[] = [];
+  for (const addon of loadAddons()) {
+    if (skip.has(addon.slug)) continue;
+    for (const pack of addon.packs) {
+      const uuid = pack.manifest.header?.uuid?.toLowerCase();
+      const repo = pack.manifest.header?.version;
+      if (uuid === undefined || !Array.isArray(repo)) continue;
+      const entry = lists[pack.kind].find((e) => e.pack_id.toLowerCase() === uuid);
+      if (entry !== undefined && compareVersions(entry.version, repo) < 0) {
+        behind.push({ slug: addon.slug, kind: pack.kind, world: entry.version, repo });
+      }
+    }
+  }
+  return behind;
 }
 
 /**
@@ -924,6 +968,21 @@ async function main(): Promise<void> {
   const worldName = readWorldName(staged.root);
 
   try {
+    const behind = packsBehind(staged.root, addons);
+    if (behind.length > 0) {
+      const slugs = [...new Set(behind.map((b) => b.slug))];
+      log.warn(`${color.bold(worldName)} has older versions of add-ons this run leaves out:`);
+      for (const b of behind) {
+        log.warn(`  ${b.slug} ${b.kind}: world v${versionString(b.world)}, repo v${versionString(b.repo)}`);
+      }
+      log.warn('A Realm serves the last world its server saved, so an upload nobody has joined');
+      log.warn('since is missing from this download. Uploading it would revert that upload.');
+      log.warn(`Add them to the run: ${[...addons.map((a) => a.slug), ...slugs].join(' ')}`);
+      if (boolFlag(args, 'upload') && !boolFlag(args, 'allow-behind')) {
+        fail('Not uploading. Add those slugs, or pass --allow-behind if the older versions are intended.');
+      }
+    }
+
     if (removals.length > 0) {
       log.step(`Removing ${removals.length} pack(s) from ${color.bold(worldName)}`);
       for (const uuid of removals) {
