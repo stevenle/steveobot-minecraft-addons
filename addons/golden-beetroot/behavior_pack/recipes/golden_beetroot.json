@@ -1,0 +1,18 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "steveo:golden_beetroot_recipe"
+    },
+    "tags": ["crafting_table"],
+    "pattern": ["NNN", "NBN", "NNN"],
+    "key": {
+      "N": { "item": "minecraft:gold_nugget" },
+      "B": { "item": "minecraft:beetroot" }
+    },
+    "unlock": [{ "item": "minecraft:beetroot" }],
+    "result": {
+      "item": "steveo:golden_beetroot"
+    }
+  }
+}
