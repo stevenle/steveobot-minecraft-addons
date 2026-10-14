@@ -5,9 +5,9 @@
       "identifier": "steveo:golden_beetroot_recipe"
     },
     "tags": ["crafting_table"],
-    "pattern": ["NNN", "NBN", "NNN"],
+    "pattern": ["GGG", "GBG", "GGG"],
     "key": {
-      "N": { "item": "minecraft:gold_nugget" },
+      "G": { "item": "minecraft:gold_ingot" },
       "B": { "item": "minecraft:beetroot" }
     },
     "unlock": [{ "item": "minecraft:beetroot" }],

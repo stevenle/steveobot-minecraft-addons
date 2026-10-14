@@ -5,15 +5,15 @@ with golden-carrot-grade saturation.
 
 ## Crafting
 
-Eight gold nuggets around a beetroot, on a crafting table:
+Eight gold ingots around a beetroot, on a crafting table:
 
 ```
-[ N ] [ N ] [ N ]
-[ N ] [ B ] [ N ]
-[ N ] [ N ] [ N ]
+[ G ] [ G ] [ G ]
+[ G ] [ B ] [ G ]
+[ G ] [ G ] [ G ]
 ```
 
-`N` is a gold nugget and `B` is a beetroot. The recipe unlocks in the recipe
+`G` is a gold ingot and `B` is a beetroot. The recipe unlocks in the recipe
 book once you have picked up a beetroot.
 
 ## Checking it is installed

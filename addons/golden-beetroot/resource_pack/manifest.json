@@ -2,16 +2,16 @@
   "format_version": 2,
   "header": {
     "name": "Golden Beetroot RP",
-    "description": "Craft a Golden Beetroot from eight gold nuggets around a beetroot. Fills 7.5 hunger (15 points).",
+    "description": "Craft a Golden Beetroot from eight gold ingots around a beetroot. Fills 7.5 hunger (15 points).",
     "uuid": "1e619bd0-fb45-45ee-bb57-72d4a39c5e3d",
-    "version": [1, 0, 0],
+    "version": [1, 0, 1],
     "min_engine_version": [1, 26, 40]
   },
   "modules": [
     {
       "type": "resources",
       "uuid": "d13dec1c-aefc-4d2c-a4a6-8cca266b7160",
-      "version": [1, 0, 0]
+      "version": [1, 0, 1]
     }
   ],
   "metadata": {
