@@ -99,6 +99,14 @@
         }
       },
       "steveo:sick": {
+        "minecraft:damage_sensor": {
+          "triggers": [
+            {
+              "cause": "all",
+              "deals_damage": "yes"
+            }
+          ]
+        },
         "minecraft:mark_variant": {
           "value": 1
         },
@@ -183,6 +191,18 @@
         "value": 8.0,
         "range": 16.0,
         "event_name": "ambient"
+      },
+      "minecraft:damage_sensor": {
+        "triggers": [
+          {
+            "cause": "void",
+            "deals_damage": "yes"
+          },
+          {
+            "cause": "all",
+            "deals_damage": "no"
+          }
+        ]
       },
       "minecraft:hurt_on_condition": {
         "damage_conditions": [

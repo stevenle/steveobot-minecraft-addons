@@ -54,7 +54,13 @@ pufferfish make any spaniel sick. It slows down, droops, glows green with
 poison, and dies 30 seconds later. Good food cannot cure it. Don't.
 
 **It is afraid of monsters** and runs from anything hostile within eight
-blocks, and it panics when hurt. It cannot fight back.
+blocks. It cannot fight back.
+
+**Nothing can hurt it.** Mobs, players, arrows, fire, lava, falling,
+drowning, explosions, and lightning all do no damage. The only things that
+can still kill it are bad food (a sick spaniel loses its immunity, so it
+still dies on schedule) and falling into the void, so a dog that drops out
+of the world does not fall forever.
 
 ## The crown
 
