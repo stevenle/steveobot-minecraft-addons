@@ -73,6 +73,7 @@ every tier, change a trim, and remove one.
 /scriptevent steveo:tools_trim give netherite sword lapis # any tier, tool, and material (or "none")
 /scriptevent steveo:tools_trim held                       # the held tool's trim, durability, and enchantment count
 /scriptevent steveo:tools_trim check                      # confirm every item id exists in this game version
+/scriptevent steveo:tools_trim probe                      # which items (slot probes included) take the held tool's enchantments
 ```
 
 ## Layout

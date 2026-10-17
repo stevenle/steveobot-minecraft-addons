@@ -514,6 +514,35 @@ for (const tier of TIERS) {
     }
   }
 }
+// Enchant-slot probes for `/scriptevent steveo:tools_trim probe`: bare
+// sword-like items, one per candidate slot, so the game itself reports which
+// slot takes every sword enchantment. The docs and Fire Aspect disagree (see
+// the sword slot comment above). Delete these once the slot is settled.
+const PROBES = [
+  { name: 'sword', slot: 'sword' },
+  { name: 'melee_spear', slot: 'melee_spear' },
+  { name: 'spear', slot: 'spear' },
+  { name: 'all', slot: 'all' },
+  // Undocumented: the script API reports a list of slots, so try one here.
+  // An invalid item fails to load and the probe reports it as missing.
+  { name: 'sword_melee_spear', slot: ['sword', 'melee_spear'] },
+  { name: 'sword_new_format', slot: 'sword', format: '1.26.40' },
+];
+for (const probe of PROBES) {
+  write(path.join(dirs.items, `probe_${probe.name}.json`), {
+    format_version: probe.format ?? '1.21.40',
+    'minecraft:item': {
+      description: { identifier: `steveo:tools_trim_probe_${probe.name}`, menu_category: { category: 'none' } },
+      components: {
+        'minecraft:max_stack_size': 1,
+        'minecraft:durability': { max_durability: 100 },
+        'minecraft:enchantable': { slot: probe.slot, value: 10 },
+        'minecraft:tags': { tags: ['minecraft:is_sword'] },
+      },
+    },
+  });
+}
+
 write(path.join(dirs.recipes, 'better_smithing_table.json'), tableRecipe);
 write(path.join(dirs.blocks, 'better_smithing_table.json'), tableBlock);
 

@@ -28,7 +28,9 @@ tools_trim.debug.held=Holding %s: tier %s, tool %s, trim %s, durability %s of %s
 tools_trim.debug.held.none=You are not holding a tool the table can trim.
 tools_trim.debug.check=Checked %s item ids: %s missing.
 tools_trim.debug.missing=Missing: %s
-tools_trim.debug.help=Usage: /scriptevent steveo:tools_trim <table|give [tier] [tool] [material]|held|check>
+tools_trim.debug.probe=%s (slots %s) takes: %s; refuses: %s
+tools_trim.debug.probe.none=Hold an enchanted tool to probe which items can carry its enchantments.
+tools_trim.debug.help=Usage: /scriptevent steveo:tools_trim <table|give [tier] [tool] [material]|held|check|probe>
 
 ## BEGIN GENERATED: trimmed tool names (assets/generate.mjs)
 item.steveo:wooden_sword_quartz_trim.name=Wooden Sword
