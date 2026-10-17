@@ -48,9 +48,12 @@ They also:
 - Strip logs (axe), make paths (shovel), and till farmland (hoe). A trimmed
   paxel strips and makes paths.
 
-Trimmed swords enchant in the `melee_spear` slot rather than `sword`: since
-spears were added, Looting only goes on items in that slot, and a `sword`-slot
-trimmed sword refused to take it from the vanilla sword.
+Trimmed swords enchant in the `all` slot. A vanilla sword belongs to more than
+one enchantment slot, but a custom item gets exactly one: a `sword`-slot
+trimmed sword refused Looting (which moved to `melee_spear` when spears were
+added), and a `melee_spear` one refused Fire Aspect. The catch is that an
+anvil or enchanting table can also put non-sword enchantments, such as
+Efficiency or Protection, on a trimmed sword.
 
 ## Why a separate table
 
@@ -70,6 +73,7 @@ every tier, change a trim, and remove one.
 /scriptevent steveo:tools_trim give netherite sword lapis # any tier, tool, and material (or "none")
 /scriptevent steveo:tools_trim held                       # the held tool's trim, durability, and enchantment count
 /scriptevent steveo:tools_trim check                      # confirm every item id exists in this game version
+/scriptevent steveo:tools_trim probe                      # which items (slot probes included) take the held tool's enchantments
 ```
 
 ## Layout

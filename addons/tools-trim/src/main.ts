@@ -80,7 +80,10 @@ function say(player: Player, key: string, ...args: (string | RawMessage)[]): voi
 
 function nameOf(typeId: string): RawMessage {
   try {
-    return { translate: new ItemStack(typeId).localizationKey };
+    // Vanilla keys end in ".name"; custom items report theirs without it,
+    // while en_US.lang (like vanilla) keys the name with it.
+    const key = new ItemStack(typeId).localizationKey;
+    return { translate: key.endsWith('.name') ? key : `${key}.name` };
   } catch {
     return { text: typeId };
   }
@@ -411,7 +414,7 @@ world.afterEvents.playerInteractWithBlock.subscribe((event) => {
   wear(event.player, event.itemStack, 1);
 });
 
-// ---------- debug: /scriptevent steveo:tools_trim <table|give|held|check> ----------
+// ---------- debug: /scriptevent steveo:tools_trim <table|give|held|check|probe> ----------
 
 function debugTable(player: Player): void {
   let above: Block | undefined;
@@ -484,6 +487,75 @@ function debugCheck(player: Player): void {
   if (missing.length > 0) say(player, 'tools_trim.debug.missing', missing.join(', '));
 }
 
+/**
+ * Probe items from assets/generate.mjs: a trimmed sword whose digger holds
+ * only the fractional speed, and one with only the plain block-name entries.
+ */
+const PROBES = ['fractional', 'block_names'];
+/** Paxels name blocks the same way, so check the paxel add-on's own item too. */
+const PROBE_CONTROL = 'steveo:netherite_paxel';
+
+/**
+ * For each candidate item, reports which of the held tool's enchantments a
+ * fresh copy would take, or "slots none" when the item has no enchantable
+ * component at all. The held tool's own type is the control. A refusal
+ * marked "!" means addEnchantment worked anyway.
+ */
+function debugProbe(player: Player): void {
+  const item = heldItem(player);
+  const enchantments = item?.getComponent(ItemComponentTypes.Enchantable)?.getEnchantments() ?? [];
+  if (item === undefined || enchantments.length === 0) {
+    say(player, 'tools_trim.debug.probe.none');
+    return;
+  }
+  const tool = parseTool(item.typeId);
+  const targets = [item.typeId];
+  if (tool !== undefined) targets.push(idOf({ ...tool, trim: tool.trim ?? MATERIALS[0] }));
+  targets.push(PROBE_CONTROL, ...PROBES.map((name) => `steveo:tools_trim_probe_${name}`));
+
+  for (const id of targets) {
+    if (ItemTypes.get(id) === undefined) {
+      say(player, 'tools_trim.debug.missing', id);
+      continue;
+    }
+    const enchantable = new ItemStack(id).getComponent(ItemComponentTypes.Enchantable);
+    if (enchantable === undefined) {
+      say(player, 'tools_trim.debug.probe', id, 'none', '-', '-');
+      continue;
+    }
+    let slots = '?';
+    try {
+      slots = enchantable.slots.join('+');
+    } catch {
+      // Reported as "?".
+    }
+    const takes: string[] = [];
+    const refuses: string[] = [];
+    for (const enchantment of enchantments) {
+      let fits = false;
+      try {
+        fits = enchantable.canAddEnchantment(enchantment);
+      } catch {
+        fits = false;
+      }
+      if (fits) {
+        takes.push(enchantment.type.id);
+        continue;
+      }
+      const fresh = new ItemStack(id).getComponent(ItemComponentTypes.Enchantable);
+      let added = false;
+      try {
+        fresh?.addEnchantment(enchantment);
+        added = fresh?.hasEnchantment(enchantment.type) ?? false;
+      } catch {
+        added = false;
+      }
+      refuses.push(added ? `${enchantment.type.id}!` : enchantment.type.id);
+    }
+    say(player, 'tools_trim.debug.probe', id, slots, takes.join(', ') || '-', refuses.join(', ') || '-');
+  }
+}
+
 system.afterEvents.scriptEventReceive.subscribe(
   (event) => {
     if (event.id !== 'steveo:tools_trim') return;
@@ -502,6 +574,9 @@ system.afterEvents.scriptEventReceive.subscribe(
         break;
       case 'check':
         debugCheck(player);
+        break;
+      case 'probe':
+        debugProbe(player);
         break;
       default:
         say(player, 'tools_trim.debug.help');

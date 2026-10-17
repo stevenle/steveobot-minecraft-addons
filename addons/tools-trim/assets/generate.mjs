@@ -66,13 +66,14 @@ const PICK_REQUIREMENTS = [
 // The grip is wound, not painted: every third diagonal across the handle is
 // left bare.
 const GRIP = { rects: [[3, 10, 7, 12]], lo: 1, hi: 6, skip: (x, y) => (y - x) % 3 === 0 };
-// Swords enchant in the melee_spear slot, not sword. Since spears arrived,
-// Looting (and likely Knockback and Fire Aspect) only go on items in that
-// slot, so a "sword" slot trimmed sword refused Looting from its vanilla twin.
-// Every Bedrock sword enchantment is also a spear one, so nothing is lost.
+// Swords enchant in the "all" slot. A vanilla sword sits in more than one
+// slot, but a custom item gets exactly one: "sword" refused Looting (which
+// moved to melee_spear when spears arrived), and "melee_spear" refused Fire
+// Aspect. "all" accepts every sword enchantment, at the cost of letting an
+// anvil or enchanting table put non-sword ones on a trimmed sword too.
 const TOOLS = [
   {
-    id: 'sword', name: 'Sword', slot: 'melee_spear', attackOffset: 0, tags: ['minecraft:is_sword'],
+    id: 'sword', name: 'Sword', slot: 'all', attackOffset: 0, tags: ['minecraft:is_sword'],
     regions: [
       { points: [[13, 2], [12, 3], [11, 4], [10, 5], [9, 6], [8, 7]], lo: 1, hi: 1 },
       { rects: [[0, 13, 1, 15], [2, 14, 2, 15]], lo: 1, hi: 6 },
@@ -342,7 +343,10 @@ function destroySpeeds(tier, tool) {
       return [
         { block: 'minecraft:web', speed: 15 },
         { block: 'minecraft:bamboo', speed: 20 },
-        { block: { tags: anyTag(['minecraft:is_sword_item_destructible']) }, speed: 1.5 },
+        // Vanilla's sword speed here is 1.5, but speed must be a whole number:
+        // with 1.5 the game dropped the digger and took minecraft:enchantable
+        // down with it, so trimmed swords could not carry any enchantment.
+        { block: { tags: anyTag(['minecraft:is_sword_item_destructible']) }, speed: 2 },
       ];
     default:
       throw new Error(`no digger for ${tool.id}`);
@@ -513,6 +517,25 @@ for (const tier of TIERS) {
     }
   }
 }
+// Enchantable probes for `/scriptevent steveo:tools_trim probe`. Dropping the
+// sword's digger brought minecraft:enchantable back; these split the digger
+// into its two suspects, the fractional speed and the plain block-name
+// entries, so the game confirms which one broke it. Delete once settled.
+{
+  const sample = itemJson(TIERS.at(-1), TOOLS[0], MATERIALS[0]);
+  const digger = sample['minecraft:item'].components['minecraft:digger'];
+  const variants = {
+    fractional: [{ block: { tags: anyTag(['minecraft:is_sword_item_destructible']) }, speed: 1.5 }],
+    block_names: digger.destroy_speeds.filter((entry) => typeof entry.block === 'string'),
+  };
+  for (const [name, speeds] of Object.entries(variants)) {
+    const item = structuredClone(sample);
+    item['minecraft:item'].description.identifier = `steveo:tools_trim_probe_${name}`;
+    item['minecraft:item'].components['minecraft:digger'].destroy_speeds = speeds;
+    write(path.join(dirs.items, `probe_${name}.json`), item);
+  }
+}
+
 write(path.join(dirs.recipes, 'better_smithing_table.json'), tableRecipe);
 write(path.join(dirs.blocks, 'better_smithing_table.json'), tableBlock);
 
