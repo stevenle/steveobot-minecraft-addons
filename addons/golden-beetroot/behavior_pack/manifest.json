@@ -1,0 +1,38 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Golden Beetroot BP",
+    "description": "Craft a Golden Beetroot from eight gold ingots around a beetroot. Fills 7.5 hunger (15 points).",
+    "uuid": "444db54e-9efd-417d-8c3b-e2a78d74ab69",
+    "version": [1, 0, 1],
+    "min_engine_version": [1, 26, 40]
+  },
+  "modules": [
+    {
+      "type": "data",
+      "uuid": "10426300-8b63-4e43-b8eb-1eec5e59135a",
+      "version": [1, 0, 1]
+    },
+    {
+      "type": "script",
+      "language": "javascript",
+      "entry": "scripts/main.js",
+      "uuid": "bf0d1a28-1396-4a73-a5b2-cb40efadf581",
+      "version": [1, 0, 1]
+    }
+  ],
+  "dependencies": [
+    {
+      "uuid": "1e619bd0-fb45-45ee-bb57-72d4a39c5e3d",
+      "version": [1, 0, 1]
+    },
+    {
+      "module_name": "@minecraft/server",
+      "version": "2.9.0"
+    }
+  ],
+  "metadata": {
+    "authors": ["Steven Le"],
+    "license": "MIT"
+  }
+}

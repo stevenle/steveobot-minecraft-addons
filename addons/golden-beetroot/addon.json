@@ -1,0 +1,5 @@
+{
+  "$schema": "../../tools/schemas/addon.schema.json",
+  "name": "Golden Beetroot",
+  "description": "Craft a Golden Beetroot from eight gold ingots around a beetroot. Fills 7.5 hunger (15 points)."
+}

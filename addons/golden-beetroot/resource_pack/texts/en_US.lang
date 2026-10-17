@@ -1,0 +1,8 @@
+## Strings for the Golden Beetroot add-on.
+## Client-side translations live in the resource pack; the behavior pack
+## references them by key with RawMessage { translate: ... }.
+
+item.steveo:golden_beetroot.name=Golden Beetroot
+
+## Debug (/scriptevent steveo:beetroot)
+golden_beetroot.debug.given=§7[Golden Beetroot]§r Loaded. A Golden Beetroot has been placed in your inventory. It fills 7.5 hunger.
