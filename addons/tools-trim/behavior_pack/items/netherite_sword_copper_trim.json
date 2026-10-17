@@ -62,7 +62,7 @@
             "block": {
               "tags": "query.any_tag('minecraft:is_sword_item_destructible')"
             },
-            "speed": 1.5
+            "speed": 2
           }
         ]
       }

@@ -2,7 +2,7 @@
   "format_version": "1.21.40",
   "minecraft:item": {
     "description": {
-      "identifier": "steveo:tools_trim_probe_no_digger",
+      "identifier": "steveo:tools_trim_probe_fractional",
       "menu_category": {
         "category": "none"
       }
@@ -45,6 +45,17 @@
           "minecraft:is_sword",
           "minecraft:netherite_tier",
           "steveo:trimmed_tool"
+        ]
+      },
+      "minecraft:digger": {
+        "use_efficiency": true,
+        "destroy_speeds": [
+          {
+            "block": {
+              "tags": "query.any_tag('minecraft:is_sword_item_destructible')"
+            },
+            "speed": 1.5
+          }
         ]
       }
     }

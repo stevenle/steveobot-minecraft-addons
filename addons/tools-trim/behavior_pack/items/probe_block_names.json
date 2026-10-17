@@ -2,7 +2,7 @@
   "format_version": "1.21.40",
   "minecraft:item": {
     "description": {
-      "identifier": "steveo:tools_trim_probe_no_can_destroy_in_creative",
+      "identifier": "steveo:tools_trim_probe_block_names",
       "menu_category": {
         "category": "none"
       }
@@ -14,6 +14,7 @@
       },
       "minecraft:max_stack_size": 1,
       "minecraft:hand_equipped": true,
+      "minecraft:can_destroy_in_creative": false,
       "minecraft:damage": 8,
       "minecraft:durability": {
         "max_durability": 2031
@@ -56,12 +57,6 @@
           {
             "block": "minecraft:bamboo",
             "speed": 20
-          },
-          {
-            "block": {
-              "tags": "query.any_tag('minecraft:is_sword_item_destructible')"
-            },
-            "speed": 1.5
           }
         ]
       }

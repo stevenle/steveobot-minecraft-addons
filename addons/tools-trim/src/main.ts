@@ -488,24 +488,12 @@ function debugCheck(player: Player): void {
 }
 
 /**
- * Probe items from assets/generate.mjs: a copy of one trimmed sword, then the
- * same copy minus one component each.
+ * Probe items from assets/generate.mjs: a trimmed sword whose digger holds
+ * only the fractional speed, and one with only the plain block-name entries.
  */
-const PROBES = [
-  'full',
-  'no_icon',
-  'no_display_name',
-  'no_max_stack_size',
-  'no_hand_equipped',
-  'no_can_destroy_in_creative',
-  'no_damage',
-  'no_durability',
-  'no_repairable',
-  'no_tags',
-  'no_digger',
-];
-/** A trimmed non-sword, to show whether the other tools lose the component too. */
-const PROBE_CONTROL = 'steveo:netherite_pickaxe_quartz_trim';
+const PROBES = ['fractional', 'block_names'];
+/** Paxels name blocks the same way, so check the paxel add-on's own item too. */
+const PROBE_CONTROL = 'steveo:netherite_paxel';
 
 /**
  * For each candidate item, reports which of the held tool's enchantments a

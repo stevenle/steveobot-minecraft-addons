@@ -343,7 +343,10 @@ function destroySpeeds(tier, tool) {
       return [
         { block: 'minecraft:web', speed: 15 },
         { block: 'minecraft:bamboo', speed: 20 },
-        { block: { tags: anyTag(['minecraft:is_sword_item_destructible']) }, speed: 1.5 },
+        // Vanilla's sword speed here is 1.5, but speed must be a whole number:
+        // with 1.5 the game dropped the digger and took minecraft:enchantable
+        // down with it, so trimmed swords could not carry any enchantment.
+        { block: { tags: anyTag(['minecraft:is_sword_item_destructible']) }, speed: 2 },
       ];
     default:
       throw new Error(`no digger for ${tool.id}`);
@@ -514,19 +517,21 @@ for (const tier of TIERS) {
     }
   }
 }
-// Enchantable probes for `/scriptevent steveo:tools_trim probe`. A bare item
-// with any sword slot took Fire Aspect in-game, but the real trimmed swords
-// came back with no enchantable component at all. These copy one trimmed
-// sword exactly ("full"), then drop one other component each, so the game
-// shows which one knocks out minecraft:enchantable. Delete once settled.
+// Enchantable probes for `/scriptevent steveo:tools_trim probe`. Dropping the
+// sword's digger brought minecraft:enchantable back; these split the digger
+// into its two suspects, the fractional speed and the plain block-name
+// entries, so the game confirms which one broke it. Delete once settled.
 {
   const sample = itemJson(TIERS.at(-1), TOOLS[0], MATERIALS[0]);
-  const others = Object.keys(sample['minecraft:item'].components).filter((key) => key !== 'minecraft:enchantable');
-  for (const drop of [undefined, ...others]) {
-    const name = drop === undefined ? 'full' : `no_${drop.replace('minecraft:', '')}`;
+  const digger = sample['minecraft:item'].components['minecraft:digger'];
+  const variants = {
+    fractional: [{ block: { tags: anyTag(['minecraft:is_sword_item_destructible']) }, speed: 1.5 }],
+    block_names: digger.destroy_speeds.filter((entry) => typeof entry.block === 'string'),
+  };
+  for (const [name, speeds] of Object.entries(variants)) {
     const item = structuredClone(sample);
     item['minecraft:item'].description.identifier = `steveo:tools_trim_probe_${name}`;
-    if (drop !== undefined) delete item['minecraft:item'].components[drop];
+    item['minecraft:item'].components['minecraft:digger'].destroy_speeds = speeds;
     write(path.join(dirs.items, `probe_${name}.json`), item);
   }
 }
