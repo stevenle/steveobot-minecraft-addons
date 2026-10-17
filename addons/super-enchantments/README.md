@@ -1,6 +1,6 @@
 # Super Enchantments
 
-Every enchantment goes up to level 20, six new enchantments join the
+Every enchantment goes up to level 20, seven new enchantments join the
 list, and the place to get them is the Super Enchantment Fountain at the
 top of an Enchantment Tower.
 
@@ -117,6 +117,17 @@ vanilla copy in `assets/vanilla/enderman.json` is from Mojang's
 `bedrock-samples` v1.26.50.4; when the game updates, refresh that file and
 rerun the generator.
 
+**Lightning Strike** (swords and maces, including trimmed swords from the
+Tools Trim add-on): each melee hit has a chance to call a lightning bolt
+down on the mob. The strike adds 4 damage plus 1 per level to the hit, and
+the bolt then deals its own vanilla damage and sets the mob alight. Level I
+is a 12% chance; each level adds 2%, so level XX strikes half the time and
+adds 24 damage. You are immune to your own bolt's lightning and fire for
+two seconds, but other players and pets standing next to the target are
+not. It is real lightning, like Channeling: it can start fires on the
+ground, charge creepers, and turn pigs and villagers into zombified piglins
+and witches.
+
 ## Debug commands
 
 Chat is the only console on a Realm, so the add-on answers to a script event:
@@ -131,6 +142,7 @@ Chat is the only console on a Realm, so the add-on answers to a script event:
 /scriptevent steveo:enchant blind               # whether endermen can see you right now
 /scriptevent steveo:enchant apply sharpness 20  # enchant the held item for free
 /scriptevent steveo:enchant apply extra_hit 5   # the new ones work by name too
+/scriptevent steveo:enchant apply lightning_strike 20
 ```
 
 ## Files
@@ -162,3 +174,4 @@ The tower places, the fountain menu works, and the lore lines render
 - The letter particle.
 - `entityHitBlock` firing on bedrock for the Super Efficiency timer.
 - Ender Blinding: the patched enderman's `has_tag` stare filter.
+- Lightning Strike: the bolt spawning, and the wielder's immunity to it.

@@ -5,7 +5,9 @@
  * parts the game can do on its own: four coats picked at spawn, taming with
  * cooked meat, begging, shadowing the owner with `follow_owner`, and trotting
  * to the nearest bed when it is not following. The dog has no attack goal at
- * all — it exists to love.
+ * all — it exists to love — and a damage sensor makes it immune to every
+ * damage cause except the void. The `steveo:sick` group overrides that sensor
+ * so the script's `kill()` still lands.
  *
  * This script adds the parts that need judgement:
  *
