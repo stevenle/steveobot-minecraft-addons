@@ -1,5 +1,5 @@
 /**
- * Super Enchantments — every enchantment up to level 20, six new ones, and
+ * Super Enchantments — every enchantment up to level 20, seven new ones, and
  * an Enchantment Tower to find them in.
  *
  * Bedrock has no data-driven enchantments and `addEnchantment` refuses levels
@@ -18,8 +18,9 @@
  *   is cosmetic. README.md lists which is which.
  *
  * The custom enchantments (Power Knockback, Extra Hit, Super Efficiency, Keen
- * Edge, Super Gems, Ender Blinding) exist only in that property; they are
- * applied by the fountain, shown in lore, and enacted here. Ender Blinding
+ * Edge, Super Gems, Ender Blinding, Lightning Strike) exist only in that
+ * property; they are applied by the fountain, shown in lore, and enacted here.
+ * Ender Blinding
  * also needs behavior_pack/entities/enderman.json, a vanilla copy whose stare
  * trigger skips players with ENDER_BLIND_TAG.
  *
@@ -76,7 +77,8 @@ const SUPER_EFFICIENCY = 'steveo:super_efficiency';
 const KEEN_EDGE = 'steveo:keen_edge';
 const SUPER_GEMS = 'steveo:super_gems';
 const ENDER_BLINDING = 'steveo:ender_blinding';
-const CUSTOM_IDS = [POWER_KNOCKBACK, EXTRA_HIT, SUPER_EFFICIENCY, KEEN_EDGE, SUPER_GEMS, ENDER_BLINDING] as const;
+const LIGHTNING_STRIKE = 'steveo:lightning_strike';
+const CUSTOM_IDS = [POWER_KNOCKBACK, EXTRA_HIT, SUPER_EFFICIENCY, KEEN_EDGE, SUPER_GEMS, ENDER_BLINDING, LIGHTNING_STRIKE] as const;
 /** Player tag the patched enderman.json checks; must match assets/generate.mjs. */
 const ENDER_BLIND_TAG = 'steveo:ender_blind';
 
@@ -116,6 +118,14 @@ const EXTRA_HIT_BASE_RADIUS = 2;
 const EXTRA_HIT_RADIUS_PER_LEVEL = 0.4;
 /** Share of the original hit's damage dealt to each nearby mob. */
 const EXTRA_HIT_DAMAGE_SHARE = 0.75;
+/** Lightning Strike: chance per melee hit of calling down a bolt, base plus this much per level. */
+const LIGHTNING_BASE_CHANCE = 0.1;
+const LIGHTNING_CHANCE_PER_LEVEL = 0.02;
+/** Damage the strike adds to the hit itself, on top of whatever the bolt deals. */
+const LIGHTNING_DAMAGE_BASE = 4;
+const LIGHTNING_DAMAGE_PER_LEVEL = 1;
+/** Ticks the wielder is immune to lightning and fire after calling a bolt, so it never hurts them. */
+const LIGHTNING_GRACE_TICKS = 40;
 /** Super Efficiency: seconds to chew through bedrock at level I, and the cut per further level. */
 const BEDROCK_SECONDS = 180;
 const BEDROCK_CUT_PER_LEVEL = 0.04;
@@ -356,6 +366,8 @@ function customApplies(id: string, item: ItemStack): boolean {
       return isMelee(item) || RANGED_TYPES.has(item.typeId);
     case ENDER_BLINDING:
       return isHelmet(item);
+    case LIGHTNING_STRIKE:
+      return item.hasTag('minecraft:is_sword') || item.typeId === 'minecraft:mace';
     default:
       return false;
   }
@@ -514,7 +526,7 @@ world.beforeEvents.itemUse.subscribe((event) => {
   if (facingFountain(event.source)) event.cancel = true;
 });
 
-// ---------- damage: super Sharpness/Smite/Bane/Power, Keen Edge, super Protection ----------
+// ---------- damage: super Sharpness/Smite/Bane/Power, Keen Edge, Lightning Strike, super Protection ----------
 
 function hasFamily(entity: Entity, family: string): boolean {
   try {
@@ -563,10 +575,61 @@ function protectionFactor(player: Player, source: EntityDamageSource): number {
   return 1 - Math.min(PROTECTION_CAP, reduction);
 }
 
+/** Player id -> last tick of their immunity to the bolt they called down. */
+const lightningGrace = new Map<string, number>();
+const LIGHTNING_CAUSES = new Set([EntityDamageCause.lightning, EntityDamageCause.fire, EntityDamageCause.fireTick]);
+
+function shieldedFromOwnBolt(player: Player, source: EntityDamageSource): boolean {
+  const until = lightningGrace.get(player.id);
+  if (until === undefined) return false;
+  if (system.currentTick > until) {
+    lightningGrace.delete(player.id);
+    return false;
+  }
+  return LIGHTNING_CAUSES.has(source.cause);
+}
+
+/** Calls the bolt down on the target, then puts out the wielder if it set them alight. */
+function callLightning(attacker: Player, target: Entity): void {
+  if (!target.isValid) return;
+  try {
+    target.dimension.spawnEntity('minecraft:lightning_bolt', target.location);
+  } catch (err) {
+    log.warn(`could not strike ${target.typeId}: ${String(err)}`);
+  }
+  for (const delay of [2, 10, LIGHTNING_GRACE_TICKS - 1]) {
+    system.runTimeout(() => {
+      if (attacker.isValid) attacker.extinguishFire(false);
+    }, delay);
+  }
+}
+
+/**
+ * Lightning Strike: rolls once per melee hit. The bonus damage rides on the
+ * hit itself, because a separate applyDamage this tick would land in the
+ * victim's invulnerability frames; the bolt follows a tick later and deals
+ * its own damage on top. Extra Hit splashes never call bolts.
+ */
+function lightningBonus(attacker: Player, victim: Entity, source: EntityDamageSource): number {
+  if (source.cause !== EntityDamageCause.entityAttack || splashing) return 0;
+  const level = totalLevel(heldItem(attacker), LIGHTNING_STRIKE);
+  if (level === 0 || Math.random() > LIGHTNING_BASE_CHANCE + LIGHTNING_CHANCE_PER_LEVEL * level) return 0;
+  lightningGrace.set(attacker.id, system.currentTick + LIGHTNING_GRACE_TICKS);
+  system.run(() => callLightning(attacker, victim));
+  return LIGHTNING_DAMAGE_BASE + LIGHTNING_DAMAGE_PER_LEVEL * level;
+}
+
 world.beforeEvents.entityHurt.subscribe((event) => {
+  if (event.hurtEntity instanceof Player && shieldedFromOwnBolt(event.hurtEntity, event.damageSource)) {
+    event.cancel = true;
+    return;
+  }
   let damage = event.damage;
   const attacker = event.damageSource.damagingEntity;
-  if (attacker instanceof Player) damage = attackBonus(attacker, event.hurtEntity, event.damageSource, damage);
+  if (attacker instanceof Player) {
+    damage = attackBonus(attacker, event.hurtEntity, event.damageSource, damage);
+    damage += lightningBonus(attacker, event.hurtEntity, event.damageSource);
+  }
   if (event.hurtEntity instanceof Player) damage *= protectionFactor(event.hurtEntity, event.damageSource);
   if (damage !== event.damage) event.damage = damage;
 });
