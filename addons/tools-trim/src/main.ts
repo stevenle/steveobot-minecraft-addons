@@ -487,14 +487,31 @@ function debugCheck(player: Player): void {
   if (missing.length > 0) say(player, 'tools_trim.debug.missing', missing.join(', '));
 }
 
-/** Probe items from assets/generate.mjs, one per candidate enchant slot. */
-const PROBES = ['sword', 'melee_spear', 'spear', 'all', 'sword_melee_spear', 'sword_new_format'];
+/**
+ * Probe items from assets/generate.mjs: a copy of one trimmed sword, then the
+ * same copy minus one component each.
+ */
+const PROBES = [
+  'full',
+  'no_icon',
+  'no_display_name',
+  'no_max_stack_size',
+  'no_hand_equipped',
+  'no_can_destroy_in_creative',
+  'no_damage',
+  'no_durability',
+  'no_repairable',
+  'no_tags',
+  'no_digger',
+];
+/** A trimmed non-sword, to show whether the other tools lose the component too. */
+const PROBE_CONTROL = 'steveo:netherite_pickaxe_quartz_trim';
 
 /**
  * For each candidate item, reports which of the held tool's enchantments a
- * fresh copy would take. The held tool's own type is the control: if a plain
- * vanilla sword refuses its own enchantment, the check is wrong, not the
- * slot. A refusal marked "!" means addEnchantment worked anyway.
+ * fresh copy would take, or "slots none" when the item has no enchantable
+ * component at all. The held tool's own type is the control. A refusal
+ * marked "!" means addEnchantment worked anyway.
  */
 function debugProbe(player: Player): void {
   const item = heldItem(player);
@@ -506,7 +523,7 @@ function debugProbe(player: Player): void {
   const tool = parseTool(item.typeId);
   const targets = [item.typeId];
   if (tool !== undefined) targets.push(idOf({ ...tool, trim: tool.trim ?? MATERIALS[0] }));
-  targets.push(...PROBES.map((name) => `steveo:tools_trim_probe_${name}`));
+  targets.push(PROBE_CONTROL, ...PROBES.map((name) => `steveo:tools_trim_probe_${name}`));
 
   for (const id of targets) {
     if (ItemTypes.get(id) === undefined) {

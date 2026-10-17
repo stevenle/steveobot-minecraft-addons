@@ -514,33 +514,21 @@ for (const tier of TIERS) {
     }
   }
 }
-// Enchant-slot probes for `/scriptevent steveo:tools_trim probe`: bare
-// sword-like items, one per candidate slot, so the game itself reports which
-// slot takes every sword enchantment. The docs and Fire Aspect disagree (see
-// the sword slot comment above). Delete these once the slot is settled.
-const PROBES = [
-  { name: 'sword', slot: 'sword' },
-  { name: 'melee_spear', slot: 'melee_spear' },
-  { name: 'spear', slot: 'spear' },
-  { name: 'all', slot: 'all' },
-  // Undocumented: the script API reports a list of slots, so try one here.
-  // An invalid item fails to load and the probe reports it as missing.
-  { name: 'sword_melee_spear', slot: ['sword', 'melee_spear'] },
-  { name: 'sword_new_format', slot: 'sword', format: '1.26.40' },
-];
-for (const probe of PROBES) {
-  write(path.join(dirs.items, `probe_${probe.name}.json`), {
-    format_version: probe.format ?? '1.21.40',
-    'minecraft:item': {
-      description: { identifier: `steveo:tools_trim_probe_${probe.name}`, menu_category: { category: 'none' } },
-      components: {
-        'minecraft:max_stack_size': 1,
-        'minecraft:durability': { max_durability: 100 },
-        'minecraft:enchantable': { slot: probe.slot, value: 10 },
-        'minecraft:tags': { tags: ['minecraft:is_sword'] },
-      },
-    },
-  });
+// Enchantable probes for `/scriptevent steveo:tools_trim probe`. A bare item
+// with any sword slot took Fire Aspect in-game, but the real trimmed swords
+// came back with no enchantable component at all. These copy one trimmed
+// sword exactly ("full"), then drop one other component each, so the game
+// shows which one knocks out minecraft:enchantable. Delete once settled.
+{
+  const sample = itemJson(TIERS.at(-1), TOOLS[0], MATERIALS[0]);
+  const others = Object.keys(sample['minecraft:item'].components).filter((key) => key !== 'minecraft:enchantable');
+  for (const drop of [undefined, ...others]) {
+    const name = drop === undefined ? 'full' : `no_${drop.replace('minecraft:', '')}`;
+    const item = structuredClone(sample);
+    item['minecraft:item'].description.identifier = `steveo:tools_trim_probe_${name}`;
+    if (drop !== undefined) delete item['minecraft:item'].components[drop];
+    write(path.join(dirs.items, `probe_${name}.json`), item);
+  }
 }
 
 write(path.join(dirs.recipes, 'better_smithing_table.json'), tableRecipe);
