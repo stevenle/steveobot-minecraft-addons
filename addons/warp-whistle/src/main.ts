@@ -18,6 +18,7 @@
 import {
   EquipmentSlot,
   ItemStack,
+  MolangVariableMap,
   Player,
   system,
   world,
@@ -440,7 +441,27 @@ function playWindup(player: Player, onDone?: () => void): void {
   }, 1);
 }
 
-/** Two arms of sparkles climbing around the player, tightening as they rise. */
+/** Custom particle tinted by `variable.color`, defined in the resource pack. */
+const SPARKLE_ID = 'steveo:warp_sparkle';
+
+/** Fully saturated color at `hue` turns around the wheel (0 red, 1/3 green, 2/3 blue). */
+function rainbow(hue: number): { red: number; green: number; blue: number; alpha: number } {
+  const h = (((hue % 1) + 1) % 1) * 6;
+  const channel = (offset: number): number => Math.max(0, Math.min(1, Math.abs(((h + offset) % 6) - 3) - 1));
+  return { red: channel(0), green: channel(4), blue: channel(2), alpha: 1 };
+}
+
+function sparkle(dimension: Dimension, at: Vector3, hue: number): void {
+  const vars = new MolangVariableMap();
+  vars.setColorRGBA('variable.color', rainbow(hue));
+  dimension.spawnParticle(SPARKLE_ID, at, vars);
+}
+
+/**
+ * Two arms of sparkles climbing around the player, tightening as they rise.
+ * The colors cycle through the rainbow, the arms half a wheel apart, with a
+ * white end rod twinkle every few ticks.
+ */
 function spiral(player: Player, tick: number): void {
   const progress = tick / WINDUP_TICKS;
   const base = player.location;
@@ -448,18 +469,23 @@ function spiral(player: Player, tick: number): void {
   const radius = 1.2 - progress * 0.5;
   const height = progress * 2.4;
   for (const arm of [0, Math.PI]) {
-    player.dimension.spawnParticle('minecraft:endrod', {
+    const at = {
       x: base.x + Math.cos(angle + arm) * radius,
       y: base.y + height,
       z: base.z + Math.sin(angle + arm) * radius,
-    });
+    };
+    sparkle(player.dimension, at, tick / 20 + arm / (Math.PI * 2));
+    if (tick % 3 === 0) player.dimension.spawnParticle('minecraft:endrod', at);
   }
 }
 
+/** A rainbow ring around `at`, with white end rod sparkles between the colors. */
 function burst(dimension: Dimension, at: Vector3): void {
-  for (let i = 0; i < 16; i++) {
-    const a = (i / 16) * Math.PI * 2;
-    dimension.spawnParticle('minecraft:endrod', { x: at.x + Math.cos(a) * 0.8, y: at.y + 1, z: at.z + Math.sin(a) * 0.8 });
+  for (let i = 0; i < 24; i++) {
+    const a = (i / 24) * Math.PI * 2;
+    const point = { x: at.x + Math.cos(a) * 0.8, y: at.y + 1, z: at.z + Math.sin(a) * 0.8 };
+    sparkle(dimension, point, i / 24);
+    if (i % 3 === 0) dimension.spawnParticle('minecraft:endrod', point);
   }
 }
 
