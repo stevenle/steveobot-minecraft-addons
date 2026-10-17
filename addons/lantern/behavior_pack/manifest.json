@@ -1,0 +1,38 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Lantern BP",
+    "description": "A hand lantern you hold in your off-hand. It lights up the area around you as you walk.",
+    "uuid": "ba3d8689-21f3-4874-a664-53b221c574d6",
+    "version": [1, 0, 0],
+    "min_engine_version": [1, 26, 40]
+  },
+  "modules": [
+    {
+      "type": "data",
+      "uuid": "259961d7-64f5-433d-b2fd-0f572c02cc27",
+      "version": [1, 0, 0]
+    },
+    {
+      "type": "script",
+      "language": "javascript",
+      "entry": "scripts/main.js",
+      "uuid": "a03804de-24e9-4e72-9ab4-b71762025a3a",
+      "version": [1, 0, 0]
+    }
+  ],
+  "dependencies": [
+    {
+      "uuid": "2f7e4c8e-d75d-45bd-8731-cb8e44492920",
+      "version": [1, 0, 0]
+    },
+    {
+      "module_name": "@minecraft/server",
+      "version": "2.9.0"
+    }
+  ],
+  "metadata": {
+    "authors": ["Steven Le"],
+    "license": "MIT"
+  }
+}

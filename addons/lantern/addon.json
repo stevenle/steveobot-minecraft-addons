@@ -1,0 +1,5 @@
+{
+  "$schema": "../../tools/schemas/addon.schema.json",
+  "name": "Lantern",
+  "description": "A hand lantern you hold in your off-hand. It lights up the area around you as you walk."
+}
