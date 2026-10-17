@@ -1,0 +1,21 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Lantern RP",
+    "description": "A hand lantern you hold in your off-hand. It lights up the area around you as you walk.",
+    "uuid": "2f7e4c8e-d75d-45bd-8731-cb8e44492920",
+    "version": [1, 0, 0],
+    "min_engine_version": [1, 26, 40]
+  },
+  "modules": [
+    {
+      "type": "resources",
+      "uuid": "9f7326ec-4c80-49f7-ad09-bb3cfba0f88a",
+      "version": [1, 0, 0]
+    }
+  ],
+  "metadata": {
+    "authors": ["Steven Le"],
+    "license": "MIT"
+  }
+}
