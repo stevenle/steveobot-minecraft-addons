@@ -193,9 +193,53 @@ function vanillaMax(id: string): number {
   return isCustom(id) ? 0 : (EnchantmentTypes.get(id)?.maxLevel ?? 0);
 }
 
+const ROMAN_DIGITS: Record<string, number> = { I: 1, V: 5, X: 10, L: 50, C: 100, D: 500, M: 1000 };
+
+function fromRoman(digits: string): number {
+  let total = 0;
+  for (let i = 0; i < digits.length; i++) {
+    const value = ROMAN_DIGITS[digits.charAt(i)] ?? 0;
+    const next = ROMAN_DIGITS[digits.charAt(i + 1)] ?? 0;
+    total += value < next ? -value : value;
+  }
+  return total;
+}
+
+/**
+ * Matches a lore line writeSuper rendered, in whatever shape it came back:
+ * the RawMessage itself, or a string another pack flattened it into. Both
+ * carry the translation key, then a space and the numeral.
+ */
+const LORE_LINE = /super_enchantments\.enchant\.([a-z_]+).*? ([MDCLXVI]+)\b/;
+
+/**
+ * Rebuilds the record from its lore lines. Dynamic properties belong to the
+ * pack that wrote them, so an add-on that swaps the item for a new one (Tools
+ * Trim does, to change its texture) can copy the lore but never sees
+ * SUPER_PROP, and the new item would otherwise lose every super level.
+ */
+function readSuperFromLore(item: ItemStack): SuperLevels {
+  let lines: RawMessage[];
+  try {
+    lines = item.getRawLore();
+  } catch {
+    return {};
+  }
+  const levels: SuperLevels = {};
+  for (const line of lines) {
+    const match = LORE_LINE.exec(JSON.stringify(line));
+    if (match === null) continue;
+    const name = match[1] ?? '';
+    const id = isCustom(`steveo:${name}`) ? `steveo:${name}` : name;
+    const level = fromRoman(match[2] ?? '');
+    if (level > vanillaMax(id)) levels[id] = Math.min(MAX_LEVEL, level);
+  }
+  return levels;
+}
+
 function readSuper(item: ItemStack): SuperLevels {
   const raw = item.getDynamicProperty(SUPER_PROP);
-  if (typeof raw !== 'string' || raw.length === 0) return {};
+  if (typeof raw !== 'string' || raw.length === 0) return readSuperFromLore(item);
   try {
     const parsed: unknown = JSON.parse(raw);
     if (typeof parsed !== 'object' || parsed === null) return {};
@@ -913,11 +957,25 @@ function updateEnderBlind(player: Player, helmet: ItemStack | undefined): void {
   else player.removeTag(ENDER_BLIND_TAG);
 }
 
+/**
+ * Writes a record recovered from lore back onto the item, so the property is
+ * the source again and the lore is re-rendered as RawMessages.
+ */
+function healRecord(player: Player, item: ItemStack | undefined): void {
+  if (item === undefined || item.getDynamicProperty(SUPER_PROP) !== undefined) return;
+  const levels = readSuperFromLore(item);
+  if (Object.keys(levels).length === 0) return;
+  writeSuper(item, levels);
+  setHeldItem(player, item);
+  log.info(`${player.name}: recovered ${JSON.stringify(levels)} on ${item.typeId} from lore`);
+}
+
 system.runInterval(() => {
   for (const player of world.getAllPlayers()) {
     const helmet = player.getComponent('minecraft:equippable')?.getEquipment(EquipmentSlot.Head);
     updateEnderBlind(player, helmet);
     const tool = heldItem(player);
+    healRecord(player, tool);
     const haste = surplus(tool, 'efficiency');
     if (haste > 0) {
       player.addEffect('haste', PASSIVE_TICKS * 2, { amplifier: Math.min(4, Math.ceil(haste / 5) - 1), showParticles: false });
