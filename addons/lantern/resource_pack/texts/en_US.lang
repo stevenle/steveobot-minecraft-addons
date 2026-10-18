@@ -1,0 +1,8 @@
+## Strings for the Lantern add-on.
+## Client-side translations live in the resource pack; the behavior pack
+## references them by key with RawMessage { translate: ... }.
+
+item.steveo:lantern.name=Hand Lantern
+
+## Debug (/scriptevent steveo:lantern)
+lantern.debug.status=§7[Lantern]§r Loaded. A Hand Lantern has been placed in your inventory; hold it in your off-hand to light your way. Lit players: %s. Stale lights awaiting cleanup: %s.

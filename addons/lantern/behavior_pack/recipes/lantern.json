@@ -1,0 +1,17 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:recipe_shapeless": {
+    "description": {
+      "identifier": "steveo:lantern_recipe"
+    },
+    "tags": ["crafting_table"],
+    "ingredients": [
+      { "item": "minecraft:lantern" },
+      { "item": "minecraft:string" }
+    ],
+    "unlock": [{ "item": "minecraft:lantern" }],
+    "result": {
+      "item": "steveo:lantern"
+    }
+  }
+}

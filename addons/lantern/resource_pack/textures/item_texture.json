@@ -1,0 +1,9 @@
+{
+  "resource_pack_name": "lantern",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "steveo_lantern": {
+      "textures": "textures/items/steveo_hand_lantern"
+    }
+  }
+}
