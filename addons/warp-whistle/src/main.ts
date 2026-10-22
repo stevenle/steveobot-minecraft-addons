@@ -3,7 +3,8 @@
  *
  * Using the whistle opens a menu of places to warp to. The first entry is
  * always Home: the player's own bed (their spawn point). Below it are the
- * world's shared waypoints, which anyone can set, rename, move, or delete.
+ * other players online, then the world's shared waypoints, newest first,
+ * which anyone can set, rename, move, or delete.
  * Crouch + use is a shortcut to set a waypoint where you stand.
  *
  * A warp is not instant. The whistle plays a rising tune while sparkles
@@ -88,8 +89,10 @@ interface Destination {
   location: Vector3;
   dimension: Dimension;
   yaw?: number;
-  /** Key of the arrival message; defaults to the generic one with the label. */
+  /** Key of the arrival message, given the label; defaults to the generic one. */
   arrivedKey?: string;
+  /** A player to warp to: `location` and `dimension` are re-read from them on arrival. */
+  follow?: Player;
 }
 
 function isWaypoint(value: unknown): value is Waypoint {
@@ -125,6 +128,11 @@ function saveWaypoints(waypoints: Waypoint[]): boolean {
   if (json.length > MAX_STORAGE_CHARS) return false;
   world.setDynamicProperty(WAYPOINTS_PROP, json);
   return true;
+}
+
+/** Waypoints as menus list them: newest first. Storage keeps the order they were set. */
+function newestFirst(): Waypoint[] {
+  return loadWaypoints().reverse();
 }
 
 function findWaypoint(name: string): Waypoint | undefined {
@@ -213,7 +221,8 @@ async function show<T extends FormResponse>(player: Player, form: { show(player:
 
 async function openMenu(player: Player): Promise<void> {
   const home = homeOf(player);
-  const waypoints = loadWaypoints();
+  const others = world.getAllPlayers().filter((p) => p.id !== player.id);
+  const waypoints = newestFirst();
 
   const form = new ActionFormData().title(t('warp_whistle.menu.title')).body(t('warp_whistle.menu.body'));
   form.button(
@@ -222,6 +231,8 @@ async function openMenu(player: Player): Promise<void> {
       : t('warp_whistle.menu.home.none'),
     'textures/items/bed_red',
   );
+  // Generic head from this pack: the script API cannot read a player's skin.
+  for (const other of others) form.button({ text: other.name }, 'textures/ui/warp_whistle_player');
   for (const w of waypoints) {
     form.button({ rawtext: [{ text: `${w.name} ${Format.gray}` }, describe(w, w.dimension)] }, 'textures/items/ender_pearl');
   }
@@ -237,15 +248,32 @@ async function openMenu(player: Player): Promise<void> {
     else tell(player, t('warp_whistle.home.none'));
     return;
   }
-  const waypoint = waypoints[pick - 1];
+  const other = others[pick - 1];
+  if (other) return warpToPlayer(player, other);
+  const waypoint = waypoints[pick - 1 - others.length];
   if (waypoint) {
     const destination = destinationOf(waypoint);
     if (destination) beginWarp(player, destination);
     else tell(player, t('warp_whistle.failed'));
     return;
   }
-  if (pick === waypoints.length + 1) return openSetWaypoint(player);
-  if (pick === waypoints.length + 2) return openManage(player);
+  const rest = pick - 1 - others.length - waypoints.length;
+  if (rest === 0) return openSetWaypoint(player);
+  if (rest === 1) return openManage(player);
+}
+
+function warpToPlayer(player: Player, target: Player): void {
+  if (!target.isValid) {
+    tell(player, t('warp_whistle.player.gone'));
+    return;
+  }
+  beginWarp(player, {
+    label: { text: target.name },
+    location: target.location,
+    dimension: target.dimension,
+    follow: target,
+    arrivedKey: 'warp_whistle.arrived.player',
+  });
 }
 
 async function openSetWaypoint(player: Player): Promise<void> {
@@ -295,7 +323,7 @@ function validName(player: Player, value: unknown, current?: string): string | u
 }
 
 async function openManage(player: Player): Promise<void> {
-  const waypoints = loadWaypoints();
+  const waypoints = newestFirst();
   if (waypoints.length === 0) {
     tell(player, t('warp_whistle.manage.none'));
     return;
@@ -502,22 +530,29 @@ function beginWarp(player: Player, destination: Destination): void {
 
   playWindup(player, () => {
     warping.delete(player.id);
+    const { follow } = destination;
+    if (follow && !follow.isValid) {
+      if (player.isValid) tell(player, t('warp_whistle.player.gone'));
+      return;
+    }
+    const to = follow ? { location: follow.location, dimension: follow.dimension } : destination;
     try {
       const from = player.dimension;
       const fromLocation = player.location;
-      player.teleport(destination.location, {
-        dimension: destination.dimension,
+      player.teleport(to.location, {
+        dimension: to.dimension,
         ...(destination.yaw !== undefined ? { rotation: { x: 0, y: destination.yaw } } : {}),
       });
       from.playSound('mob.endermen.portal', fromLocation, { volume: 0.7 });
       try {
         burst(from, fromLocation);
-        burst(destination.dimension, destination.location);
+        burst(to.dimension, to.location);
       } catch {
         // Particles are decoration; a missing chunk must not fail the warp.
       }
       player.playSound('mob.endermen.portal', { volume: 0.7, pitch: 1.2 });
-      tell(player, destination.arrivedKey ? t(destination.arrivedKey) : t('warp_whistle.arrived', destination.label));
+      tell(player, t(destination.arrivedKey ?? 'warp_whistle.arrived', destination.label));
+      if (follow) tell(follow, t('warp_whistle.player.incoming', player.name));
     } catch (err) {
       log.error('teleport failed', err);
       if (player.isValid) tell(player, t('warp_whistle.failed'));
@@ -564,7 +599,7 @@ world.afterEvents.playerLeave.subscribe((event) => {
 // ---------- debug: /scriptevent steveo:warp <give|list|clear|demo> ----------
 
 function listMessage(player: Player): RawMessage {
-  const waypoints = loadWaypoints();
+  const waypoints = newestFirst();
   const home = homeOf(player);
   const rawtext: RawMessage[] = [PREFIX, t('warp_whistle.debug.list', `${waypoints.length}`)];
   rawtext.push({ text: '\n' }, home ? t('warp_whistle.debug.list.home', describe(home.location, home.dimension.id)) : t('warp_whistle.debug.list.home.none'));

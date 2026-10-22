@@ -28,7 +28,7 @@ warp_whistle.set.duplicate=There is already a waypoint called §e%s§r.
 
 ## Manage
 warp_whistle.manage.title=Waypoints
-warp_whistle.manage.body=Pick a waypoint to warp, rename, move, or delete it.
+warp_whistle.manage.body=Pick a waypoint to warp, rename, move, or delete it. Newest first.
 warp_whistle.manage.none=No waypoints yet. Crouch and use the whistle to set one.
 warp_whistle.manage.detail=§e%s§r\n%s\nSet by %s
 warp_whistle.manage.warp=Warp there
@@ -53,6 +53,9 @@ warp_whistle.warping=Whistling... hold on!
 warp_whistle.cooldown=The whistle needs a moment to catch its breath.
 warp_whistle.arrived=Whoosh! You are at §e%s§r.
 warp_whistle.arrived.home=Whoosh! Home sweet home.
+warp_whistle.arrived.player=Whoosh! You are with §e%s§r.
+warp_whistle.player.gone=That player is no longer here.
+warp_whistle.player.incoming=§e%s§r warped to you.
 warp_whistle.failed=The wind fizzled out. Try again.
 
 ## Debug (/scriptevent steveo:warp ...)

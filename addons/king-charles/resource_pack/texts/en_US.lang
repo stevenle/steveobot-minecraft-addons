@@ -11,8 +11,6 @@ king_charles.fed=%s gobbles up the treat and showers you with love. Your hearts 
 king_charles.fed_other=%s wags happily, but only heals its own human.
 king_charles.sick=%s ate something rotten and looks terribly sick...
 king_charles.died=%s died of a bad tummy. Only ever feed cooked meat or fish.
-king_charles.stays.lost=%s is nowhere near a bed and looks confused. It will wait here for you.
-king_charles.returns=%s comes bounding back to your side.
 
 king_charles.debug.spawned=Spawned one spaniel of each coat in front of you (blenheim, tricolor, black and tan, ruby).
 king_charles.debug.tamed=Tamed %s nearby spaniel(s) to you.

@@ -295,14 +295,11 @@ function tendDog(dog: Entity): void {
   if (reason && !homebound) {
     dog.addTag(HOMEBOUND_TAG);
     dog.triggerEvent('steveo:go_home');
+    // Staying behind and coming back are routine, so neither is announced in chat.
     if (home && distance(dog.location, home) > HOME_WALK_RANGE) teleportHome(dog, home);
-    // Staying home (too far, or underground) is routine and needs no announcement.
-    // A dog with no bed at all is the one case worth a word, since it waits wherever it is.
-    if (!home) say(owner, 'king_charles.stays.lost', dog);
   } else if (!reason && homebound) {
     dog.removeTag(HOMEBOUND_TAG);
     dog.triggerEvent('steveo:resume_follow');
-    say(owner, 'king_charles.returns', dog);
   } else if (reason && home && distance(dog.location, home) > HOME_WALK_RANGE) {
     teleportHome(dog, home);
   }
