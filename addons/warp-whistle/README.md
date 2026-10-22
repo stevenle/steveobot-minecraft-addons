@@ -26,38 +26,20 @@ whistle never breaks.
 | **Use** (right-click / tap) | Opens the warp menu |
 | **Crouch + Use** | Sets a new waypoint where you stand |
 
-The menu has two sections:
+The menu lists, in order:
 
-- **Quick warp**
-  - **Home**: your bed (or respawn anchor). It is read from your spawn
-    point every time, so it follows wherever you last slept. If you have no
-    bed yet the button says so and warping does nothing.
-  - **One button per other player online**: you land wherever they are when
-    the wind-up ends, and they get a chat message saying you arrived.
-- **Waypoints**
-  - **Set a waypoint here**: asks for a name and saves your current spot
-    and facing. There is no limit on how many waypoints the world holds;
-    names are up to 24 characters and must be unique.
-  - **Every shared waypoint, newest first**: each one shows its coordinates
-    and, outside the Overworld, its dimension.
-
-The **Edit waypoints** toggle above the waypoint list reopens the menu with
-edit controls under each waypoint:
-
-- a **Name** field (the new name is saved when you close the menu),
-- **Move here**, which moves the waypoint to where you stand,
-- **Delete**, which removes it at once and leaves an **Undo** button in its
-  place until you close the menu.
-
-The menu remembers whether Edit was on the next time you open it.
-
-The menu is a data-driven `CustomForm` from `@minecraft/server-ui` 2.1.0,
-not the older `ActionFormData`, so the name field and buttons can sit in one
-list and Undo can replace a deleted waypoint while the menu is open. Only the
-current view is built: hidden controls still cost time to send, and building
-the edit controls up front for every waypoint froze the game on each open.
-Its buttons have no icons, and its
-text shows `§` color codes literally, so the menu uses none.
+1. **Home** — your bed (or respawn anchor). It is read from your spawn point
+   every time, so it follows wherever you last slept. If you have no bed yet
+   the button says so and warping does nothing.
+2. **Players** — everyone else online. You land wherever they are when the
+   wind-up ends, and they get a chat message saying you arrived.
+3. **Waypoints** — every shared waypoint, newest first, with its coordinates
+   and, outside the Overworld, its dimension.
+4. **Set a waypoint here** — asks for a name and saves your current spot and
+   facing. There is no limit on how many waypoints the world holds; names
+   are up to 24 characters and must be unique.
+5. **Manage waypoints** — pick a waypoint to warp to it, rename it, move it
+   to where you stand, or delete it (with a confirmation).
 
 Picking a destination starts a two-second wind-up: the whistle plays its tune
 and sparkles spiral upward around you. Then you are teleported, across
