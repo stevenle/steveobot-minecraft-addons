@@ -31,18 +31,32 @@ The menu lists, in order:
 1. **Home** — your bed (or respawn anchor). It is read from your spawn point
    every time, so it follows wherever you last slept. If you have no bed yet
    the button says so and warping does nothing.
-2. **Waypoints** — every shared waypoint, with its coordinates and, outside
-   the Overworld, its dimension.
-3. **Set a waypoint here** — asks for a name and saves your current spot and
+2. **Set a waypoint here** — asks for a name and saves your current spot and
    facing. There is no limit on how many waypoints the world holds; names
    are up to 24 characters and must be unique.
-4. **Manage waypoints** — pick a waypoint to warp to it, rename it, move it
-   to where you stand, or delete it (with a confirmation).
+3. **Players** — everyone else online. You land wherever they are when the
+   wind-up ends, and they get a chat message saying you arrived.
+4. **Waypoints** — every shared waypoint, newest first, with its coordinates
+   and, outside the Overworld, its dimension.
+
+The **Edit waypoints** toggle above the waypoint list adds edit controls in
+place under each waypoint, so you never leave the menu:
+
+- a **Name** field (the new name is saved when you close the menu),
+- **Move here**, which moves the waypoint to where you stand,
+- **Delete**, which removes it at once and leaves an **Undo** button in its
+  place until you close the menu.
+
+The menu remembers whether Edit was on the next time you open it.
+
+The menu is a data-driven `CustomForm` from `@minecraft/server-ui` 2.1.0,
+not the older `ActionFormData`. That is what lets the edit controls appear
+and disappear while the menu is open. Its buttons have no icons.
 
 Picking a destination starts a two-second wind-up: the whistle plays its tune
 and sparkles spiral upward around you. Then you are teleported, across
 dimensions if needed, facing the way the waypoint was set. The whistle then
-rests for five seconds.
+rests for five seconds. Warping to a player keeps your own facing.
 
 Waypoints are shared by everyone in the world and saved with it, so they
 survive restarts and Realm uploads. Home is personal.

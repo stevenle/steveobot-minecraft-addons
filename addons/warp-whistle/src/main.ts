@@ -3,7 +3,8 @@
  *
  * Using the whistle opens a menu of places to warp to. The first entry is
  * always Home: the player's own bed (their spawn point). Below it are the
- * world's shared waypoints, which anyone can set, rename, move, or delete.
+ * other players online, then the world's shared waypoints, newest first,
+ * which anyone can set, rename, move, or delete from the same menu.
  * Crouch + use is a shortcut to set a waypoint where you stand.
  *
  * A warp is not instant. The whistle plays a rising tune while sparkles
@@ -27,10 +28,13 @@ import {
   type Vector3,
 } from '@minecraft/server';
 import {
-  ActionFormData,
+  CustomForm,
+  DataDrivenScreenClosedReason,
   FormCancelationReason,
-  MessageFormData,
   ModalFormData,
+  ObservableBoolean,
+  ObservableString,
+  ObservableUIRawMessage,
   type FormResponse,
 } from '@minecraft/server-ui';
 import { createLogger } from '@shared/log';
@@ -88,8 +92,10 @@ interface Destination {
   location: Vector3;
   dimension: Dimension;
   yaw?: number;
-  /** Key of the arrival message; defaults to the generic one with the label. */
+  /** Key of the arrival message, given the label; defaults to the generic one. */
   arrivedKey?: string;
+  /** A player to warp to: `location` and `dimension` are re-read from them on arrival. */
+  follow?: Player;
 }
 
 function isWaypoint(value: unknown): value is Waypoint {
@@ -211,41 +217,86 @@ async function show<T extends FormResponse>(player: Player, form: { show(player:
   return undefined;
 }
 
+/**
+ * Shows a data-driven form, retrying while the player is busy in another
+ * screen. `build` runs per attempt so each try gets a fresh form. False when
+ * the player never became free.
+ */
+async function showCustom(build: () => CustomForm): Promise<boolean> {
+  for (let attempt = 0; attempt < FORM_RETRY_LIMIT; attempt++) {
+    if ((await build().show()) !== DataDrivenScreenClosedReason.UserBusy) return true;
+    await sleep(FORM_RETRY_TICKS);
+  }
+  return false;
+}
+
+/** Whether each player last left the menu in edit mode, so it reopens the same way. */
+const editing = new Map<string, boolean>();
+
+/**
+ * The one menu: Home, other players, then waypoints newest first. The Edit
+ * toggle reveals a name field and Move / Delete buttons under each waypoint
+ * in place, so nothing needs a second screen. Move and Delete apply at once
+ * (Delete leaves an undo button behind); renames are saved when the menu
+ * closes. Anything that leaves the menu — a warp, setting a waypoint — is
+ * queued and run after the form has closed.
+ */
 async function openMenu(player: Player): Promise<void> {
   const home = homeOf(player);
-  const waypoints = loadWaypoints();
+  const others = world.getAllPlayers().filter((p) => p.id !== player.id);
+  const editMode = new ObservableBoolean(editing.get(player.id) ?? false, { clientWritable: true });
+  // Stored oldest first, in the order they were set; shown newest first.
+  const rows = loadWaypoints()
+    .map((w, index) => new WaypointRow(player, w, index, editMode))
+    .reverse();
+  let next: (() => void | Promise<void>) | undefined;
 
-  const form = new ActionFormData().title(t('warp_whistle.menu.title')).body(t('warp_whistle.menu.body'));
-  form.button(
-    home
-      ? { rawtext: [t('warp_whistle.menu.home'), { text: ` ${Format.gray}` }, describe(home.location, home.dimension.id)] }
-      : t('warp_whistle.menu.home.none'),
-    'textures/items/bed_red',
-  );
-  for (const w of waypoints) {
-    form.button({ rawtext: [{ text: `${w.name} ${Format.gray}` }, describe(w, w.dimension)] }, 'textures/items/ender_pearl');
-  }
-  form.button(t('warp_whistle.menu.set'), 'textures/items/compass_item');
-  if (waypoints.length > 0) form.button(t('warp_whistle.menu.manage'), 'textures/items/book_writable');
+  const shown = await showCustom(() => {
+    const form = new CustomForm(player, t('warp_whistle.menu.title')).closeButton();
+    const then = (action: () => void | Promise<void>): void => {
+      next = action;
+      form.close();
+    };
 
-  const response = await show(player, form);
-  const pick = response?.selection;
-  if (pick === undefined) return;
+    form.button(
+      home ? { rawtext: [t('warp_whistle.menu.home'), { text: ` ${Format.gray}` }, describe(home.location, home.dimension.id)] } : t('warp_whistle.menu.home.none'),
+      () => then(() => (home ? beginWarp(player, home) : tell(player, t('warp_whistle.home.none')))),
+    );
+    form.button(t('warp_whistle.menu.set'), () => then(() => openSetWaypoint(player)));
 
-  if (pick === 0) {
-    if (home) beginWarp(player, home);
-    else tell(player, t('warp_whistle.home.none'));
+    if (others.length > 0) {
+      form.header(t('warp_whistle.menu.players'));
+      for (const other of others) {
+        form.button({ text: other.name }, () => then(() => warpToPlayer(player, other)));
+      }
+    }
+
+    if (rows.length > 0) {
+      form.header(t('warp_whistle.menu.waypoints'));
+      form.toggle(t('warp_whistle.menu.edit'), editMode, { description: t('warp_whistle.menu.edit.hint') });
+      for (const row of rows) row.addTo(form, then);
+    }
+    return form;
+  });
+
+  editing.set(player.id, editMode.getData());
+  if (!shown) return;
+  for (const row of rows) row.commitRename();
+  await next?.();
+}
+
+function warpToPlayer(player: Player, target: Player): void {
+  if (!target.isValid) {
+    tell(player, t('warp_whistle.player.gone'));
     return;
   }
-  const waypoint = waypoints[pick - 1];
-  if (waypoint) {
-    const destination = destinationOf(waypoint);
-    if (destination) beginWarp(player, destination);
-    else tell(player, t('warp_whistle.failed'));
-    return;
-  }
-  if (pick === waypoints.length + 1) return openSetWaypoint(player);
-  if (pick === waypoints.length + 2) return openManage(player);
+  beginWarp(player, {
+    label: { text: target.name },
+    location: target.location,
+    dimension: target.dimension,
+    follow: target,
+    arrivedKey: 'warp_whistle.arrived.player',
+  });
 }
 
 async function openSetWaypoint(player: Player): Promise<void> {
@@ -294,115 +345,131 @@ function validName(player: Player, value: unknown, current?: string): string | u
   return name;
 }
 
-async function openManage(player: Player): Promise<void> {
-  const waypoints = loadWaypoints();
-  if (waypoints.length === 0) {
-    tell(player, t('warp_whistle.manage.none'));
-    return;
-  }
-  const form = new ActionFormData().title(t('warp_whistle.manage.title')).body(t('warp_whistle.manage.body'));
-  for (const w of waypoints) {
-    form.button({ rawtext: [{ text: `${w.name} ${Format.gray}` }, describe(w, w.dimension)] }, 'textures/items/ender_pearl');
-  }
-  form.button(t('warp_whistle.manage.back'));
+/**
+ * One waypoint in the menu: its warp button, plus the edit controls the Edit
+ * toggle reveals beneath it. The waypoint is found in storage by the name it
+ * had when the menu opened, and every change reloads the list first, so edits
+ * by other players in the meantime are not overwritten.
+ */
+class WaypointRow {
+  private readonly player: Player;
+  private readonly waypoint: Waypoint;
+  /** Position in storage when the menu opened, so an undone delete goes back in place. */
+  private readonly index: number;
+  private readonly name: ObservableString;
+  private readonly label: ObservableUIRawMessage;
+  private readonly deleted = new ObservableBoolean(false);
+  /** Warp button: hidden once deleted. */
+  private readonly shown = new ObservableBoolean(true);
+  /** Edit controls: edit mode on and not deleted. */
+  private readonly editable: ObservableBoolean;
+  /** Undo button: edit mode on and deleted. */
+  private readonly restorable = new ObservableBoolean(false);
 
-  const response = await show(player, form);
-  const pick = response?.selection;
-  if (pick === undefined) return;
-  const waypoint = waypoints[pick];
-  if (!waypoint) return openMenu(player);
-  return openWaypoint(player, waypoint.name);
-}
-
-async function openWaypoint(player: Player, name: string): Promise<void> {
-  const waypoint = findWaypoint(name);
-  if (!waypoint) {
-    tell(player, t('warp_whistle.gone'));
-    return;
+  constructor(player: Player, waypoint: Waypoint, index: number, editMode: ObservableBoolean) {
+    this.player = player;
+    this.waypoint = waypoint;
+    this.index = index;
+    this.name = new ObservableString(waypoint.name, { clientWritable: true });
+    this.label = new ObservableUIRawMessage(this.labelFor(waypoint));
+    this.editable = new ObservableBoolean(editMode.getData());
+    const update = (): void => {
+      const editing = editMode.getData();
+      const deleted = this.deleted.getData();
+      this.shown.setData(!deleted);
+      this.editable.setData(editing && !deleted);
+      this.restorable.setData(editing && deleted);
+    };
+    editMode.subscribe(update);
+    this.deleted.subscribe(update);
   }
-  const form = new ActionFormData()
-    .title({ text: waypoint.name })
-    .body(t('warp_whistle.manage.detail', waypoint.name, describe(waypoint, waypoint.dimension), waypoint.by))
-    .button(t('warp_whistle.manage.warp'), 'textures/items/ender_pearl')
-    .button(t('warp_whistle.manage.rename'), 'textures/items/name_tag')
-    .button(t('warp_whistle.manage.move'), 'textures/items/compass_item')
-    .button(t('warp_whistle.manage.delete'), 'textures/items/barrier')
-    .button(t('warp_whistle.manage.back'));
 
-  const response = await show(player, form);
-  switch (response?.selection) {
-    case 0: {
-      const destination = destinationOf(waypoint);
-      if (destination) beginWarp(player, destination);
-      else tell(player, t('warp_whistle.failed'));
+  addTo(form: CustomForm, then: (action: () => void) => void): void {
+    const name = this.waypoint.name;
+    form.button(this.label, () => then(() => this.warp()), { visible: this.shown });
+    form.textField(t('warp_whistle.edit.name'), this.name, {
+      description: t('warp_whistle.edit.by', this.waypoint.by),
+      visible: this.editable,
+    });
+    form.button(t('warp_whistle.edit.move', name), () => this.moveHere(), { visible: this.editable });
+    form.button(t('warp_whistle.edit.delete', name), () => this.delete(), { visible: this.editable });
+    form.button(t('warp_whistle.edit.restore', name), () => this.restore(), { visible: this.restorable });
+    form.divider({ visible: this.editable });
+  }
+
+  private labelFor(w: Waypoint): RawMessage {
+    return { rawtext: [{ text: `${w.name} ${Format.gray}` }, describe(w, w.dimension)] };
+  }
+
+  private warp(): void {
+    const current = findWaypoint(this.waypoint.name);
+    const destination = current && destinationOf(current);
+    if (destination) beginWarp(this.player, destination);
+    else tell(this.player, current ? t('warp_whistle.failed') : t('warp_whistle.gone'));
+  }
+
+  private moveHere(): void {
+    const waypoints = loadWaypoints();
+    const target = waypoints.find((w) => w.name === this.waypoint.name);
+    if (!target) {
+      tell(this.player, t('warp_whistle.gone'));
       return;
     }
-    case 1:
-      return renameWaypoint(player, waypoint.name);
-    case 2:
-      return moveWaypoint(player, waypoint.name);
-    case 3:
-      return deleteWaypoint(player, waypoint.name);
-    case 4:
-      return openManage(player);
-    default:
+    Object.assign(target, whereIs(this.player), { by: this.player.name });
+    saveWaypoints(waypoints);
+    this.label.setData(this.labelFor(target));
+    this.player.playSound('random.orb', { pitch: 1.4, volume: 0.6 });
+    tell(this.player, t('warp_whistle.move.done', target.name, describe(target, target.dimension)));
+  }
+
+  private delete(): void {
+    const waypoints = loadWaypoints();
+    const remaining = waypoints.filter((w) => w.name !== this.waypoint.name);
+    if (remaining.length === waypoints.length) {
+      tell(this.player, t('warp_whistle.gone'));
       return;
+    }
+    saveWaypoints(remaining);
+    this.deleted.setData(true);
+    tell(this.player, t('warp_whistle.delete.done', this.waypoint.name));
   }
-}
 
-async function renameWaypoint(player: Player, oldName: string): Promise<void> {
-  const form = new ModalFormData()
-    .title(t('warp_whistle.rename.title'))
-    .textField(t('warp_whistle.set.name'), NAME_PLACEHOLDER, { defaultValue: oldName })
-    .submitButton(t('warp_whistle.rename.submit'));
-  const response = await show(player, form);
-  const newName = validName(player, response?.formValues?.[0], oldName);
-  if (newName === undefined || newName === oldName) return;
-
-  const waypoints = loadWaypoints();
-  const target = waypoints.find((w) => w.name === oldName);
-  if (!target) {
-    tell(player, t('warp_whistle.gone'));
-    return;
+  private restore(): void {
+    const waypoints = loadWaypoints();
+    if (waypoints.some((w) => w.name === this.waypoint.name)) {
+      tell(this.player, t('warp_whistle.set.duplicate', this.waypoint.name));
+      return;
+    }
+    waypoints.splice(Math.min(this.index, waypoints.length), 0, this.waypoint);
+    if (!saveWaypoints(waypoints)) {
+      tell(this.player, t('warp_whistle.set.full'));
+      return;
+    }
+    this.deleted.setData(false);
+    tell(this.player, t('warp_whistle.restore.done', this.waypoint.name));
   }
-  target.name = newName;
-  if (!saveWaypoints(waypoints)) {
-    tell(player, t('warp_whistle.set.full'));
-    return;
-  }
-  tell(player, t('warp_whistle.rename.done', oldName, newName));
-}
 
-function moveWaypoint(player: Player, name: string): void {
-  const waypoints = loadWaypoints();
-  const target = waypoints.find((w) => w.name === name);
-  if (!target) {
-    tell(player, t('warp_whistle.gone'));
-    return;
-  }
-  Object.assign(target, whereIs(player), { by: player.name });
-  saveWaypoints(waypoints);
-  player.playSound('random.orb', { pitch: 1.4, volume: 0.6 });
-  tell(player, t('warp_whistle.move.done', name, describe(target, target.dimension)));
-}
+  /** Saves an edited name field once the menu has closed. */
+  commitRename(): void {
+    if (this.deleted.getData()) return;
+    const oldName = this.waypoint.name;
+    if (this.name.getData().trim() === oldName) return;
+    const newName = validName(this.player, this.name.getData(), oldName);
+    if (newName === undefined) return;
 
-async function deleteWaypoint(player: Player, name: string): Promise<void> {
-  const form = new MessageFormData()
-    .title(t('warp_whistle.delete.title'))
-    .body(t('warp_whistle.delete.body', name))
-    .button1(t('warp_whistle.delete.confirm'))
-    .button2(t('warp_whistle.delete.cancel'));
-  const response = await show(player, form);
-  if (response?.selection !== 0) return;
-
-  const waypoints = loadWaypoints();
-  const remaining = waypoints.filter((w) => w.name !== name);
-  if (remaining.length === waypoints.length) {
-    tell(player, t('warp_whistle.gone'));
-    return;
+    const waypoints = loadWaypoints();
+    const target = waypoints.find((w) => w.name === oldName);
+    if (!target) {
+      tell(this.player, t('warp_whistle.gone'));
+      return;
+    }
+    target.name = newName;
+    if (!saveWaypoints(waypoints)) {
+      tell(this.player, t('warp_whistle.set.full'));
+      return;
+    }
+    tell(this.player, t('warp_whistle.rename.done', oldName, newName));
   }
-  saveWaypoints(remaining);
-  tell(player, t('warp_whistle.delete.done', name));
 }
 
 // ---------- warping ----------
@@ -502,22 +569,29 @@ function beginWarp(player: Player, destination: Destination): void {
 
   playWindup(player, () => {
     warping.delete(player.id);
+    const { follow } = destination;
+    if (follow && !follow.isValid) {
+      if (player.isValid) tell(player, t('warp_whistle.player.gone'));
+      return;
+    }
+    const to = follow ? { location: follow.location, dimension: follow.dimension } : destination;
     try {
       const from = player.dimension;
       const fromLocation = player.location;
-      player.teleport(destination.location, {
-        dimension: destination.dimension,
+      player.teleport(to.location, {
+        dimension: to.dimension,
         ...(destination.yaw !== undefined ? { rotation: { x: 0, y: destination.yaw } } : {}),
       });
       from.playSound('mob.endermen.portal', fromLocation, { volume: 0.7 });
       try {
         burst(from, fromLocation);
-        burst(destination.dimension, destination.location);
+        burst(to.dimension, to.location);
       } catch {
         // Particles are decoration; a missing chunk must not fail the warp.
       }
       player.playSound('mob.endermen.portal', { volume: 0.7, pitch: 1.2 });
-      tell(player, destination.arrivedKey ? t(destination.arrivedKey) : t('warp_whistle.arrived', destination.label));
+      tell(player, t(destination.arrivedKey ?? 'warp_whistle.arrived', destination.label));
+      if (follow) tell(follow, t('warp_whistle.player.incoming', player.name));
     } catch (err) {
       log.error('teleport failed', err);
       if (player.isValid) tell(player, t('warp_whistle.failed'));
@@ -559,6 +633,7 @@ world.afterEvents.playerLeave.subscribe((event) => {
   lastUse.delete(event.playerId);
   warping.delete(event.playerId);
   restingUntil.delete(event.playerId);
+  editing.delete(event.playerId);
 });
 
 // ---------- debug: /scriptevent steveo:warp <give|list|clear|demo> ----------
@@ -568,7 +643,8 @@ function listMessage(player: Player): RawMessage {
   const home = homeOf(player);
   const rawtext: RawMessage[] = [PREFIX, t('warp_whistle.debug.list', `${waypoints.length}`)];
   rawtext.push({ text: '\n' }, home ? t('warp_whistle.debug.list.home', describe(home.location, home.dimension.id)) : t('warp_whistle.debug.list.home.none'));
-  waypoints.forEach((w, i) => {
+  // Newest first, numbered as in the menu.
+  [...waypoints].reverse().forEach((w, i) => {
     rawtext.push({ text: '\n' }, t('warp_whistle.debug.list.one', `${i + 1}`, w.name, describe(w, w.dimension), w.by));
   });
   return { rawtext };
