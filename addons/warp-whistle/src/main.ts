@@ -231,7 +231,8 @@ async function openMenu(player: Player): Promise<void> {
       : t('warp_whistle.menu.home.none'),
     'textures/items/bed_red',
   );
-  for (const other of others) form.button({ text: other.name });
+  // Generic head from this pack: the script API cannot read a player's skin.
+  for (const other of others) form.button({ text: other.name }, 'textures/ui/warp_whistle_player');
   for (const w of waypoints) {
     form.button({ rawtext: [{ text: `${w.name} ${Format.gray}` }, describe(w, w.dimension)] }, 'textures/items/ender_pearl');
   }

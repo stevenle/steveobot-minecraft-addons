@@ -1,4 +1,4 @@
-// Generates the whistle item icon and the pack icons for this add-on.
+// Generates the whistle item icon, the menu's player icon, and the pack icons for this add-on.
 // Run from the repo root:  node addons/warp-whistle/assets/generate.mjs addons/warp-whistle
 // It overwrites the generated files under resource_pack/ and behavior_pack/;
 // the generated output is what gets committed, this script is for regenerating it.
@@ -122,11 +122,45 @@ function paintPackIcon() {
   return c.png();
 }
 
+// ---------- Player icon: 16×16 ----------
+// A generic blocky head for the menu's player buttons, drawn 8×8 at 2×. The
+// script API cannot read a player's skin, so every player gets this one.
+const HEAD = [
+  'HHHHHHHH',
+  'HHHHHHHH',
+  'HSSSSSSH',
+  'SSSSSSSS',
+  'SWESSEWS',
+  'SSSNNSSS',
+  'SSMMMMSS',
+  'sSMSSMSs',
+];
+const HEAD_COLORS = {
+  H: hex('#3B2A1A'), // hair
+  S: hex('#C69C6D'), // skin
+  s: hex('#B4845A'), // skin shade
+  W: hex('#FFFFFF'), // eye white
+  E: hex('#4A5DBF'), // iris
+  N: hex('#9C6B43'), // nose
+  M: hex('#6E4530'), // mouth
+};
+
+function paintPlayerIcon() {
+  const c = canvas(16, 16);
+  for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++) {
+    const col = HEAD_COLORS[HEAD[y][x]];
+    for (let dy = 0; dy < 2; dy++) for (let dx = 0; dx < 2; dx++) c.set(x * 2 + dx, y * 2 + dy, col);
+  }
+  return c.png();
+}
+
 // ---------- Write ----------
 const rp = path.join(out, 'resource_pack');
 fs.mkdirSync(path.join(rp, 'textures', 'items'), { recursive: true });
 fs.writeFileSync(path.join(rp, 'textures', 'items', 'warp_whistle.png'), paintItemIcon());
+fs.mkdirSync(path.join(rp, 'textures', 'ui'), { recursive: true });
+fs.writeFileSync(path.join(rp, 'textures', 'ui', 'warp_whistle_player.png'), paintPlayerIcon());
 const icon = paintPackIcon();
 fs.writeFileSync(path.join(rp, 'pack_icon.png'), icon);
 fs.writeFileSync(path.join(out, 'behavior_pack', 'pack_icon.png'), icon);
-console.log('wrote whistle icon and pack icons to', out);
+console.log('wrote whistle, player, and pack icons to', out);
