@@ -26,18 +26,20 @@ whistle never breaks.
 | **Use** (right-click / tap) | Opens the warp menu |
 | **Crouch + Use** | Sets a new waypoint where you stand |
 
-The menu lists, in order:
+The menu has two sections:
 
-1. **Home** — your bed (or respawn anchor). It is read from your spawn point
-   every time, so it follows wherever you last slept. If you have no bed yet
-   the button says so and warping does nothing.
-2. **Set a waypoint here** — asks for a name and saves your current spot and
-   facing. There is no limit on how many waypoints the world holds; names
-   are up to 24 characters and must be unique.
-3. **Players** — everyone else online. You land wherever they are when the
-   wind-up ends, and they get a chat message saying you arrived.
-4. **Waypoints** — every shared waypoint, newest first, with its coordinates
-   and, outside the Overworld, its dimension.
+- **Quick warp**
+  - **Home**: your bed (or respawn anchor). It is read from your spawn
+    point every time, so it follows wherever you last slept. If you have no
+    bed yet the button says so and warping does nothing.
+  - **One button per other player online**: you land wherever they are when
+    the wind-up ends, and they get a chat message saying you arrived.
+- **Waypoints**
+  - **Set a waypoint here**: asks for a name and saves your current spot
+    and facing. There is no limit on how many waypoints the world holds;
+    names are up to 24 characters and must be unique.
+  - **Every shared waypoint, newest first**: each one shows its coordinates
+    and, outside the Overworld, its dimension.
 
 The **Edit waypoints** toggle above the waypoint list adds edit controls in
 place under each waypoint, so you never leave the menu:
@@ -51,7 +53,8 @@ The menu remembers whether Edit was on the next time you open it.
 
 The menu is a data-driven `CustomForm` from `@minecraft/server-ui` 2.1.0,
 not the older `ActionFormData`. That is what lets the edit controls appear
-and disappear while the menu is open. Its buttons have no icons.
+and disappear while the menu is open. Its buttons have no icons, and its
+text shows `§` color codes literally, so the menu uses none.
 
 Picking a destination starts a two-second wind-up: the whistle plays its tune
 and sparkles spiral upward around you. Then you are teleported, across

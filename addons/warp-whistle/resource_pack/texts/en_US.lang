@@ -6,13 +6,13 @@ item.steveo:warp_whistle.name=Warp Whistle
 
 warp_whistle.hint=Use: open the warp menu. Crouch + use: set a waypoint where you stand. Home is always your bed; turn on Edit in the menu to rename, move, or delete waypoints.
 
-## Main menu
+## Main menu (a CustomForm: § color codes show literally here, so none are used)
 warp_whistle.menu.title=Warp Whistle
-warp_whistle.menu.home=Home (your bed)
-warp_whistle.menu.home.none=Home §7(no bed yet)
+warp_whistle.menu.home=Home
+warp_whistle.menu.home.none=Home (no bed yet)
 warp_whistle.menu.set=Set a waypoint here
-warp_whistle.menu.players=Players
-warp_whistle.menu.waypoints=Waypoints §7(newest first)
+warp_whistle.menu.quick=Quick warp
+warp_whistle.menu.waypoints=Waypoints
 warp_whistle.menu.edit=Edit waypoints
 warp_whistle.menu.edit.hint=Rename, move, or delete waypoints right in this list. New names are saved when you close the menu.
 warp_whistle.dim.nether=Nether
@@ -31,9 +31,9 @@ warp_whistle.set.duplicate=There is already a waypoint called §e%s§r.
 ## Edit (inline in the menu)
 warp_whistle.edit.name=Name
 warp_whistle.edit.by=Set by %s
-warp_whistle.edit.move=§7  Move §e%s§7 here
-warp_whistle.edit.delete=§7  Delete §e%s
-warp_whistle.edit.restore=Undo: bring back §e%s
+warp_whistle.edit.move=Move %s here
+warp_whistle.edit.delete=Delete %s
+warp_whistle.edit.restore=Undo: bring back %s
 warp_whistle.rename.done=Renamed §e%s§r to §e%s§r.
 warp_whistle.move.done=Moved §e%s§r to %s.
 warp_whistle.delete.done=Deleted §e%s§r.

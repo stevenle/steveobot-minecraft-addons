@@ -234,7 +234,8 @@ async function showCustom(build: () => CustomForm): Promise<boolean> {
 const editing = new Map<string, boolean>();
 
 /**
- * The one menu: Home, other players, then waypoints newest first. The Edit
+ * The one menu: a quick-warp section with Home and the other players, then
+ * the waypoints, newest first. The Edit
  * toggle reveals a name field and Move / Delete buttons under each waypoint
  * in place, so nothing needs a second screen. Move and Delete apply at once
  * (Delete leaves an undo button behind); renames are saved when the menu
@@ -252,27 +253,25 @@ async function openMenu(player: Player): Promise<void> {
   let next: (() => void | Promise<void>) | undefined;
 
   const shown = await showCustom(() => {
-    const form = new CustomForm(player, t('warp_whistle.menu.title')).closeButton();
+    // CustomForm text shows § color codes literally, so nothing in this form uses them.
+    const form = new CustomForm(player, t('warp_whistle.menu.title'));
     const then = (action: () => void | Promise<void>): void => {
       next = action;
       form.close();
     };
 
-    form.button(
-      home ? { rawtext: [t('warp_whistle.menu.home'), { text: ` ${Format.gray}` }, describe(home.location, home.dimension.id)] } : t('warp_whistle.menu.home.none'),
-      () => then(() => (home ? beginWarp(player, home) : tell(player, t('warp_whistle.home.none')))),
+    form.header(t('warp_whistle.menu.quick'));
+    form.button(home ? t('warp_whistle.menu.home') : t('warp_whistle.menu.home.none'), () =>
+      then(() => (home ? beginWarp(player, home) : tell(player, t('warp_whistle.home.none')))),
     );
-    form.button(t('warp_whistle.menu.set'), () => then(() => openSetWaypoint(player)));
-
-    if (others.length > 0) {
-      form.header(t('warp_whistle.menu.players'));
-      for (const other of others) {
-        form.button({ text: other.name }, () => then(() => warpToPlayer(player, other)));
-      }
+    for (const other of others) {
+      form.button({ text: other.name }, () => then(() => warpToPlayer(player, other)));
     }
 
+    form.spacer();
+    form.header(t('warp_whistle.menu.waypoints'));
+    form.button(t('warp_whistle.menu.set'), () => then(() => openSetWaypoint(player)));
     if (rows.length > 0) {
-      form.header(t('warp_whistle.menu.waypoints'));
       form.toggle(t('warp_whistle.menu.edit'), editMode, { description: t('warp_whistle.menu.edit.hint') });
       for (const row of rows) row.addTo(form, then);
     }
@@ -398,7 +397,7 @@ class WaypointRow {
   }
 
   private labelFor(w: Waypoint): RawMessage {
-    return { rawtext: [{ text: `${w.name} ${Format.gray}` }, describe(w, w.dimension)] };
+    return { rawtext: [{ text: `${w.name}  ·  ` }, describe(w, w.dimension)] };
   }
 
   private warp(): void {
