@@ -32,8 +32,9 @@ the darker shade of that material.
 ## What carries over
 
 Trimming swaps the tool for a trimmed twin and copies everything across:
-enchantments, durability, custom name, lore, and data other add-ons keep on
-the item (Super Enchantments' custom enchantments come along). If the trimmed
+enchantments, durability, custom name, and lore. Super Enchantments' levels
+come along too: the game hides one pack's item data from another, so Super
+Enchantments reads them back from the lore lines. If the trimmed
 tool cannot carry one of the enchantments, the table refuses and leaves the
 tool alone rather than dropping it.
 

@@ -7,8 +7,8 @@
  * one. Picking a material takes one of it and swaps the tool in your hand for
  * its trimmed twin (see trims.ts for why a trim is a different item). The
  * swap carries everything over: enchantments, durability, custom name, lore,
- * and other add-ons' dynamic properties (Super Enchantments keeps its data
- * there).
+ * and this pack's dynamic properties. Other packs' dynamic properties cannot
+ * be read from here; Super Enchantments recovers its levels from the lore.
  *
  * The vanilla smithing table cannot do this. Its base slot only accepts items
  * tagged minecraft:transformable_items, which vanilla gives to diamond tools
@@ -162,11 +162,16 @@ function transfer(source: ItemStack, targetId: string): ItemStack | Enchantment 
   if (from && to) to.damage = Math.min(from.damage, to.maxDurability - 1);
 
   if (source.nameTag !== undefined) target.nameTag = source.nameTag;
-  target.setLore(source.getLore());
+  // Raw lore, not getLore(): Super Enchantments renders RawMessage lines,
+  // which flatten to strings and would lose their translations.
+  target.setLore(source.getRawLore());
   target.keepOnDeath = source.keepOnDeath;
   target.lockMode = source.lockMode;
   target.setCanDestroy(source.getCanDestroy());
   target.setCanPlaceOn(source.getCanPlaceOn());
+  // Only this pack's own properties: the game scopes them per behavior pack,
+  // so Super Enchantments' record is invisible here. It rebuilds the record
+  // from the lore copied above.
   for (const id of source.getDynamicPropertyIds()) target.setDynamicProperty(id, source.getDynamicProperty(id));
   return target;
 }
