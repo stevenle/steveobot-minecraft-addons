@@ -235,30 +235,36 @@ const editing = new Map<string, boolean>();
 
 /**
  * The one menu: a quick-warp section with Home and the other players, then
- * the waypoints, newest first. The Edit
- * toggle reveals a name field and Move / Delete buttons under each waypoint
- * in place, so nothing needs a second screen. Move and Delete apply at once
- * (Delete leaves an undo button behind); renames are saved when the menu
- * closes. Anything that leaves the menu — a warp, setting a waypoint — is
- * queued and run after the form has closed.
+ * the waypoints, newest first. The Edit toggle switches to a view with a
+ * name field and Move / Delete buttons under each waypoint. Move and Delete
+ * apply at once (Delete leaves an undo button behind); renames are saved
+ * when the menu closes. Anything that leaves the menu — a warp, setting a
+ * waypoint — is queued and run after the form has closed.
+ *
+ * Only the current view is built. Every control and observable is sent to
+ * the client even when hidden, and building the edit controls for a long
+ * list up front froze the game for seconds on every open, so the toggle
+ * reopens the menu in the other view instead of revealing hidden controls.
  */
 async function openMenu(player: Player): Promise<void> {
   const home = homeOf(player);
   const others = world.getAllPlayers().filter((p) => p.id !== player.id);
-  const editMode = new ObservableBoolean(editing.get(player.id) ?? false, { clientWritable: true });
+  const inEditView = editing.get(player.id) ?? false;
+  const editMode = new ObservableBoolean(inEditView, { clientWritable: true });
   // Stored oldest first, in the order they were set; shown newest first.
-  const rows = loadWaypoints()
-    .map((w, index) => new WaypointRow(player, w, index, editMode))
-    .reverse();
+  const waypoints = loadWaypoints();
+  const rows = inEditView ? waypoints.map((w, index) => new WaypointRow(player, w, index)).reverse() : [];
   let next: (() => void | Promise<void>) | undefined;
+  let form: CustomForm | undefined;
+  const then = (action: () => void | Promise<void>): void => {
+    next = action;
+    form?.close();
+  };
+  editMode.subscribe(() => then(() => openMenu(player)));
 
   const shown = await showCustom(() => {
     // CustomForm text shows § color codes literally, so nothing in this form uses them.
-    const form = new CustomForm(player, t('warp_whistle.menu.title'));
-    const then = (action: () => void | Promise<void>): void => {
-      next = action;
-      form.close();
-    };
+    form = new CustomForm(player, t('warp_whistle.menu.title'));
 
     form.header(t('warp_whistle.menu.quick'));
     form.button(home ? t('warp_whistle.menu.home') : t('warp_whistle.menu.home.none'), () =>
@@ -271,9 +277,15 @@ async function openMenu(player: Player): Promise<void> {
     form.spacer();
     form.header(t('warp_whistle.menu.waypoints'));
     form.button(t('warp_whistle.menu.set'), () => then(() => openSetWaypoint(player)));
-    if (rows.length > 0) {
+    if (waypoints.length > 0) {
       form.toggle(t('warp_whistle.menu.edit'), editMode, { description: t('warp_whistle.menu.edit.hint') });
+    }
+    if (inEditView) {
       for (const row of rows) row.addTo(form, then);
+    } else {
+      for (const w of [...waypoints].reverse()) {
+        form.button(waypointLabel(w), () => then(() => warpToWaypoint(player, w.name)));
+      }
     }
     return form;
   });
@@ -282,6 +294,18 @@ async function openMenu(player: Player): Promise<void> {
   if (!shown) return;
   for (const row of rows) row.commitRename();
   await next?.();
+}
+
+function waypointLabel(w: Waypoint): RawMessage {
+  return { rawtext: [{ text: `${w.name}  ·  ` }, describe(w, w.dimension)] };
+}
+
+/** Warps to a waypoint by name, re-reading it so a move or delete since the menu opened counts. */
+function warpToWaypoint(player: Player, name: string): void {
+  const current = findWaypoint(name);
+  const destination = current && destinationOf(current);
+  if (destination) beginWarp(player, destination);
+  else tell(player, current ? t('warp_whistle.failed') : t('warp_whistle.gone'));
 }
 
 function warpToPlayer(player: Player, target: Player): void {
@@ -345,10 +369,10 @@ function validName(player: Player, value: unknown, current?: string): string | u
 }
 
 /**
- * One waypoint in the menu: its warp button, plus the edit controls the Edit
- * toggle reveals beneath it. The waypoint is found in storage by the name it
- * had when the menu opened, and every change reloads the list first, so edits
- * by other players in the meantime are not overwritten.
+ * One waypoint in the menu's edit view: its warp button and edit controls.
+ * The waypoint is found in storage by the name it had when the menu opened,
+ * and every change reloads the list first, so edits by other players in the
+ * meantime are not overwritten.
  */
 class WaypointRow {
   private readonly player: Player;
@@ -357,54 +381,31 @@ class WaypointRow {
   private readonly index: number;
   private readonly name: ObservableString;
   private readonly label: ObservableUIRawMessage;
+  /** Undo button: shown once deleted. */
   private readonly deleted = new ObservableBoolean(false);
-  /** Warp button: hidden once deleted. */
-  private readonly shown = new ObservableBoolean(true);
-  /** Edit controls: edit mode on and not deleted. */
-  private readonly editable: ObservableBoolean;
-  /** Undo button: edit mode on and deleted. */
-  private readonly restorable = new ObservableBoolean(false);
+  /** Everything else: hidden once deleted. */
+  private readonly kept = new ObservableBoolean(true);
 
-  constructor(player: Player, waypoint: Waypoint, index: number, editMode: ObservableBoolean) {
+  constructor(player: Player, waypoint: Waypoint, index: number) {
     this.player = player;
     this.waypoint = waypoint;
     this.index = index;
     this.name = new ObservableString(waypoint.name, { clientWritable: true });
-    this.label = new ObservableUIRawMessage(this.labelFor(waypoint));
-    this.editable = new ObservableBoolean(editMode.getData());
-    const update = (): void => {
-      const editing = editMode.getData();
-      const deleted = this.deleted.getData();
-      this.shown.setData(!deleted);
-      this.editable.setData(editing && !deleted);
-      this.restorable.setData(editing && deleted);
-    };
-    editMode.subscribe(update);
-    this.deleted.subscribe(update);
+    this.label = new ObservableUIRawMessage(waypointLabel(waypoint));
+    this.deleted.subscribe((deleted) => this.kept.setData(!deleted));
   }
 
   addTo(form: CustomForm, then: (action: () => void) => void): void {
     const name = this.waypoint.name;
-    form.button(this.label, () => then(() => this.warp()), { visible: this.shown });
+    form.button(this.label, () => then(() => warpToWaypoint(this.player, name)), { visible: this.kept });
     form.textField(t('warp_whistle.edit.name'), this.name, {
       description: t('warp_whistle.edit.by', this.waypoint.by),
-      visible: this.editable,
+      visible: this.kept,
     });
-    form.button(t('warp_whistle.edit.move', name), () => this.moveHere(), { visible: this.editable });
-    form.button(t('warp_whistle.edit.delete', name), () => this.delete(), { visible: this.editable });
-    form.button(t('warp_whistle.edit.restore', name), () => this.restore(), { visible: this.restorable });
-    form.divider({ visible: this.editable });
-  }
-
-  private labelFor(w: Waypoint): RawMessage {
-    return { rawtext: [{ text: `${w.name}  ·  ` }, describe(w, w.dimension)] };
-  }
-
-  private warp(): void {
-    const current = findWaypoint(this.waypoint.name);
-    const destination = current && destinationOf(current);
-    if (destination) beginWarp(this.player, destination);
-    else tell(this.player, current ? t('warp_whistle.failed') : t('warp_whistle.gone'));
+    form.button(t('warp_whistle.edit.move', name), () => this.moveHere(), { visible: this.kept });
+    form.button(t('warp_whistle.edit.delete', name), () => this.delete(), { visible: this.kept });
+    form.button(t('warp_whistle.edit.restore', name), () => this.restore(), { visible: this.deleted });
+    form.divider({ visible: this.kept });
   }
 
   private moveHere(): void {
@@ -416,7 +417,7 @@ class WaypointRow {
     }
     Object.assign(target, whereIs(this.player), { by: this.player.name });
     saveWaypoints(waypoints);
-    this.label.setData(this.labelFor(target));
+    this.label.setData(waypointLabel(target));
     this.player.playSound('random.orb', { pitch: 1.4, volume: 0.6 });
     tell(this.player, t('warp_whistle.move.done', target.name, describe(target, target.dimension)));
   }

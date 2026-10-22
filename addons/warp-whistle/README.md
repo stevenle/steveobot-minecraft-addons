@@ -41,8 +41,8 @@ The menu has two sections:
   - **Every shared waypoint, newest first**: each one shows its coordinates
     and, outside the Overworld, its dimension.
 
-The **Edit waypoints** toggle above the waypoint list adds edit controls in
-place under each waypoint, so you never leave the menu:
+The **Edit waypoints** toggle above the waypoint list reopens the menu with
+edit controls under each waypoint:
 
 - a **Name** field (the new name is saved when you close the menu),
 - **Move here**, which moves the waypoint to where you stand,
@@ -52,8 +52,11 @@ place under each waypoint, so you never leave the menu:
 The menu remembers whether Edit was on the next time you open it.
 
 The menu is a data-driven `CustomForm` from `@minecraft/server-ui` 2.1.0,
-not the older `ActionFormData`. That is what lets the edit controls appear
-and disappear while the menu is open. Its buttons have no icons, and its
+not the older `ActionFormData`, so the name field and buttons can sit in one
+list and Undo can replace a deleted waypoint while the menu is open. Only the
+current view is built: hidden controls still cost time to send, and building
+the edit controls up front for every waypoint froze the game on each open.
+Its buttons have no icons, and its
 text shows `§` color codes literally, so the menu uses none.
 
 Picking a destination starts a two-second wind-up: the whistle plays its tune
