@@ -1,5 +1,5 @@
 /**
- * Super Enchantments — every enchantment up to level 20, seven new ones, and
+ * Super Enchantments — every enchantment up to level 20, eight new ones, and
  * an Enchantment Tower to find them in.
  *
  * Bedrock has no data-driven enchantments and `addEnchantment` refuses levels
@@ -18,8 +18,8 @@
  *   is cosmetic. README.md lists which is which.
  *
  * The custom enchantments (Power Knockback, Extra Hit, Super Efficiency, Keen
- * Edge, Super Gems, Ender Blinding, Lightning Strike) exist only in that
- * property; they are applied by the fountain, shown in lore, and enacted here.
+ * Edge, Super Gems, Ender Blinding, Lightning Strike, Victor's Boon) exist
+ * only in that property; they are applied by the fountain, shown in lore, and enacted here.
  * Ender Blinding
  * also needs behavior_pack/entities/enderman.json, a vanilla copy whose stare
  * trigger skips players with ENDER_BLIND_TAG.
@@ -78,7 +78,17 @@ const KEEN_EDGE = 'steveo:keen_edge';
 const SUPER_GEMS = 'steveo:super_gems';
 const ENDER_BLINDING = 'steveo:ender_blinding';
 const LIGHTNING_STRIKE = 'steveo:lightning_strike';
-const CUSTOM_IDS = [POWER_KNOCKBACK, EXTRA_HIT, SUPER_EFFICIENCY, KEEN_EDGE, SUPER_GEMS, ENDER_BLINDING, LIGHTNING_STRIKE] as const;
+const VICTORS_BOON = 'steveo:victors_boon';
+const CUSTOM_IDS = [
+  POWER_KNOCKBACK,
+  EXTRA_HIT,
+  SUPER_EFFICIENCY,
+  KEEN_EDGE,
+  SUPER_GEMS,
+  ENDER_BLINDING,
+  LIGHTNING_STRIKE,
+  VICTORS_BOON,
+] as const;
 /** Player tag the patched enderman.json checks; must match assets/generate.mjs. */
 const ENDER_BLIND_TAG = 'steveo:ender_blind';
 
@@ -93,6 +103,28 @@ const SUPER_GEMS_BASE_CHANCE = 0.02;
 const SUPER_GEMS_CHANCE_PER_LEVEL = 0.005;
 /** The gems Super Gems can drop, picked with equal odds. */
 const GEM_IDS = ['minecraft:diamond', 'minecraft:emerald'];
+/** Victor's Boon: chance per mob kill of a blessing, base plus this much per level. */
+const BOON_BASE_CHANCE = 0.04;
+const BOON_CHANCE_PER_LEVEL = 0.008;
+/** Seconds the blessing lasts, base plus this much per level. */
+const BOON_SECONDS_BASE = 10;
+const BOON_SECONDS_PER_LEVEL = 1;
+/** From this level on the blessing is one tier stronger (Strength II, Speed II, ...). */
+const BOON_TIER_TWO_LEVEL = 11;
+/** The blessings Victor's Boon can grant, picked with equal odds. All are positive. */
+const BOON_EFFECTS = [
+  'speed',
+  'strength',
+  'regeneration',
+  'resistance',
+  'absorption',
+  'haste',
+  'jump_boost',
+  'fire_resistance',
+  'night_vision',
+] as const;
+/** Effects with only one meaningful tier; a higher amplifier would do nothing. */
+const BOON_SINGLE_TIER = new Set<string>(['fire_resistance', 'night_vision']);
 /** Extra damage per Smite / Bane of Arthropods level above V, against their families. */
 const SMITE_PER_LEVEL = 2.5;
 /** Arrow damage multiplier gained per Power level above V (vanilla is +25% per level). */
@@ -407,6 +439,7 @@ function customApplies(id: string, item: ItemStack): boolean {
     case KEEN_EDGE:
       return isPaxel(item);
     case SUPER_GEMS:
+    case VICTORS_BOON:
       return isMelee(item) || RANGED_TYPES.has(item.typeId);
     case ENDER_BLINDING:
       return isHelmet(item);
@@ -678,14 +711,10 @@ world.beforeEvents.entityHurt.subscribe((event) => {
   if (damage !== event.damage) event.damage = damage;
 });
 
-// ---------- kills: Super Gems ----------
+// ---------- kills: Super Gems, Victor's Boon ----------
 
-world.afterEvents.entityDie.subscribe((event) => {
-  const killer = event.damageSource.damagingEntity;
-  const victim = event.deadEntity;
-  if (!(killer instanceof Player) || victim instanceof Player) return;
-  // For an arrow kill this is the bow still in hand, which is what we want.
-  const level = totalLevel(heldItem(killer), SUPER_GEMS);
+function superGems(weapon: ItemStack | undefined, victim: Entity): void {
+  const level = totalLevel(weapon, SUPER_GEMS);
   if (level === 0 || Math.random() > SUPER_GEMS_BASE_CHANCE + SUPER_GEMS_CHANCE_PER_LEVEL * level) return;
   const gem = GEM_IDS[Math.floor(Math.random() * GEM_IDS.length)];
   if (gem === undefined) return;
@@ -696,6 +725,46 @@ world.afterEvents.entityDie.subscribe((event) => {
   } catch (err) {
     log.warn(`could not drop a gem for ${victim.typeId}: ${String(err)}`);
   }
+}
+
+/** Grants one random positive effect, longer and (from BOON_TIER_TWO_LEVEL) stronger with the level. */
+function victorsBoon(killer: Player, weapon: ItemStack | undefined): void {
+  const level = totalLevel(weapon, VICTORS_BOON);
+  if (level === 0 || Math.random() > BOON_BASE_CHANCE + BOON_CHANCE_PER_LEVEL * level) return;
+  const effect = BOON_EFFECTS[Math.floor(Math.random() * BOON_EFFECTS.length)];
+  if (effect === undefined) return;
+  const seconds = BOON_SECONDS_BASE + BOON_SECONDS_PER_LEVEL * level;
+  const amplifier = level >= BOON_TIER_TWO_LEVEL && !BOON_SINGLE_TIER.has(effect) ? 1 : 0;
+  try {
+    killer.addEffect(effect, seconds * 20, { amplifier, showParticles: true });
+  } catch (err) {
+    log.warn(`could not grant ${effect} to ${killer.name}: ${String(err)}`);
+    return;
+  }
+  try {
+    killer.dimension.playSound('random.levelup', killer.location, { pitch: 1.6, volume: 0.6 });
+    killer.dimension.spawnParticle('minecraft:totem_particle', {
+      x: killer.location.x,
+      y: killer.location.y + 1,
+      z: killer.location.z,
+    });
+  } catch {
+    // Decoration only.
+  }
+  killer.onScreenDisplay.setActionBar({
+    translate: 'super_enchantments.boon.granted',
+    with: { rawtext: [{ translate: `super_enchantments.boon.effect.${effect}` }, { text: amplifier > 0 ? ' II' : '' }, { text: String(seconds) }] },
+  });
+}
+
+world.afterEvents.entityDie.subscribe((event) => {
+  const killer = event.damageSource.damagingEntity;
+  const victim = event.deadEntity;
+  if (!(killer instanceof Player) || victim instanceof Player) return;
+  // For an arrow kill this is the bow still in hand, which is what we want.
+  const weapon = heldItem(killer);
+  superGems(weapon, victim);
+  victorsBoon(killer, weapon);
 });
 
 // ---------- melee hits: Knockback, Power Knockback, Fire Aspect ----------

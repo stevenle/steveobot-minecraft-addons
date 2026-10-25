@@ -1,6 +1,6 @@
 # Super Enchantments
 
-Every enchantment goes up to level 20, seven new enchantments join the
+Every enchantment goes up to level 20, eight new enchantments join the
 list, and the place to get them is the Super Enchantment Fountain at the
 top of an Enchantment Tower.
 
@@ -128,6 +128,17 @@ not. It is real lightning, like Channeling: it can start fires on the
 ground, charge creepers, and turn pigs and villagers into zombified piglins
 and witches.
 
+**Victor's Boon** (swords, axes, paxels, maces, tridents, bows, crossbows):
+every mob you kill has a small chance of blessing you with a random
+positive effect: Speed, Strength, Regeneration, Resistance, Absorption,
+Haste, Jump Boost, Fire Resistance, or Night Vision. The action bar names
+the one you got. Level I is a 4.8% chance for 11 seconds; each level adds
+0.8% and a second, so level XX is a 20% chance for 30 seconds. From level
+XI on the effect is one tier stronger (Strength II, Speed II, and so on;
+Fire Resistance and Night Vision have only one tier). For arrow kills, the
+bow or crossbow in your hand when the mob dies is the one that counts.
+Killing players never triggers it.
+
 ## Debug commands
 
 Chat is the only console on a Realm, so the add-on answers to a script event:
@@ -143,6 +154,7 @@ Chat is the only console on a Realm, so the add-on answers to a script event:
 /scriptevent steveo:enchant apply sharpness 20  # enchant the held item for free
 /scriptevent steveo:enchant apply extra_hit 5   # the new ones work by name too
 /scriptevent steveo:enchant apply lightning_strike 20
+/scriptevent steveo:enchant apply victors_boon 20
 ```
 
 ## Files
@@ -175,3 +187,4 @@ The tower places, the fountain menu works, and the lore lines render
 - `entityHitBlock` firing on bedrock for the Super Efficiency timer.
 - Ender Blinding: the patched enderman's `has_tag` stare filter.
 - Lightning Strike: the bolt spawning, and the wielder's immunity to it.
+- Victor's Boon: the effects, the totem particle, and the action-bar line.

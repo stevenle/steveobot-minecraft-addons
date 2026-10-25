@@ -53,6 +53,7 @@ super_enchantments.enchant.keen_edge=Keen Edge
 super_enchantments.enchant.super_gems=Super Gems
 super_enchantments.enchant.ender_blinding=Ender Blinding
 super_enchantments.enchant.lightning_strike=Lightning Strike
+super_enchantments.enchant.victors_boon=Victor's Boon
 
 ## The fountain menu
 super_enchantments.fountain.title=Super Enchantment Fountain
@@ -76,6 +77,16 @@ super_enchantments.efficiency.start=Super Efficiency bites into the bedrock. Kee
 super_enchantments.efficiency.progress=Mining bedrock %s §7%s%% - %s left
 super_enchantments.efficiency.lost=You stopped mining the bedrock. Progress lost.
 super_enchantments.efficiency.done=The bedrock gives way!
+super_enchantments.boon.granted=§6Victor's Boon!§r %s%s for %s seconds
+super_enchantments.boon.effect.speed=Speed
+super_enchantments.boon.effect.strength=Strength
+super_enchantments.boon.effect.regeneration=Regeneration
+super_enchantments.boon.effect.resistance=Resistance
+super_enchantments.boon.effect.absorption=Absorption
+super_enchantments.boon.effect.haste=Haste
+super_enchantments.boon.effect.jump_boost=Jump Boost
+super_enchantments.boon.effect.fire_resistance=Fire Resistance
+super_enchantments.boon.effect.night_vision=Night Vision
 
 ## Debug (/scriptevent steveo:enchant ...)
 super_enchantments.debug.tower=An Enchantment Tower has been raised around you. Climb the ladder.
@@ -90,7 +101,7 @@ super_enchantments.debug.info.header=%s carries %s enchantment(s):
 super_enchantments.debug.info.line=  §d%s %s§r (vanilla max %s, in-game level %s)
 super_enchantments.debug.info.empty=  (none)
 super_enchantments.debug.apply=Applied §d%s %s§r to your %s.
-super_enchantments.debug.apply.bad=Usage: apply <enchantment> <1-%s>, for example: apply sharpness 20 or apply extra_hit 5
+super_enchantments.debug.apply.bad=Usage: apply <enchantment> <1-%s>, for example: apply sharpness 20 or apply victors_boon 5
 super_enchantments.debug.apply.failed=Could not apply %s: %s
 super_enchantments.debug.blind.on=Endermen cannot see you: your helmet has Ender Blinding.
 super_enchantments.debug.blind.off=Endermen can see you: no Ender Blinding helmet is being worn.
