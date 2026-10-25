@@ -1,0 +1,5 @@
+{
+  "$schema": "../../tools/schemas/addon.schema.json",
+  "name": "Luckier Block",
+  "description": "A rainbow lucky block. Break it for a random item, or something terrible."
+}

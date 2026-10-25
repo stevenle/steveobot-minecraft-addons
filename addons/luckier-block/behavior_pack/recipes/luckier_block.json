@@ -1,0 +1,32 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "steveo:luckier_block_recipe"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "GGG",
+      "GDG",
+      "GGG"
+    ],
+    "key": {
+      "G": {
+        "item": "minecraft:gold_ingot"
+      },
+      "D": {
+        "item": "minecraft:dropper"
+      }
+    },
+    "unlock": [
+      {
+        "item": "minecraft:gold_ingot"
+      }
+    ],
+    "result": {
+      "item": "steveo:luckier_block"
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "format_version": "1.21.90",
+  "minecraft:block": {
+    "description": {
+      "identifier": "steveo:luckier_block",
+      "menu_category": {
+        "category": "construction"
+      }
+    },
+    "components": {
+      "minecraft:display_name": "tile.steveo:luckier_block.name",
+      "minecraft:geometry": "minecraft:geometry.full_block",
+      "minecraft:material_instances": {
+        "*": {
+          "texture": "steveo_luckier_block",
+          "render_method": "opaque"
+        }
+      },
+      "minecraft:map_color": "#E040FB",
+      "minecraft:light_emission": 6,
+      "minecraft:destructible_by_explosion": false,
+      "minecraft:destructible_by_mining": {
+        "seconds_to_destroy": 0.6
+      },
+      "minecraft:loot": "loot_tables/empty.json",
+      "steveo:luckier_block": {}
+    }
+  }
+}
