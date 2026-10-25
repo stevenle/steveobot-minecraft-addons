@@ -25,6 +25,15 @@
           "leg_r": "query.mark_variant == 0"
         },
         {
+          "arm_l": "query.mark_variant == 0"
+        },
+        {
+          "arm_r": "query.mark_variant == 0"
+        },
+        {
+          "head": "query.mark_variant == 0"
+        },
+        {
           "shell_only": "query.mark_variant == 1"
         }
       ]

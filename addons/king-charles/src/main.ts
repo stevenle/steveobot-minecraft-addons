@@ -56,7 +56,12 @@ const HOME_PROPERTY = 'steveo:home';
 const HOMEBOUND_TAG = 'steveo:homebound';
 const BED_ID = 'minecraft:bed';
 
-/** Food that heals. Matches `tame_items` and `tempt` in the entity JSON. */
+/**
+ * Food that heals. Matches `tame_items`, `tempt`, and `healable` in the entity
+ * JSON. `healable` is what makes the client treat food on a tamed dog as an
+ * entity interaction at all, so the before-event below fires instead of the
+ * player just eating it.
+ */
 const GOOD_FOOD = new Set([
   'minecraft:cooked_beef',
   'minecraft:cooked_chicken',

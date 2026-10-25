@@ -68,6 +68,17 @@
           "value": 16,
           "max": 16
         },
+        "minecraft:healable": {
+          "items": [
+            { "item": "minecraft:cooked_beef", "heal_amount": 16 },
+            { "item": "minecraft:cooked_chicken", "heal_amount": 16 },
+            { "item": "minecraft:cooked_porkchop", "heal_amount": 16 },
+            { "item": "minecraft:cooked_mutton", "heal_amount": 16 },
+            { "item": "minecraft:cooked_rabbit", "heal_amount": 16 },
+            { "item": "minecraft:cooked_cod", "heal_amount": 16 },
+            { "item": "minecraft:cooked_salmon", "heal_amount": 16 }
+          ]
+        },
         "minecraft:sittable": {},
         "minecraft:behavior.stay_while_sitting": {
           "priority": 1
