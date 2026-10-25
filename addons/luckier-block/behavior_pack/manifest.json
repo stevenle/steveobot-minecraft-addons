@@ -1,0 +1,38 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Luckier Block BP",
+    "description": "A rainbow lucky block. Break it for a random item, or something terrible.",
+    "uuid": "c262384d-169b-4bd9-b37c-4ca3a4f5cfda",
+    "version": [1, 0, 0],
+    "min_engine_version": [1, 26, 40]
+  },
+  "modules": [
+    {
+      "type": "data",
+      "uuid": "7682c822-b2d4-49fe-adf2-6a042ccf0e10",
+      "version": [1, 0, 0]
+    },
+    {
+      "type": "script",
+      "language": "javascript",
+      "entry": "scripts/main.js",
+      "uuid": "2824480a-28a1-4fde-8d56-3cc22156a31d",
+      "version": [1, 0, 0]
+    }
+  ],
+  "dependencies": [
+    {
+      "uuid": "48eb2831-6965-4bfe-8515-51317bf9626e",
+      "version": [1, 0, 0]
+    },
+    {
+      "module_name": "@minecraft/server",
+      "version": "2.9.0"
+    }
+  ],
+  "metadata": {
+    "authors": ["Steven Le"],
+    "license": "MIT"
+  }
+}

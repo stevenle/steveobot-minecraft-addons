@@ -1,0 +1,8 @@
+[
+  {
+    "flipbook_texture": "textures/blocks/luckier_block",
+    "atlas_tile": "steveo_luckier_block",
+    "ticks_per_frame": 3,
+    "blend_frames": true
+  }
+]

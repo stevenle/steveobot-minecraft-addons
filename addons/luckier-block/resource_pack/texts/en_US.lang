@@ -1,0 +1,31 @@
+## Pack
+pack.name=Luckier Block
+pack.description=A rainbow lucky block. Break it for a random item, or something terrible.
+
+## Blocks
+tile.steveo:luckier_block.name=Luckier Block
+
+## Lucky
+luckier.lucky=§aLucky!§r You got %1$s x%2$s.
+luckier.jackpot=§6§lJACKPOT!§r %s random items!
+
+## Unlucky
+luckier.unlucky.ambush=§cUnlucky!§r Ambush!
+luckier.unlucky.tnt=§cUnlucky!§r Is that... hissing? RUN!
+luckier.unlucky.lightning=§cUnlucky!§r The sky does not like you.
+luckier.unlucky.curse=§cUnlucky!§r You feel cursed.
+luckier.unlucky.yeet=§cUnlucky!§r YEET!
+luckier.unlucky.webs=§cUnlucky!§r It's a trap!
+luckier.unlucky.silverfish=§cUnlucky!§r Something is crawling out of the cracks...
+luckier.unlucky.fire=§cUnlucky!§r Hot hot hot!
+luckier.unlucky.creeper=§cUnlucky!§r Don't look behind you.
+luckier.unlucky.fangs=§cUnlucky!§r The ground bites!
+luckier.unlucky.phantoms=§cUnlucky!§r You should really get some sleep.
+luckier.unlucky.butterfingers=§cUnlucky!§r Butterfingers!
+luckier.unlucky.rotten=§cUnlucky!§r JACKPOT! ...of garbage.
+
+## Debug: /scriptevent steveo:luckier <command>
+luckier.debug.help=Commands: give, lucky, jackpot, unlucky [name], items. Unlucky names: %s
+luckier.debug.given=Gave you 16 Luckier Blocks.
+luckier.debug.unknown=No such unlucky outcome. Try one of: %s
+luckier.debug.items=%s items in the prize pool. A few: %s
