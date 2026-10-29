@@ -1,0 +1,17 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:recipe_furnace": {
+    "description": {
+      "identifier": "steveo:cracked_creeperite_bricks_smelting"
+    },
+    "tags": [
+      "furnace"
+    ],
+    "input": {
+      "item": "steveo:creeperite_bricks"
+    },
+    "output": {
+      "item": "steveo:cracked_creeperite_bricks"
+    }
+  }
+}

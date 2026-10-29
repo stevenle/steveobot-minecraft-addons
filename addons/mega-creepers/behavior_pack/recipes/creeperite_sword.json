@@ -1,0 +1,33 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "steveo:creeperite_sword"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "I",
+      "I",
+      "S"
+    ],
+    "key": {
+      "I": {
+        "item": "steveo:creeperite_ingot"
+      },
+      "S": {
+        "item": "minecraft:stick"
+      }
+    },
+    "unlock": [
+      {
+        "item": "steveo:creeperite_ingot"
+      }
+    ],
+    "result": {
+      "item": "steveo:creeperite_sword",
+      "count": 1
+    }
+  }
+}

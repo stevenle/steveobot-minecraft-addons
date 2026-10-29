@@ -1,0 +1,32 @@
+{
+  "resource_pack_name": "mega-creepers",
+  "texture_name": "atlas.terrain",
+  "padding": 8,
+  "num_mip_levels": 4,
+  "texture_data": {
+    "steveo_creeperite": {
+      "textures": "textures/blocks/creeperite"
+    },
+    "steveo_polished_creeperite": {
+      "textures": "textures/blocks/polished_creeperite"
+    },
+    "steveo_creeperite_bricks": {
+      "textures": "textures/blocks/creeperite_bricks"
+    },
+    "steveo_cracked_creeperite_bricks": {
+      "textures": "textures/blocks/cracked_creeperite_bricks"
+    },
+    "steveo_carved_creeperite_bricks": {
+      "textures": "textures/blocks/carved_creeperite_bricks"
+    },
+    "steveo_creeperite_block": {
+      "textures": "textures/blocks/creeperite_block"
+    },
+    "steveo_creeperite_ore": {
+      "textures": "textures/blocks/creeperite_ore"
+    },
+    "steveo_sealed_creeperite_bricks": {
+      "textures": "textures/blocks/sealed_creeperite_bricks"
+    }
+  }
+}

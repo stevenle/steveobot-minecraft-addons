@@ -1,0 +1,31 @@
+{
+  "format_version": [
+    1,
+    1,
+    0
+  ],
+  "steveo:creeperite": {
+    "sound": "stone"
+  },
+  "steveo:polished_creeperite": {
+    "sound": "stone"
+  },
+  "steveo:creeperite_bricks": {
+    "sound": "stone"
+  },
+  "steveo:cracked_creeperite_bricks": {
+    "sound": "stone"
+  },
+  "steveo:carved_creeperite_bricks": {
+    "sound": "stone"
+  },
+  "steveo:creeperite_block": {
+    "sound": "metal"
+  },
+  "steveo:creeperite_ore": {
+    "sound": "stone"
+  },
+  "steveo:sealed_creeperite_bricks": {
+    "sound": "stone"
+  }
+}

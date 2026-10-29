@@ -1,0 +1,29 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "steveo:creeperite_boots"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "I I",
+      "I I"
+    ],
+    "key": {
+      "I": {
+        "item": "steveo:creeperite_ingot"
+      }
+    },
+    "unlock": [
+      {
+        "item": "steveo:creeperite_ingot"
+      }
+    ],
+    "result": {
+      "item": "steveo:creeperite_boots",
+      "count": 1
+    }
+  }
+}

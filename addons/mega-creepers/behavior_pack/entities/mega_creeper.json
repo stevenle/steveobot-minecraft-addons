@@ -1,0 +1,65 @@
+{
+  "format_version": "1.21.0",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "steveo:mega_creeper",
+      "is_spawnable": true,
+      "is_summonable": true,
+      "properties": {
+        "steveo:state": {
+          "type": "int",
+          "range": [0, 3],
+          "default": 0,
+          "client_sync": true
+        }
+      }
+    },
+    "components": {
+      "minecraft:type_family": { "family": ["steveo_mega_creeper", "monster", "mob"] },
+      "minecraft:health": { "value": 200, "max": 200 },
+      "minecraft:boss": { "should_darken_sky": false, "hud_range": 40 },
+      "minecraft:collision_box": { "width": 1.2, "height": 3.4 },
+      "minecraft:movement": { "value": 0.24 },
+      "minecraft:movement.basic": {},
+      "minecraft:navigation.walk": { "can_path_over_water": true, "avoid_water": true, "avoid_damage_blocks": true },
+      "minecraft:jump.static": {},
+      "minecraft:can_climb": {},
+      "minecraft:physics": {},
+      "minecraft:pushable": { "is_pushable": false, "is_pushable_by_piston": true },
+      "minecraft:knockback_resistance": { "value": 0.8 },
+      "minecraft:breathable": { "total_supply": 15, "suffocate_time": 0 },
+      "minecraft:persistent": {},
+      "minecraft:nameable": {},
+      "minecraft:follow_range": { "value": 32, "max": 32 },
+      "minecraft:loot": { "table": "loot_tables/entities/mega_creeper.json" },
+      "minecraft:experience_reward": { "on_death": "query.last_hit_by_player ? 120 : 0" },
+      "minecraft:damage_sensor": {
+        "triggers": [
+          { "cause": "entity_explosion", "deals_damage": false },
+          { "cause": "block_explosion", "deals_damage": false },
+          { "cause": "fireworks", "deals_damage": false },
+          { "cause": "fall", "deals_damage": false },
+          { "cause": "suffocation", "deals_damage": false }
+        ]
+      },
+      "minecraft:behavior.float": { "priority": 0 },
+      "minecraft:behavior.melee_attack": { "priority": 3, "speed_multiplier": 1.2, "track_target": true, "reach_multiplier": 0.0 },
+      "minecraft:behavior.nearest_attackable_target": {
+        "priority": 1,
+        "must_see": false,
+        "reselect_targets": true,
+        "within_radius": 24,
+        "entity_types": [
+          {
+            "filters": { "test": "is_family", "subject": "other", "value": "player" },
+            "max_dist": 24
+          }
+        ]
+      },
+      "minecraft:behavior.hurt_by_target": { "priority": 2 },
+      "minecraft:behavior.random_stroll": { "priority": 6, "speed_multiplier": 0.8, "xz_dist": 4 },
+      "minecraft:behavior.look_at_player": { "priority": 7, "look_distance": 16 },
+      "minecraft:behavior.random_look_around": { "priority": 8 }
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:recipe_shapeless": {
+    "description": {
+      "identifier": "steveo:cracked_creeperite_bricks"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "ingredients": [
+      {
+        "item": "steveo:creeperite_bricks"
+      },
+      {
+        "item": "minecraft:gunpowder"
+      }
+    ],
+    "unlock": [
+      {
+        "item": "steveo:creeperite_bricks"
+      }
+    ],
+    "result": {
+      "item": "steveo:cracked_creeperite_bricks",
+      "count": 1
+    }
+  }
+}
