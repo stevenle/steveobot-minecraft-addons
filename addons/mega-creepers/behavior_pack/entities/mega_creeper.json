@@ -16,7 +16,7 @@
     },
     "components": {
       "minecraft:type_family": { "family": ["steveo_mega_creeper", "monster", "mob"] },
-      "minecraft:health": { "value": 200, "max": 200 },
+      "minecraft:health": { "value": 500, "max": 500 },
       "minecraft:boss": { "should_darken_sky": false, "hud_range": 40 },
       "minecraft:collision_box": { "width": 1.2, "height": 3.4 },
       "minecraft:movement": { "value": 0.24 },
