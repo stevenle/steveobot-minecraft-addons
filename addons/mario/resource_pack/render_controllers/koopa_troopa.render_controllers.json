@@ -13,16 +13,7 @@
       ],
       "part_visibility": [
         {
-          "*": true
-        },
-        {
-          "body": "query.mark_variant == 0"
-        },
-        {
-          "leg_l": "query.mark_variant == 0"
-        },
-        {
-          "leg_r": "query.mark_variant == 0"
+          "*": "query.mark_variant == 0"
         },
         {
           "shell_only": "query.mark_variant == 1"
