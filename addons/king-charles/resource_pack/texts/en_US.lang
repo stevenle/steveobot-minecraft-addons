@@ -12,7 +12,7 @@ king_charles.fed_other=%s wags happily, but only heals its own human.
 king_charles.sick=%s ate something rotten and looks terribly sick...
 king_charles.died=%s died of a bad tummy. Only ever feed cooked meat or fish.
 
-king_charles.debug.spawned=Spawned one spaniel of each coat in front of you (blenheim, tricolor, black and tan, ruby).
+king_charles.debug.spawned=Spawned one spaniel of each coat in front of you (blenheim, tricolor, black and tan, ruby, and the rare blue).
 king_charles.debug.tamed=Tamed %s nearby spaniel(s) to you.
 king_charles.debug.status=Your spaniels: %s
 king_charles.debug.none=You do not own any loaded spaniels. Try "/scriptevent steveo:dog spawn" then "/scriptevent steveo:dog tame".

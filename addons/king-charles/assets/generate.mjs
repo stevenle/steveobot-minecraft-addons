@@ -108,6 +108,7 @@ function hex(h) { return [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 1
 const WHITE = hex('#F4EDE0');
 const CHESTNUT = hex('#A2471F');
 const RUBY = hex('#8F3616');
+const BLUE = hex('#3A68C8');
 const BLACK = hex('#211D1C');
 const TAN = hex('#C07A36');
 const EYE = hex('#17110E');
@@ -120,7 +121,9 @@ const coats = {
   blenheim: { base: WHITE, patch: CHESTNUT, tan: null, solid: false },
   tricolor: { base: WHITE, patch: BLACK, tan: TAN, solid: false },
   black_tan: { base: BLACK, patch: BLACK, tan: TAN, solid: true },
-  ruby: { base: RUBY, patch: RUBY, tan: null, solid: true },
+  ruby: { base: RUBY, patch: RUBY, tan: null, solid: true, feather: hex('#A8481F') },
+  // The rare one: solid blue, styled like ruby. Not a real Cavalier colour.
+  blue: { base: BLUE, patch: BLUE, tan: null, solid: true, feather: hex('#6A92E0') },
 };
 
 function mulberry32(a) {
@@ -151,9 +154,9 @@ function coatColor(coat, part, x, y, z, n) {
   }
   if (part === 'snout' && n === 'north' && y === 7 && x === -0.5) return NOSE;
 
-  if (coat === 'ruby') {
+  if (c.feather) {
     // Solid, with paler feathering on ear tips and tail underside.
-    if ((part.startsWith('ear') && y <= 5) || (part === 'tail' && n === 'down')) return hex('#A8481F');
+    if ((part.startsWith('ear') && y <= 5) || (part === 'tail' && n === 'down')) return c.feather;
     return c.base;
   }
 
@@ -335,4 +338,4 @@ fs.writeFileSync(path.join(rp, 'textures', 'items', 'dog_crown.png'), paintCrown
 const icon = paintIcon();
 fs.writeFileSync(path.join(rp, 'pack_icon.png'), icon);
 fs.writeFileSync(path.join(out, 'behavior_pack', 'pack_icon.png'), icon);
-console.log('wrote model, 4 coats, and pack icons to', out);
+console.log(`wrote model, ${Object.keys(coats).length} coats, and pack icons to`, out);

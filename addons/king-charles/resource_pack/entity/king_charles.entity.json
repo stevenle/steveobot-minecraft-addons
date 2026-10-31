@@ -8,7 +8,8 @@
         "blenheim": "textures/entity/king_charles/blenheim",
         "tricolor": "textures/entity/king_charles/tricolor",
         "black_tan": "textures/entity/king_charles/black_tan",
-        "ruby": "textures/entity/king_charles/ruby"
+        "ruby": "textures/entity/king_charles/ruby",
+        "blue": "textures/entity/king_charles/blue"
       },
       "geometry": { "default": "geometry.steveo_king_charles" },
       "animations": {

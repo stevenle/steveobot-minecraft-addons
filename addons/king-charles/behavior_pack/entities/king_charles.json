@@ -27,6 +27,11 @@
           "value": 3
         }
       },
+      "steveo:coat_blue": {
+        "minecraft:variant": {
+          "value": 4
+        }
+      },
       "steveo:wild": {
         "minecraft:type_family": {
           "family": [
@@ -291,7 +296,7 @@
       "minecraft:entity_spawned": {
         "randomize": [
           {
-            "weight": 40,
+            "weight": 39,
             "add": {
               "component_groups": [
                 "steveo:coat_blenheim"
@@ -299,7 +304,7 @@
             }
           },
           {
-            "weight": 25,
+            "weight": 24,
             "add": {
               "component_groups": [
                 "steveo:coat_tricolor"
@@ -319,6 +324,14 @@
             "add": {
               "component_groups": [
                 "steveo:coat_ruby"
+              ]
+            }
+          },
+          {
+            "weight": 2,
+            "add": {
+              "component_groups": [
+                "steveo:coat_blue"
               ]
             }
           }
@@ -357,6 +370,14 @@
         "add": {
           "component_groups": [
             "steveo:coat_ruby",
+            "steveo:wild"
+          ]
+        }
+      },
+      "steveo:blue": {
+        "add": {
+          "component_groups": [
+            "steveo:coat_blue",
             "steveo:wild"
           ]
         }

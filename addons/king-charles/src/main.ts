@@ -2,7 +2,7 @@
  * King Charles — a Cavalier King Charles Spaniel pet.
  *
  * The entity definition (behavior_pack/entities/king_charles.json) covers the
- * parts the game can do on its own: four coats picked at spawn, taming with
+ * parts the game can do on its own: five coats picked at spawn (one rare), taming with
  * cooked meat, begging, shadowing the owner with `follow_owner`, and trotting
  * to the nearest bed when it is not following. The dog has no attack goal at
  * all — it exists to love — and a damage sensor makes it immune to every
@@ -100,7 +100,7 @@ const HEART_RANGE = 3;
 
 const DIMENSIONS = ['minecraft:overworld', 'minecraft:nether', 'minecraft:the_end'];
 
-const COATS = ['blenheim', 'tricolor', 'black_tan', 'ruby'] as const;
+const COATS = ['blenheim', 'tricolor', 'black_tan', 'ruby', 'blue'] as const;
 
 /** Dogs with a bed search in flight, and when each dog last searched. */
 const scanning = new Set<string>();

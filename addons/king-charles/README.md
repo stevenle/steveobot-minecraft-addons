@@ -1,7 +1,7 @@
 # King Charles
 
-A Cavalier King Charles Spaniel pet for Minecraft Bedrock. It comes in four
-coats, shadows its human everywhere, refuses to leave home or go down a mine,
+A Cavalier King Charles Spaniel pet for Minecraft Bedrock. It comes in five
+coats, one of them rare, shadows its human everywhere, refuses to leave home or go down a mine,
 heals you when you feed it well, and dies if you feed it badly. It never
 attacks anything. Its purpose is to love. Optionally, it wears a crown.
 
@@ -18,10 +18,11 @@ follow a held piece around.
 
 | Coat | Look | Spawn chance |
 |---|---|---|
-| Blenheim | White with chestnut patches, chestnut ears, a lozenge spot on the head | 40% |
-| Tricolor | White with black patches and tan cheeks and eyebrows | 25% |
+| Blenheim | White with chestnut patches, chestnut ears, a lozenge spot on the head | 39% |
+| Tricolor | White with black patches and tan cheeks and eyebrows | 24% |
 | Black and tan | Black with tan muzzle, chest, eyebrows, and lower legs | 15% |
 | Ruby | Solid rich red | 20% |
+| Blue | Solid blue with paler ear tips and tail feathering. Rare, and not a real Cavalier colour | 2% |
 
 ## How it behaves
 
@@ -87,7 +88,7 @@ content log.
 
 | Command | What it does |
 |---|---|
-| `/scriptevent steveo:dog spawn` | Spawns one wild spaniel of each coat in front of you, left to right: blenheim, tricolor, black and tan, ruby. |
+| `/scriptevent steveo:dog spawn` | Spawns one wild spaniel of each coat in front of you, left to right: blenheim, tricolor, black and tan, ruby, blue. |
 | `/scriptevent steveo:dog tame` | Tames every wild spaniel within 8 blocks to you, skipping the 50% chance. |
 | `/scriptevent steveo:dog status` | Lists every spaniel you own in your dimension: its state (following, homebound, or sick), whether it is crowned, its home bed and how far it is from it, and how far it is from you. |
 | `/scriptevent steveo:dog crown` | Puts a Spaniel Crown in your inventory. |
@@ -124,7 +125,7 @@ spaniel is referred to by its name tag; an unnamed one as "Your spaniel".
 | `resource_pack/models/entity/king_charles.geo.json` | Custom dog model with a crown bone |
 | `resource_pack/animations/king_charles.animation.json` | Walk, look, tail wag, sit, beg head tilt, sick droop |
 | `resource_pack/render_controllers/king_charles.render_controllers.json` | Picks the coat texture by variant, shows the crown by skin id |
-| `resource_pack/textures/entity/king_charles/*.png` | The four coats |
+| `resource_pack/textures/entity/king_charles/*.png` | The five coats |
 | `resource_pack/texts/en_US.lang` | Every player-facing string |
 
 The model, coat textures, item icon, and pack icon are generated pixel art;
