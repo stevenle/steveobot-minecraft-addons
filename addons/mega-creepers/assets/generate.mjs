@@ -95,6 +95,8 @@ const P = {
   s4: hex('#6A9A57'),
   mortar: hex('#1A2418'),
   // Refined creeperite metal.
+  edgeDark: hex('#08260F'),
+  edge: hex('#0F4018'),
   m0: hex('#1E5A26'),
   m1: hex('#2F8A38'),
   m2: hex('#46B84E'),
@@ -102,9 +104,11 @@ const P = {
   m4: hex('#C8FFB8'),
   glow: hex('#9CFF6E'),
   black: hex('#0E120D'),
-  haft: hex('#6B4A2A'),
-  haftDark: hex('#3E2A16'),
-  haftLight: hex('#8C6A3E'),
+  // Tool handles: the vanilla wooden stick's four shades, dark to light.
+  wood0: hex('#281E0B'),
+  wood1: hex('#493615'),
+  wood2: hex('#684E1E'),
+  wood3: hex('#896727'),
   gray: hex('#B8B8B8'),
 };
 
@@ -227,7 +231,13 @@ function paintOre() {
 }
 
 // ---------- Items (16x16) ----------
-const METAL = { K: P.m0, D: P.m1, G: P.m2, L: P.m3, W: P.m4, H: P.haft, h: P.haftLight, d: P.haftDark };
+const METAL = { K: P.m0, D: P.m1, G: P.m2, L: P.m3, W: P.m4 };
+// Tool icons keep vanilla's pixel layout (the diamond tools') and its shading
+// steps: two outline shades, then the metal ramp, on a shaded wooden handle.
+const TOOL = {
+  X: P.edgeDark, K: P.edge, N: P.m0, D: P.m1, G: P.m2, g: mix(P.m2, P.m3, 0.5), L: P.m3, W: P.m4,
+  a: P.wood0, b: P.wood1, c: P.wood2, e: P.wood3,
+};
 
 function paintIngot() {
   return paintRows([
@@ -274,106 +284,106 @@ function paintRaw() {
 function paintSword() {
   return paintRows([
     '.............KKK',
-    '............KWLK',
-    '...........KWLGK',
-    '..........KWLGK.',
-    '.........KWLGK..',
-    '........KWLGK...',
-    '.......KWLGK....',
-    '..KK..KWLGK.....',
-    '..KDKKWLGK......',
-    '...KDGLGK.......',
-    '....KDGK........',
-    '...KhKDDK.......',
-    '..KhK..KK.......',
-    'KKhK............',
-    'KhK.............',
-    'KK..............',
-  ], METAL);
+    '............KWWX',
+    '...........KWgWX',
+    '..........KWgWX.',
+    '.........KWgLX..',
+    '........KWgLX...',
+    '..KK...KLgLX....',
+    '..KNK.KLgLX.....',
+    '...KDXLDLX......',
+    '...KDDNLX.......',
+    '....KNKX........',
+    '...bcXKKX.......',
+    '..bea.XXKX......',
+    'KKca....XX......',
+    'KNX.............',
+    'XXX.............',
+  ], TOOL);
 }
 
 function paintPickaxe() {
   return paintRows([
     '................',
-    '....KKKKKK......',
-    '...KWLLLLGKK....',
-    '....KKKKGGLGK...',
-    '.........KHGLK..',
-    '........KhKKGLK.',
-    '.......KhK..KGK.',
-    '......KhK...KGK.',
-    '.....KhK....KDK.',
-    '....KhK......K..',
-    '...KhK..........',
-    '..KhK...........',
-    '.KhK............',
-    '.KK.............',
     '................',
+    '......KKKKK.....',
+    '.....KLgGGgKbc..',
+    '......KXXXGGea..',
+    '..........bgGX..',
+    '.........bcaGgX.',
+    '........bea.XGX.',
+    '.......bca..XGX.',
+    '......bea...XgX.',
+    '.....bca....XLX.',
+    '....bea......X..',
+    '...bca..........',
+    '..bea...........',
+    '..aa............',
     '................',
-  ], METAL);
+  ], TOOL);
 }
 
 function paintAxe() {
   return paintRows([
     '................',
-    '.......KKK......',
-    '......KWLGK.....',
-    '.....KWLLGGK....',
-    '....KWLGGGGGK...',
-    '....KLGGGGKhK...',
-    '....KLGGGKhK....',
-    '.....KDDKhK.....',
-    '......KKhK......',
-    '......KhK.......',
-    '.....KhK........',
-    '....KhK.........',
-    '...KhK..........',
-    '..KhK...........',
-    '.KhK............',
-    '.KK.............',
-  ], METAL);
+    '.........KK.....',
+    '........KLLK....',
+    '.......KLGgK....',
+    '......KLGGGbc...',
+    '......XLgGDGa...',
+    '.......XXbGDGX..',
+    '........bcaGGX..',
+    '.......bea.XX...',
+    '......bca.......',
+    '.....bca........',
+    '....bea.........',
+    '...bca..........',
+    '..bea...........',
+    '..aa............',
+    '................',
+  ], TOOL);
 }
 
 function paintShovel() {
   return paintRows([
     '................',
-    '..........KKK...',
-    '.........KWLGK..',
-    '.........KLGGK..',
-    '.........KGGDK..',
-    '........KhKKK...',
-    '.......KhK......',
-    '......KhK.......',
-    '.....KhK........',
-    '....KhK.........',
-    '...KhK..........',
-    '..KhK...........',
-    '.KhK............',
-    '.KK.............',
     '................',
+    '...........KKX..',
+    '..........KLLGX.',
+    '.........KLgGLX.',
+    '........KLgGgLX.',
+    '.........bGgLX..',
+    '........beaLX...',
+    '.......bea.X....',
+    '......bca.......',
+    '.....bea........',
+    '....bca.........',
+    '..bbea..........',
+    '..bea...........',
+    '...aa...........',
     '................',
-  ], METAL);
+  ], TOOL);
 }
 
 function paintHoe() {
   return paintRows([
     '................',
-    '.......KKKK.....',
-    '......KWLLGK....',
-    '.......KKGhK....',
-    '........KhK.....',
-    '.......KhK......',
-    '......KhK.......',
-    '.....KhK........',
-    '....KhK.........',
-    '...KhK..........',
-    '..KhK...........',
-    '.KhK............',
-    '.KK.............',
+    '.......KKK......',
+    '......KLggK.....',
+    '.......XXGgKbc..',
+    '.........XGGea..',
+    '..........bgGX..',
+    '.........bcaX...',
+    '........bea.....',
+    '.......bca......',
+    '......bea.......',
+    '.....bca........',
+    '....bea.........',
+    '...bca..........',
+    '..bea...........',
+    '..aa............',
     '................',
-    '................',
-    '................',
-  ], METAL);
+  ], TOOL);
 }
 
 const ARMOR_LEGEND = { g: P.m3, G: P.m2, d: P.m1, o: P.s1, O: P.s2, m: P.black, w: P.m4 };

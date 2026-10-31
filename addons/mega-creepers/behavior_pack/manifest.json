@@ -4,27 +4,27 @@
     "name": "Mega Creepers BP",
     "description": "A Mega Creeper boss that guards creeper dungeons, and creeperite: blast-proof stone, ore, tools, and armor that sometimes explodes.",
     "uuid": "5669d941-4989-45e2-8829-5afd05328e4f",
-    "version": [1, 0, 0],
+    "version": [1, 0, 2],
     "min_engine_version": [1, 26, 40]
   },
   "modules": [
     {
       "type": "data",
       "uuid": "8dde7a11-76d0-41a1-a092-354b00688ef3",
-      "version": [1, 0, 0]
+      "version": [1, 0, 2]
     },
     {
       "type": "script",
       "language": "javascript",
       "entry": "scripts/main.js",
       "uuid": "c89e3ba2-b7eb-47d2-991b-2fe3912c6fd3",
-      "version": [1, 0, 0]
+      "version": [1, 0, 2]
     }
   ],
   "dependencies": [
     {
       "uuid": "75d630d2-4e0e-4d9c-801d-e853791d0e48",
-      "version": [1, 0, 0]
+      "version": [1, 0, 1]
     },
     {
       "module_name": "@minecraft/server",

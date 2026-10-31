@@ -7,7 +7,7 @@ armor from.
 
 ## The Mega Creeper
 
-A creeper twice your height with 100 hearts and a boss bar. It walks at you,
+A creeper twice your height with 250 hearts and a boss bar. It walks at you,
 and it has two attacks:
 
 - **Explosion.** When it gets close, its fuse hisses and it swells and
