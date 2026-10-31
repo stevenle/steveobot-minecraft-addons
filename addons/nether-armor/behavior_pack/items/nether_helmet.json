@@ -1,0 +1,46 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:item": {
+    "description": {
+      "identifier": "steveo:nether_helmet",
+      "menu_category": {
+        "category": "equipment",
+        "group": "minecraft:itemGroup.name.helmet"
+      }
+    },
+    "components": {
+      "minecraft:icon": "steveo_nether_helmet",
+      "minecraft:display_name": {
+        "value": "item.steveo:nether_helmet.name"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:rarity": "rare",
+      "minecraft:wearable": {
+        "slot": "slot.armor.head",
+        "protection": 2
+      },
+      "minecraft:durability": {
+        "max_durability": 165
+      },
+      "minecraft:repairable": {
+        "repair_items": [
+          {
+            "items": [
+              "minecraft:blaze_rod"
+            ],
+            "repair_amount": 41
+          }
+        ]
+      },
+      "minecraft:enchantable": {
+        "slot": "armor_head",
+        "value": 15
+      },
+      "minecraft:tags": {
+        "tags": [
+          "minecraft:is_armor"
+        ]
+      }
+    }
+  }
+}
