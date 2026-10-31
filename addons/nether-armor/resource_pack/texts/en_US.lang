@@ -1,0 +1,10 @@
+## Strings for the Nether Armor add-on.
+
+item.steveo:nether_helmet.name=Nether Helmet
+item.steveo:nether_chestplate.name=Nether Chestplate
+item.steveo:nether_leggings.name=Nether Leggings
+item.steveo:nether_boots.name=Nether Boots
+
+nether_armor.debug.give=Gave you the full Nether Armor set.
+nether_armor.debug.status=Wearing %s of %s pieces. Fire protection: %s percent. Fire Resistance effect: %s.
+nether_armor.debug.help=Usage: /scriptevent steveo:nether_armor give, or /scriptevent steveo:nether_armor status

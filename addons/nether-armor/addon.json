@@ -1,0 +1,5 @@
+{
+  "$schema": "../../tools/schemas/addon.schema.json",
+  "name": "Nether Armor",
+  "description": "A blazing armor set: a few pieces give fire protection, the full set grants fire resistance."
+}

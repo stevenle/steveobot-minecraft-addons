@@ -1,0 +1,37 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "steveo:nether_helmet_recipe"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "NPN",
+      "R R"
+    ],
+    "key": {
+      "N": {
+        "item": "minecraft:netherrack"
+      },
+      "R": {
+        "item": "minecraft:blaze_rod"
+      },
+      "P": {
+        "item": "minecraft:blaze_powder"
+      }
+    },
+    "unlock": [
+      {
+        "item": "minecraft:blaze_rod"
+      },
+      {
+        "item": "minecraft:blaze_powder"
+      }
+    ],
+    "result": {
+      "item": "steveo:nether_helmet"
+    }
+  }
+}

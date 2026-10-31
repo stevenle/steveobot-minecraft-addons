@@ -1,0 +1,38 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Nether Armor BP",
+    "description": "A blazing armor set: a few pieces give fire protection, the full set grants fire resistance.",
+    "uuid": "59044081-0795-4b46-b868-38c3278c5d20",
+    "version": [1, 0, 0],
+    "min_engine_version": [1, 26, 40]
+  },
+  "modules": [
+    {
+      "type": "data",
+      "uuid": "a25eb5a9-4a54-47ed-ada6-7e7565a1ffd2",
+      "version": [1, 0, 0]
+    },
+    {
+      "type": "script",
+      "language": "javascript",
+      "entry": "scripts/main.js",
+      "uuid": "1ef24a81-a1a6-4d4f-8601-159c7f7d6431",
+      "version": [1, 0, 0]
+    }
+  ],
+  "dependencies": [
+    {
+      "uuid": "4bd35743-cc28-4639-b423-5655d440e7c9",
+      "version": [1, 0, 0]
+    },
+    {
+      "module_name": "@minecraft/server",
+      "version": "2.9.0"
+    }
+  ],
+  "metadata": {
+    "authors": ["Steven Le"],
+    "license": "MIT"
+  }
+}

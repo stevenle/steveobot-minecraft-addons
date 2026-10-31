@@ -1,0 +1,18 @@
+{
+  "resource_pack_name": "nether-armor",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "steveo_nether_helmet": {
+      "textures": "textures/items/nether_helmet"
+    },
+    "steveo_nether_chestplate": {
+      "textures": "textures/items/nether_chestplate"
+    },
+    "steveo_nether_leggings": {
+      "textures": "textures/items/nether_leggings"
+    },
+    "steveo_nether_boots": {
+      "textures": "textures/items/nether_boots"
+    }
+  }
+}
