@@ -1,0 +1,5 @@
+{
+  "$schema": "../../tools/schemas/addon.schema.json",
+  "name": "Mega Creepers",
+  "description": "A Mega Creeper boss that guards creeper dungeons, and creeperite: blast-proof stone, ore, tools, and armor that sometimes explodes."
+}

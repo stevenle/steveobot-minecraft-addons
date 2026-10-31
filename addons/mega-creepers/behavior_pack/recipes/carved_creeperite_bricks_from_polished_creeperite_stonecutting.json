@@ -1,0 +1,25 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:recipe_shapeless": {
+    "description": {
+      "identifier": "steveo:carved_creeperite_bricks_from_polished_creeperite_stonecutting"
+    },
+    "tags": [
+      "stonecutter"
+    ],
+    "ingredients": [
+      {
+        "item": "steveo:polished_creeperite"
+      }
+    ],
+    "unlock": [
+      {
+        "item": "steveo:polished_creeperite"
+      }
+    ],
+    "result": {
+      "item": "steveo:carved_creeperite_bricks",
+      "count": 1
+    }
+  }
+}

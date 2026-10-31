@@ -1,0 +1,21 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Mega Creepers RP",
+    "description": "A Mega Creeper boss that guards creeper dungeons, and creeperite: blast-proof stone, ore, tools, and armor that sometimes explodes.",
+    "uuid": "75d630d2-4e0e-4d9c-801d-e853791d0e48",
+    "version": [1, 0, 0],
+    "min_engine_version": [1, 26, 40]
+  },
+  "modules": [
+    {
+      "type": "resources",
+      "uuid": "4c47e3d8-1886-467c-9e97-60398145011b",
+      "version": [1, 0, 0]
+    }
+  ],
+  "metadata": {
+    "authors": ["Steven Le"],
+    "license": "MIT"
+  }
+}

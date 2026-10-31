@@ -1,0 +1,18 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:recipe_furnace": {
+    "description": {
+      "identifier": "steveo:creeperite_ingot_from_ore"
+    },
+    "tags": [
+      "furnace",
+      "blast_furnace"
+    ],
+    "input": {
+      "item": "steveo:creeperite_ore"
+    },
+    "output": {
+      "item": "steveo:creeperite_ingot"
+    }
+  }
+}

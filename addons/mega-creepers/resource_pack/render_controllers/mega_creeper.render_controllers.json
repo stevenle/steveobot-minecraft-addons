@@ -1,0 +1,22 @@
+{
+  "format_version": "1.10.0",
+  "render_controllers": {
+    "controller.render.steveo_mega_creeper": {
+      "geometry": "geometry.default",
+      "materials": [
+        {
+          "*": "material.default"
+        }
+      ],
+      "textures": [
+        "texture.default"
+      ],
+      "overlay_color": {
+        "r": "query.property('steveo:state') == 3 ? math.sin(query.life_time * 720.0) * 0.5 + 0.5 : (query.property('steveo:state') == 2 ? 0.3 : 1.0)",
+        "g": "query.property('steveo:state') == 3 ? math.sin(query.life_time * 720.0 + 120.0) * 0.5 + 0.5 : (query.property('steveo:state') == 2 ? 0.3 : 1.0)",
+        "b": "query.property('steveo:state') == 3 ? math.sin(query.life_time * 720.0 + 240.0) * 0.5 + 0.5 : (query.property('steveo:state') == 2 ? 0.4 : 1.0)",
+        "a": "query.property('steveo:state') == 1 ? math.mod(math.floor(query.life_time * 8.0), 2.0) * 0.5 : (query.property('steveo:state') == 3 ? 0.45 : (query.property('steveo:state') == 2 ? 0.35 : 0.0))"
+      }
+    }
+  }
+}

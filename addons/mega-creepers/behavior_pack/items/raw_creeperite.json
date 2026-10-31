@@ -1,0 +1,18 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:item": {
+    "description": {
+      "identifier": "steveo:raw_creeperite",
+      "menu_category": {
+        "category": "items"
+      }
+    },
+    "components": {
+      "minecraft:icon": "steveo_raw_creeperite",
+      "minecraft:display_name": {
+        "value": "item.steveo:raw_creeperite.name"
+      },
+      "minecraft:max_stack_size": 64
+    }
+  }
+}

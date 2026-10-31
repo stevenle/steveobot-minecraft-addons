@@ -1,0 +1,39 @@
+{
+  "format_version": "1.21.90",
+  "minecraft:block": {
+    "description": {
+      "identifier": "steveo:carved_creeperite_bricks",
+      "menu_category": {
+        "category": "construction"
+      }
+    },
+    "components": {
+      "minecraft:display_name": "tile.steveo:carved_creeperite_bricks.name",
+      "minecraft:geometry": "minecraft:geometry.full_block",
+      "minecraft:material_instances": {
+        "*": {
+          "texture": "steveo_carved_creeperite_bricks",
+          "render_method": "opaque"
+        },
+        "up": {
+          "texture": "steveo_polished_creeperite",
+          "render_method": "opaque"
+        },
+        "down": {
+          "texture": "steveo_polished_creeperite",
+          "render_method": "opaque"
+        }
+      },
+      "minecraft:map_color": "#2F4A2A",
+      "minecraft:destructible_by_explosion": {
+        "explosion_resistance": 1200
+      },
+      "minecraft:destructible_by_mining": {
+        "seconds_to_destroy": 3
+      },
+      "tag:stone": {},
+      "tag:minecraft:is_pickaxe_item_destructible": {},
+      "tag:steveo:creeperite": {}
+    }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "resource_pack_name": "mega-creepers",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "steveo_raw_creeperite": {
+      "textures": "textures/items/raw_creeperite"
+    },
+    "steveo_creeperite_ingot": {
+      "textures": "textures/items/creeperite_ingot"
+    },
+    "steveo_creeperite_sword": {
+      "textures": "textures/items/creeperite_sword"
+    },
+    "steveo_creeperite_pickaxe": {
+      "textures": "textures/items/creeperite_pickaxe"
+    },
+    "steveo_creeperite_axe": {
+      "textures": "textures/items/creeperite_axe"
+    },
+    "steveo_creeperite_shovel": {
+      "textures": "textures/items/creeperite_shovel"
+    },
+    "steveo_creeperite_hoe": {
+      "textures": "textures/items/creeperite_hoe"
+    },
+    "steveo_creeperite_helmet": {
+      "textures": "textures/items/creeperite_helmet"
+    },
+    "steveo_creeperite_chestplate": {
+      "textures": "textures/items/creeperite_chestplate"
+    },
+    "steveo_creeperite_leggings": {
+      "textures": "textures/items/creeperite_leggings"
+    },
+    "steveo_creeperite_boots": {
+      "textures": "textures/items/creeperite_boots"
+    }
+  }
+}

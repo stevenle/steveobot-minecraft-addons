@@ -1,0 +1,29 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "steveo:creeperite_helmet"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "III",
+      "I I"
+    ],
+    "key": {
+      "I": {
+        "item": "steveo:creeperite_ingot"
+      }
+    },
+    "unlock": [
+      {
+        "item": "steveo:creeperite_ingot"
+      }
+    ],
+    "result": {
+      "item": "steveo:creeperite_helmet",
+      "count": 1
+    }
+  }
+}

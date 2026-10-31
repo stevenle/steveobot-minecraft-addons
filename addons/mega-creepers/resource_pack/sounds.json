@@ -1,0 +1,14 @@
+{
+  "entity_sounds": {
+    "entities": {
+      "steveo:mega_creeper": {
+        "volume": 1.0,
+        "pitch": [0.5, 0.6],
+        "events": {
+          "hurt": "mob.creeper.say",
+          "death": "mob.creeper.death"
+        }
+      }
+    }
+  }
+}

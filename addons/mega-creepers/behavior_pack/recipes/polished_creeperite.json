@@ -1,0 +1,29 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "steveo:polished_creeperite"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "CC",
+      "CC"
+    ],
+    "key": {
+      "C": {
+        "item": "steveo:creeperite"
+      }
+    },
+    "unlock": [
+      {
+        "item": "steveo:creeperite"
+      }
+    ],
+    "result": {
+      "item": "steveo:polished_creeperite",
+      "count": 4
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "steveo:mega_creeper",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/mega_creeper"
+      },
+      "geometry": {
+        "default": "geometry.steveo_mega_creeper"
+      },
+      "animations": {
+        "walk": "animation.steveo_mega_creeper.walk",
+        "look_at_target": "animation.steveo_mega_creeper.look_at_target",
+        "fuse": "animation.steveo_mega_creeper.fuse",
+        "charge": "animation.steveo_mega_creeper.charge",
+        "recharge": "animation.steveo_mega_creeper.recharge"
+      },
+      "scripts": {
+        "scale": "2.0",
+        "animate": [
+          "walk",
+          { "look_at_target": "query.property('steveo:state') == 0 || query.property('steveo:state') == 1" },
+          { "fuse": "query.property('steveo:state') == 1" },
+          { "charge": "query.property('steveo:state') == 3" },
+          { "recharge": "query.property('steveo:state') == 2" }
+        ]
+      },
+      "render_controllers": [
+        "controller.render.steveo_mega_creeper"
+      ],
+      "spawn_egg": {
+        "base_color": "#2E6B27",
+        "overlay_color": "#9CFF6E"
+      }
+    }
+  }
+}

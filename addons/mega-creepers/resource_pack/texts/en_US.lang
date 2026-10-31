@@ -1,0 +1,55 @@
+## Pack
+pack.name=Mega Creepers
+pack.description=A Mega Creeper boss guards creeper dungeons. Creeperite stone, ore, tools, and armor.
+
+## Mob
+entity.steveo:mega_creeper.name=Mega Creeper
+item.spawn_egg.entity.steveo:mega_creeper.name=Spawn Mega Creeper
+
+## Blocks
+tile.steveo:creeperite.name=Creeperite
+tile.steveo:polished_creeperite.name=Polished Creeperite
+tile.steveo:creeperite_bricks.name=Creeperite Bricks
+tile.steveo:cracked_creeperite_bricks.name=Cracked Creeperite Bricks
+tile.steveo:carved_creeperite_bricks.name=Carved Creeperite Bricks
+tile.steveo:creeperite_block.name=Block of Creeperite
+tile.steveo:creeperite_ore.name=Creeperite Ore
+tile.steveo:sealed_creeperite_bricks.name=Sealed Creeperite Bricks
+
+## Items
+item.steveo:raw_creeperite.name=Raw Creeperite
+item.steveo:creeperite_ingot.name=Creeperite Ingot
+item.steveo:creeperite_sword.name=Creeperite Sword
+item.steveo:creeperite_pickaxe.name=Creeperite Pickaxe
+item.steveo:creeperite_axe.name=Creeperite Axe
+item.steveo:creeperite_shovel.name=Creeperite Shovel
+item.steveo:creeperite_hoe.name=Creeperite Hoe
+item.steveo:creeperite_helmet.name=Creeperite Helmet
+item.steveo:creeperite_chestplate.name=Creeperite Chestplate
+item.steveo:creeperite_leggings.name=Creeperite Leggings
+item.steveo:creeperite_boots.name=Creeperite Boots
+
+## Boss fight
+megacreepers.boss.title=§2§lMega Creeper
+megacreepers.boss.subtitle=§aIt does not die when it explodes...
+megacreepers.boss.awakens=The Mega Creeper awakens! Its hide shrugs off hits until it has to recharge. The vault stays sealed until it falls.
+megacreepers.boss.recharging=§eThe Mega Creeper is recharging - hit it now!
+megacreepers.boss.charging=§dThe Mega Creeper is charging fireworks - watch for the red rings!
+megacreepers.boss.armored=§7Its hide shrugs off the hit. Wait for it to recharge.
+megacreepers.boss.defeated=The Mega Creeper is defeated! The vault seal crumbles.
+megacreepers.boss.defeated_wild=The Mega Creeper is defeated!
+megacreepers.trap=§cIt's a trap!
+
+## Debug
+megacreepers.debug.help=Usage: /scriptevent steveo:megacreepers give|status|build|boss|fireworks|explode|unseal|rearm
+megacreepers.debug.given=Gave you creeperite tools, armor, ingots, raw ore, and blocks.
+megacreepers.debug.no_dungeon=No creeper dungeon known in this dimension (%s known in total). Explore, or use "build".
+megacreepers.debug.dungeon=%s dungeon(s) known. Nearest: arena at %s, %s blocks away, boss %s, vault %s.
+megacreepers.debug.boss=Nearest Mega Creeper: %s blocks away, state %s (0 idle, 1 fuse, 2 recharge, 3 charge), health %s.
+megacreepers.debug.armor=Creeperite pieces worn: %s/%s. Generator busy: %s.
+megacreepers.debug.building=Building a creeper dungeon around you. You are in the entry hall; the arena is north.
+megacreepers.debug.busy=A dungeon is being built right now. Try again in a few seconds.
+megacreepers.debug.boss_spawned=Spawned a Mega Creeper.
+megacreepers.debug.no_boss=No Mega Creeper nearby.
+megacreepers.debug.unsealed=Unsealing the nearest dungeon's vault.
+megacreepers.debug.rearmed=The nearest dungeon's Mega Creeper will wake again when you enter the arena.

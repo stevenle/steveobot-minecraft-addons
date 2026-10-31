@@ -1,0 +1,31 @@
+{
+  "format_version": "1.21.90",
+  "minecraft:block": {
+    "description": {
+      "identifier": "steveo:creeperite_block",
+      "menu_category": {
+        "category": "construction"
+      }
+    },
+    "components": {
+      "minecraft:display_name": "tile.steveo:creeperite_block.name",
+      "minecraft:geometry": "minecraft:geometry.full_block",
+      "minecraft:material_instances": {
+        "*": {
+          "texture": "steveo_creeperite_block",
+          "render_method": "opaque"
+        }
+      },
+      "minecraft:map_color": "#46B84E",
+      "minecraft:destructible_by_explosion": {
+        "explosion_resistance": 1200
+      },
+      "minecraft:destructible_by_mining": {
+        "seconds_to_destroy": 5
+      },
+      "tag:metal": {},
+      "tag:minecraft:is_pickaxe_item_destructible": {},
+      "tag:steveo:creeperite": {}
+    }
+  }
+}

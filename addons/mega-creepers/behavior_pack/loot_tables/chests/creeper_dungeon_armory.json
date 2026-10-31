@@ -1,0 +1,288 @@
+{
+  "pools": [
+    {
+      "rolls": {
+        "min": 2,
+        "max": 3
+      },
+      "entries": [
+        {
+          "type": "item",
+          "name": "steveo:creeperite_sword",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "set_damage",
+              "damage": {
+                "min": 0.15,
+                "max": 0.6
+              }
+            },
+            {
+              "function": "enchant_with_levels",
+              "levels": {
+                "min": 5,
+                "max": 20
+              },
+              "treasure": false
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "steveo:creeperite_pickaxe",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "set_damage",
+              "damage": {
+                "min": 0.15,
+                "max": 0.6
+              }
+            },
+            {
+              "function": "enchant_with_levels",
+              "levels": {
+                "min": 5,
+                "max": 20
+              },
+              "treasure": false
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "steveo:creeperite_axe",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "set_damage",
+              "damage": {
+                "min": 0.15,
+                "max": 0.6
+              }
+            },
+            {
+              "function": "enchant_with_levels",
+              "levels": {
+                "min": 5,
+                "max": 20
+              },
+              "treasure": false
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "steveo:creeperite_shovel",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "set_damage",
+              "damage": {
+                "min": 0.15,
+                "max": 0.6
+              }
+            },
+            {
+              "function": "enchant_with_levels",
+              "levels": {
+                "min": 5,
+                "max": 20
+              },
+              "treasure": false
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "steveo:creeperite_hoe",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "set_damage",
+              "damage": {
+                "min": 0.15,
+                "max": 0.6
+              }
+            },
+            {
+              "function": "enchant_with_levels",
+              "levels": {
+                "min": 5,
+                "max": 20
+              },
+              "treasure": false
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "steveo:creeperite_helmet",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "set_damage",
+              "damage": {
+                "min": 0.15,
+                "max": 0.6
+              }
+            },
+            {
+              "function": "enchant_with_levels",
+              "levels": {
+                "min": 5,
+                "max": 20
+              },
+              "treasure": false
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "steveo:creeperite_chestplate",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "set_damage",
+              "damage": {
+                "min": 0.15,
+                "max": 0.6
+              }
+            },
+            {
+              "function": "enchant_with_levels",
+              "levels": {
+                "min": 5,
+                "max": 20
+              },
+              "treasure": false
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "steveo:creeperite_leggings",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "set_damage",
+              "damage": {
+                "min": 0.15,
+                "max": 0.6
+              }
+            },
+            {
+              "function": "enchant_with_levels",
+              "levels": {
+                "min": 5,
+                "max": 20
+              },
+              "treasure": false
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "steveo:creeperite_boots",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "set_damage",
+              "damage": {
+                "min": 0.15,
+                "max": 0.6
+              }
+            },
+            {
+              "function": "enchant_with_levels",
+              "levels": {
+                "min": 5,
+                "max": 20
+              },
+              "treasure": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rolls": {
+        "min": 2,
+        "max": 4
+      },
+      "entries": [
+        {
+          "type": "item",
+          "name": "steveo:creeperite_ingot",
+          "weight": 10,
+          "functions": [
+            {
+              "function": "set_count",
+              "count": {
+                "min": 1,
+                "max": 4
+              }
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "steveo:raw_creeperite",
+          "weight": 10,
+          "functions": [
+            {
+              "function": "set_count",
+              "count": {
+                "min": 2,
+                "max": 6
+              }
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "minecraft:iron_ingot",
+          "weight": 8,
+          "functions": [
+            {
+              "function": "set_count",
+              "count": {
+                "min": 2,
+                "max": 6
+              }
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "minecraft:gunpowder",
+          "weight": 8,
+          "functions": [
+            {
+              "function": "set_count",
+              "count": {
+                "min": 3,
+                "max": 8
+              }
+            }
+          ]
+        },
+        {
+          "type": "item",
+          "name": "minecraft:arrow",
+          "weight": 6,
+          "functions": [
+            {
+              "function": "set_count",
+              "count": {
+                "min": 8,
+                "max": 16
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
