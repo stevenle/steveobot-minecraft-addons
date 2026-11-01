@@ -26,9 +26,8 @@ barely move. That is your window.
 | An explosion | 2 to 7 seconds |
 | A firework barrage | 6 to 25 seconds |
 
-Outside a recharge its hide shrugs off **75%** of all damage, so hitting it
-while it is charging at you does little. Bait an attack, dodge it, then hit
-it while it recovers. Below 40% health it gets **angry**: a shorter fuse,
+It takes full damage at any time, but a recharge is the safe time to hit it:
+bait an attack, dodge it, then hit it while it recovers. Below 40% health it gets **angry**: a shorter fuse,
 more rockets, and barrages more often.
 
 Its explosions break blocks **only if the `mobGriefing` game rule is on**,

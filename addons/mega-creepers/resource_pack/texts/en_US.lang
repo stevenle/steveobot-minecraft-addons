@@ -32,10 +32,9 @@ item.steveo:creeperite_boots.name=Creeperite Boots
 ## Boss fight
 megacreepers.boss.title=§2§lMega Creeper
 megacreepers.boss.subtitle=§aIt does not die when it explodes...
-megacreepers.boss.awakens=The Mega Creeper awakens! Its hide shrugs off hits until it has to recharge. The vault stays sealed until it falls.
+megacreepers.boss.awakens=The Mega Creeper awakens! The vault stays sealed until it falls.
 megacreepers.boss.recharging=§eThe Mega Creeper is recharging - hit it now!
 megacreepers.boss.charging=§dThe Mega Creeper is charging fireworks - watch for the red rings!
-megacreepers.boss.armored=§7Its hide shrugs off the hit. Wait for it to recharge.
 megacreepers.boss.defeated=The Mega Creeper is defeated! The vault seal crumbles.
 megacreepers.boss.defeated_wild=The Mega Creeper is defeated!
 megacreepers.trap=§cIt's a trap!

@@ -16,19 +16,17 @@
  *   RECHARGE  slumped and dizzy, nearly still: 2-7 s after an explosion,
  *             6-25 s after a barrage. This is the window to hit it.
  *
- * Outside RECHARGE its hide shrugs off most damage (ARMORED_FACTOR), so the
- * fight is about baiting attacks and punishing the recovery. It is immune
- * to explosions (its own included), fireworks, and fall damage via its
+ * It takes full damage in every state, so RECHARGE is the safe opening
+ * rather than the only one. It is immune to explosions (its own included), fireworks, and fall damage via its
  * damage sensor, and it never leaves home for long: past LEASH_RANGE it
  * teleports back to where it spawned.
  */
 import {
-  EntityDamageCause,
-  Player,
   system,
   world,
   type Dimension,
   type Entity,
+  type Player,
   type Vector3,
 } from '@minecraft/server';
 
@@ -73,9 +71,6 @@ const ROCKET_POWER = 2;
 const ROCKETS_MAX = 12;
 
 const ENRAGED_FRACTION = 0.4;
-/** Share of damage that gets through outside the recharge window. */
-const ARMORED_FACTOR = 0.25;
-const ARMOR_HINT_COOLDOWN = 80;
 const LEASH_RANGE = 24;
 /** Slowness amplifier while swelling, charging, or recharging: level 6, 90% slower. */
 const ROOTED_AMPLIFIER = 5;
@@ -101,7 +96,6 @@ interface Rocket {
 
 const brains = new Map<string, Brain>();
 const rockets: Rocket[] = [];
-const armorHintAt = new Map<string, number>();
 
 function brainOf(boss: Entity): Brain {
   let brain = brains.get(boss.id);
@@ -349,26 +343,7 @@ system.runInterval(() => {
 
 system.runInterval(updateRockets, 1);
 
-// ---------- damage ----------
-
-const UNSTOPPABLE = new Set<string>([EntityDamageCause.void, EntityDamageCause.selfDestruct, EntityDamageCause.override]);
-
-world.beforeEvents.entityHurt.subscribe((event) => {
-  const boss = event.hurtEntity;
-  if (boss.typeId !== MEGA_CREEPER) return;
-  if (UNSTOPPABLE.has(event.damageSource.cause)) return;
-  if (brains.get(boss.id)?.state === State.Recharge) return;
-  event.damage *= ARMORED_FACTOR;
-  const attacker = event.damageSource.damagingEntity;
-  if (!(attacker instanceof Player)) return;
-  const last = armorHintAt.get(attacker.id);
-  if (last !== undefined && system.currentTick - last < ARMOR_HINT_COOLDOWN) return;
-  armorHintAt.set(attacker.id, system.currentTick);
-  system.run(() => actionBar(attacker, 'megacreepers.boss.armored'));
-});
-
 world.afterEvents.entityRemove.subscribe((event) => brains.delete(event.removedEntityId), {
   entityTypes: [MEGA_CREEPER],
 });
 
-world.afterEvents.playerLeave.subscribe((event) => armorHintAt.delete(event.playerId));
