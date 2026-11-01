@@ -1,8 +1,9 @@
 # Nether Armor
 
 A four-piece set forged from blaze rods, blaze powder, and netherrack, in
-fiery orange, red, and yellow with a little brown. It is as tough as iron, and
-a blaze rod repairs a quarter of a piece's durability on an anvil.
+fiery orange, red, and yellow with a little brown. It protects like iron but
+lasts as long as netherite, and a blaze rod repairs a quarter of a piece's
+durability on an anvil.
 
 ## What it does
 

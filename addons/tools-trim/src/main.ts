@@ -1,6 +1,7 @@
 /**
  * Tools Trim — armor-style trims for swords, pickaxes, axes, shovels, hoes,
- * and paxels (from the paxel add-on), applied at the Better Smithing Table.
+ * and paxels (from the paxel add-on), including creeperite tools (from the
+ * mega-creepers add-on), applied at the Better Smithing Table.
  *
  * Hold a tool and use the table: a menu lists the eleven trim materials with
  * how many of each you carry, plus "Remove trim" when the tool already has
@@ -16,7 +17,7 @@
  * script form on a custom block instead. Trimmed diamond tools do carry the
  * tag, so the vanilla netherite upgrade still works on them and keeps the trim.
  *
- * The trimmed items copy the vanilla tools' stats in JSON. The script covers
+ * The trimmed items copy the untrimmed tools' stats in JSON. The script covers
  * what JSON cannot guarantee:
  *
  * - **Wear from mining.** After a block breaks, if the game left the tool's

@@ -1,7 +1,7 @@
 // Generates everything derived for this add-on from the tables below:
 //   - behavior_pack/items/<tier>_<tool>_<material>_trim.json, one custom item
-//     per trimmed tool (7 tiers x 6 tools x 11 materials = 462), each a copy of
-//     the untrimmed tool's stats
+//     per trimmed tool ((7 vanilla tiers x 6 tools + 5 creeperite tools) x 11
+//     materials = 517), each a copy of the untrimmed tool's stats
 //   - behavior_pack/recipes/: the Better Smithing Table, and a netherite
 //     upgrade per trimmed diamond tool so the trim survives the upgrade
 //   - resource_pack/textures/items/trimmed/*.png: the vanilla tool texture with
@@ -12,8 +12,9 @@
 // Inputs under assets/vanilla/ are unmodified copies from Mojang/bedrock-samples
 // v1.26.50.4 (resource_pack/textures/items/<tier>_<tool>.png,
 // textures/trims/color_palettes/*.png, textures/blocks/smithing_table_*.png).
-// Paxels are not vanilla: their stats, names, and icons are read straight from
-// the paxel add-on (addons/paxel), so rerun this after regenerating that one.
+// Paxels and creeperite tools are not vanilla: their stats, names, and icons are
+// read straight from the paxel and mega-creepers add-ons, so rerun this after
+// regenerating either one.
 //
 // Run from the repo root:  node addons/tools-trim/assets/generate.mjs addons/tools-trim
 // The generated output is what gets committed; this script only regenerates it.
@@ -44,7 +45,11 @@ const TIERS = [
   // the netherite upgrade (see the paxel add-on's history).
   { id: 'diamond', texture: 'diamond', name: 'Diamond', durability: 1561, speed: 8, attack: 8, enchant: 10, tier: 'minecraft:diamond_tier', mines: 3, repair: ['minecraft:diamond'], trimMatch: 'diamond', extraTags: ['minecraft:transformable_items'] },
   { id: 'netherite', texture: 'netherite', name: 'Netherite', durability: 2031, speed: 9, attack: 9, enchant: 15, tier: 'minecraft:netherite_tier', mines: 3, repair: ['minecraft:netherite_ingot'], trimMatch: 'netherite' },
+  // Not vanilla: `custom` names the add-on that owns this tier's untrimmed
+  // items, stats, names, and icons. It has no paxels.
+  { id: 'creeperite', custom: 'mega-creepers' },
 ];
+const NETHERITE = TIERS.find((t) => t.id === 'netherite');
 
 // Block tags a pickaxe must at least match to mine a block at speed; a tier
 // with `mines: n` is fast on everything below index n's requirement. Both the
@@ -84,8 +89,8 @@ const TOOLS = [
   { id: 'shovel', name: 'Shovel', slot: 'shovel', attackOffset: -3, tags: ['minecraft:is_tool', 'minecraft:is_shovel', 'minecraft:digger'], regions: [{ rects: [[8, 6, 10, 8]], lo: 0, hi: 6 }, GRIP] },
   { id: 'hoe', name: 'Hoe', slot: 'hoe', attackOffset: -3, tags: ['minecraft:is_tool', 'minecraft:is_hoe', 'minecraft:digger'], regions: [{ rects: [[10, 3, 13, 5]], lo: 0, hi: 6 }, GRIP] },
   // From the paxel add-on: a binding where the axe head meets the stick, and
-  // a wound grip low on the stick. `custom` marks a tool whose untrimmed item,
-  // stats, and icon come from that add-on rather than vanilla.
+  // a wound grip low on the stick. `custom` names the add-on that owns this
+  // tool's untrimmed items, stats, names, and icons.
   {
     id: 'paxel', custom: 'paxel',
     regions: [{ rects: [[8, 6, 10, 7]], lo: 0, hi: 6 }, { rects: [[1, 10, 6, 13]], lo: 1, hi: 6, skip: (x, y) => (y - x) % 3 === 0 }],
@@ -110,25 +115,30 @@ const MATERIALS = [
 ];
 
 const itemId = (tier, tool, mat) => `${tier.id}_${tool.id}_${mat.id}_trim`;
-/** The untrimmed tool: vanilla, or the add-on's own item for a custom tool. */
-const vanillaId = (tier, tool) => (tool.custom ? `steveo:${tier.id}_${tool.id}` : `minecraft:${tier.id}_${tool.id}`);
+/** The add-on that owns this tool, or undefined for a vanilla one. */
+const owner = (tier, tool) => tier.custom ?? tool.custom;
+/** A custom tier only has the tools its add-on defines, so no paxels. */
+const exists = (tier, tool) => !(tier.custom && tool.custom);
+/** The untrimmed tool: vanilla, or the owning add-on's own item. */
+const vanillaId = (tier, tool) => `${owner(tier, tool) ? 'steveo' : 'minecraft'}:${tier.id}_${tool.id}`;
 
 // ---------- Custom tools ----------
 
 const addons = path.join(path.dirname(new URL(import.meta.url).pathname), '..', '..');
-const customDir = (tool) => path.join(addons, tool.custom);
+const customDir = (tier, tool) => path.join(addons, owner(tier, tool));
 const customItem = (tier, tool) =>
-  JSON.parse(fs.readFileSync(path.join(customDir(tool), 'behavior_pack', 'items', `${tier.id}_${tool.id}.json`), 'utf8'))['minecraft:item'];
-const customTexture = (tier, tool) => path.join(customDir(tool), 'resource_pack', 'textures', 'items', `${tier.id}_${tool.id}.png`);
+  JSON.parse(fs.readFileSync(path.join(customDir(tier, tool), 'behavior_pack', 'items', `${tier.id}_${tool.id}.json`), 'utf8'))['minecraft:item'];
+const customTexture = (tier, tool) => path.join(customDir(tier, tool), 'resource_pack', 'textures', 'items', `${tier.id}_${tool.id}.png`);
 const customNames = new Map();
 function customName(tier, tool) {
-  if (!customNames.has(tool.custom)) {
-    const lang = fs.readFileSync(path.join(customDir(tool), 'resource_pack', 'texts', 'en_US.lang'), 'utf8');
-    customNames.set(tool.custom, new Map(lang.split('\n').filter((l) => l.includes('=')).map((l) => [l.slice(0, l.indexOf('=')), l.slice(l.indexOf('=') + 1).trim()])));
+  const addon = owner(tier, tool);
+  if (!customNames.has(addon)) {
+    const lang = fs.readFileSync(path.join(customDir(tier, tool), 'resource_pack', 'texts', 'en_US.lang'), 'utf8');
+    customNames.set(addon, new Map(lang.split('\n').filter((l) => l.includes('=')).map((l) => [l.slice(0, l.indexOf('=')), l.slice(l.indexOf('=') + 1).trim()])));
   }
   const key = `item.${vanillaId(tier, tool)}.name`;
-  const name = customNames.get(tool.custom).get(key);
-  if (!name) throw new Error(`${tool.custom} has no ${key}`);
+  const name = customNames.get(addon).get(key);
+  if (!name) throw new Error(`${addon} has no ${key}`);
   return name;
 }
 
@@ -364,6 +374,9 @@ function customItemJson(tier, tool, mat) {
   const components = structuredClone(source.components);
   components['minecraft:icon'] = `steveo_${id}`;
   components['minecraft:display_name'] = { value: `item.steveo:${id}.name` };
+  // A trimmed sword enchants in the "all" slot whatever its source says, or
+  // the table would refuse a sword holding Looting (see TOOLS).
+  if (tool.slot) components['minecraft:enchantable'].slot = tool.slot;
   const repair = components['minecraft:repairable']?.repair_items ?? [];
   components['minecraft:repairable'] = {
     repair_items: [
@@ -386,7 +399,7 @@ function customItemJson(tier, tool, mat) {
 }
 
 function itemJson(tier, tool, mat) {
-  if (tool.custom) return customItemJson(tier, tool, mat);
+  if (owner(tier, tool)) return customItemJson(tier, tool, mat);
   const id = itemId(tier, tool, mat);
   return {
     format_version: '1.21.40',
@@ -426,16 +439,15 @@ function itemJson(tier, tool, mat) {
 
 function netheriteUpgradeJson(tool, mat) {
   const diamond = TIERS.find((t) => t.id === 'diamond');
-  const netherite = TIERS.find((t) => t.id === 'netherite');
   return {
     format_version: '1.21.40',
     'minecraft:recipe_smithing_transform': {
-      description: { identifier: `steveo:${itemId(netherite, tool, mat)}_smithing` },
+      description: { identifier: `steveo:${itemId(NETHERITE, tool, mat)}_smithing` },
       tags: ['smithing_table'],
       template: 'minecraft:netherite_upgrade_smithing_template',
       base: `steveo:${itemId(diamond, tool, mat)}`,
       addition: 'minecraft:netherite_ingot',
-      result: `steveo:${itemId(netherite, tool, mat)}`,
+      result: `steveo:${itemId(NETHERITE, tool, mat)}`,
     },
   };
 }
@@ -501,8 +513,8 @@ const itemTextures = {};
 const names = [];
 let packArt;
 for (const tier of TIERS) {
-  for (const tool of TOOLS) {
-    const base = decodePng(tool.custom ? customTexture(tier, tool) : path.join(vanilla, 'tools', `${tier.texture}_${tool.id}.png`)).rgba;
+  for (const tool of TOOLS.filter((t) => exists(tier, t))) {
+    const base = decodePng(owner(tier, tool) ? customTexture(tier, tool) : path.join(vanilla, 'tools', `${tier.texture}_${tool.id}.png`)).rgba;
     for (const mat of MATERIALS) {
       const id = itemId(tier, tool, mat);
       const darker = tier.trimMatch === mat.id && palettes[`${mat.palette}_darker`];
@@ -511,8 +523,8 @@ for (const tier of TIERS) {
       write(path.join(dirs.items, `${id}.json`), itemJson(tier, tool, mat));
       itemTextures[`steveo_${id}`] = { textures: `textures/items/trimmed/${id}` };
       // Same name as the untrimmed tool, as vanilla does for trimmed armor.
-      names.push(`item.steveo:${id}.name=${tool.custom ? customName(tier, tool) : `${tier.name} ${tool.name}`}`);
-      if (tier.id === 'diamond') write(path.join(dirs.recipes, `${itemId(TIERS.at(-1), tool, mat)}.json`), netheriteUpgradeJson(tool, mat));
+      names.push(`item.steveo:${id}.name=${owner(tier, tool) ? customName(tier, tool) : `${tier.name} ${tool.name}`}`);
+      if (tier.id === 'diamond') write(path.join(dirs.recipes, `${itemId(NETHERITE, tool, mat)}.json`), netheriteUpgradeJson(tool, mat));
       if (tier.id === 'diamond' && tool.id === 'pickaxe' && mat.id === 'gold') packArt = art;
     }
   }
@@ -522,7 +534,7 @@ for (const tier of TIERS) {
 // into its two suspects, the fractional speed and the plain block-name
 // entries, so the game confirms which one broke it. Delete once settled.
 {
-  const sample = itemJson(TIERS.at(-1), TOOLS[0], MATERIALS[0]);
+  const sample = itemJson(NETHERITE, TOOLS[0], MATERIALS[0]);
   const digger = sample['minecraft:item'].components['minecraft:digger'];
   const variants = {
     fractional: [{ block: { tags: anyTag(['minecraft:is_sword_item_destructible']) }, speed: 1.5 }],

@@ -10,10 +10,11 @@
  *
  * The paxel is the one tool that is not vanilla: its untrimmed item is
  * `steveo:<tier>_paxel` from the paxel add-on, so trimming one needs that
- * add-on too. The trimmed paxels themselves live here.
+ * add-on too. Creeperite tools are the same, from the mega-creepers add-on.
+ * The trimmed items themselves live here.
  */
 
-export const TIERS = ['wooden', 'stone', 'copper', 'iron', 'golden', 'diamond', 'netherite'] as const;
+export const TIERS = ['wooden', 'stone', 'copper', 'iron', 'golden', 'diamond', 'netherite', 'creeperite'] as const;
 export type Tier = (typeof TIERS)[number];
 
 export const TOOLS = ['sword', 'pickaxe', 'axe', 'shovel', 'hoe', 'paxel'] as const;
@@ -49,12 +50,19 @@ export interface TrimmableTool {
   readonly trim: Material | undefined;
 }
 
-/** Tools that come from another add-on, keyed to their untrimmed item's namespace. */
-const CUSTOM: Partial<Record<Tool, string>> = { paxel: 'steveo' };
+/** True when the untrimmed tool comes from another add-on rather than vanilla. */
+function isCustom(tier: Tier, tool: Tool): boolean {
+  return tier === 'creeperite' || tool === 'paxel';
+}
 
-/** The untrimmed tool: vanilla, or the paxel add-on's item. */
+/** Mega Creepers has no paxel, so this is the one combination with no items. */
+function exists(tier: Tier, tool: Tool): boolean {
+  return tier !== 'creeperite' || tool !== 'paxel';
+}
+
+/** The untrimmed tool: vanilla, or the owning add-on's item. */
 export function vanillaId(tier: Tier, tool: Tool): string {
-  return `${CUSTOM[tool] ?? 'minecraft'}:${tier}_${tool}`;
+  return `${isCustom(tier, tool) ? 'steveo' : 'minecraft'}:${tier}_${tool}`;
 }
 
 export function trimmedId(tier: Tier, tool: Tool, material: Material): string {
@@ -77,8 +85,7 @@ export function isTool(name: string): name is Tool {
   return (TOOLS as readonly string[]).includes(name);
 }
 
-const VANILLA = /^minecraft:([a-z]+)_([a-z]+)$/;
-const PAXEL = /^steveo:([a-z]+)_(paxel)$/;
+const UNTRIMMED = /^[a-z]+:([a-z]+)_([a-z]+)$/;
 const TRIMMED = /^steveo:([a-z]+)_([a-z]+)_([a-z]+)_trim$/;
 
 /** Reads an item id as a trimmable tool, or undefined when the table cannot work on it. */
@@ -89,24 +96,25 @@ export function parseTool(typeId: string): TrimmableTool | undefined {
     const trim = findMaterial(material);
     return isTier(tier) && isTool(tool) && trim ? { tier, tool, trim } : undefined;
   }
-  const plain = VANILLA.exec(typeId) ?? PAXEL.exec(typeId);
+  const plain = UNTRIMMED.exec(typeId);
   if (plain) {
     const [, tier = '', tool = ''] = plain;
-    return isTier(tier) && isTool(tool) ? { tier, tool, trim: undefined } : undefined;
+    return isTier(tier) && isTool(tool) && exists(tier, tool) && typeId === vanillaId(tier, tool) ? { tier, tool, trim: undefined } : undefined;
   }
   return undefined;
 }
 
 /**
  * Every item id the add-on relies on: the vanilla tools, the materials, and
- * every trimmed tool. Untrimmed paxels are left out; they exist only when the
- * paxel add-on is on too.
+ * every trimmed tool. Untrimmed paxels and creeperite tools are left out; they
+ * exist only when their own add-on is on too.
  */
 export function allItemIds(): string[] {
   const ids: string[] = MATERIALS.map((m) => m.item);
   for (const tier of TIERS) {
     for (const tool of TOOLS) {
-      if (CUSTOM[tool] === undefined) ids.push(vanillaId(tier, tool));
+      if (!exists(tier, tool)) continue;
+      if (!isCustom(tier, tool)) ids.push(vanillaId(tier, tool));
       for (const material of MATERIALS) ids.push(trimmedId(tier, tool, material));
     }
   }

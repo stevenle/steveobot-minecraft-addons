@@ -1387,6 +1387,171 @@
     },
     "steveo_netherite_paxel_resin_trim": {
       "textures": "textures/items/trimmed/netherite_paxel_resin_trim"
+    },
+    "steveo_creeperite_sword_quartz_trim": {
+      "textures": "textures/items/trimmed/creeperite_sword_quartz_trim"
+    },
+    "steveo_creeperite_sword_iron_trim": {
+      "textures": "textures/items/trimmed/creeperite_sword_iron_trim"
+    },
+    "steveo_creeperite_sword_netherite_trim": {
+      "textures": "textures/items/trimmed/creeperite_sword_netherite_trim"
+    },
+    "steveo_creeperite_sword_redstone_trim": {
+      "textures": "textures/items/trimmed/creeperite_sword_redstone_trim"
+    },
+    "steveo_creeperite_sword_copper_trim": {
+      "textures": "textures/items/trimmed/creeperite_sword_copper_trim"
+    },
+    "steveo_creeperite_sword_gold_trim": {
+      "textures": "textures/items/trimmed/creeperite_sword_gold_trim"
+    },
+    "steveo_creeperite_sword_emerald_trim": {
+      "textures": "textures/items/trimmed/creeperite_sword_emerald_trim"
+    },
+    "steveo_creeperite_sword_diamond_trim": {
+      "textures": "textures/items/trimmed/creeperite_sword_diamond_trim"
+    },
+    "steveo_creeperite_sword_lapis_trim": {
+      "textures": "textures/items/trimmed/creeperite_sword_lapis_trim"
+    },
+    "steveo_creeperite_sword_amethyst_trim": {
+      "textures": "textures/items/trimmed/creeperite_sword_amethyst_trim"
+    },
+    "steveo_creeperite_sword_resin_trim": {
+      "textures": "textures/items/trimmed/creeperite_sword_resin_trim"
+    },
+    "steveo_creeperite_pickaxe_quartz_trim": {
+      "textures": "textures/items/trimmed/creeperite_pickaxe_quartz_trim"
+    },
+    "steveo_creeperite_pickaxe_iron_trim": {
+      "textures": "textures/items/trimmed/creeperite_pickaxe_iron_trim"
+    },
+    "steveo_creeperite_pickaxe_netherite_trim": {
+      "textures": "textures/items/trimmed/creeperite_pickaxe_netherite_trim"
+    },
+    "steveo_creeperite_pickaxe_redstone_trim": {
+      "textures": "textures/items/trimmed/creeperite_pickaxe_redstone_trim"
+    },
+    "steveo_creeperite_pickaxe_copper_trim": {
+      "textures": "textures/items/trimmed/creeperite_pickaxe_copper_trim"
+    },
+    "steveo_creeperite_pickaxe_gold_trim": {
+      "textures": "textures/items/trimmed/creeperite_pickaxe_gold_trim"
+    },
+    "steveo_creeperite_pickaxe_emerald_trim": {
+      "textures": "textures/items/trimmed/creeperite_pickaxe_emerald_trim"
+    },
+    "steveo_creeperite_pickaxe_diamond_trim": {
+      "textures": "textures/items/trimmed/creeperite_pickaxe_diamond_trim"
+    },
+    "steveo_creeperite_pickaxe_lapis_trim": {
+      "textures": "textures/items/trimmed/creeperite_pickaxe_lapis_trim"
+    },
+    "steveo_creeperite_pickaxe_amethyst_trim": {
+      "textures": "textures/items/trimmed/creeperite_pickaxe_amethyst_trim"
+    },
+    "steveo_creeperite_pickaxe_resin_trim": {
+      "textures": "textures/items/trimmed/creeperite_pickaxe_resin_trim"
+    },
+    "steveo_creeperite_axe_quartz_trim": {
+      "textures": "textures/items/trimmed/creeperite_axe_quartz_trim"
+    },
+    "steveo_creeperite_axe_iron_trim": {
+      "textures": "textures/items/trimmed/creeperite_axe_iron_trim"
+    },
+    "steveo_creeperite_axe_netherite_trim": {
+      "textures": "textures/items/trimmed/creeperite_axe_netherite_trim"
+    },
+    "steveo_creeperite_axe_redstone_trim": {
+      "textures": "textures/items/trimmed/creeperite_axe_redstone_trim"
+    },
+    "steveo_creeperite_axe_copper_trim": {
+      "textures": "textures/items/trimmed/creeperite_axe_copper_trim"
+    },
+    "steveo_creeperite_axe_gold_trim": {
+      "textures": "textures/items/trimmed/creeperite_axe_gold_trim"
+    },
+    "steveo_creeperite_axe_emerald_trim": {
+      "textures": "textures/items/trimmed/creeperite_axe_emerald_trim"
+    },
+    "steveo_creeperite_axe_diamond_trim": {
+      "textures": "textures/items/trimmed/creeperite_axe_diamond_trim"
+    },
+    "steveo_creeperite_axe_lapis_trim": {
+      "textures": "textures/items/trimmed/creeperite_axe_lapis_trim"
+    },
+    "steveo_creeperite_axe_amethyst_trim": {
+      "textures": "textures/items/trimmed/creeperite_axe_amethyst_trim"
+    },
+    "steveo_creeperite_axe_resin_trim": {
+      "textures": "textures/items/trimmed/creeperite_axe_resin_trim"
+    },
+    "steveo_creeperite_shovel_quartz_trim": {
+      "textures": "textures/items/trimmed/creeperite_shovel_quartz_trim"
+    },
+    "steveo_creeperite_shovel_iron_trim": {
+      "textures": "textures/items/trimmed/creeperite_shovel_iron_trim"
+    },
+    "steveo_creeperite_shovel_netherite_trim": {
+      "textures": "textures/items/trimmed/creeperite_shovel_netherite_trim"
+    },
+    "steveo_creeperite_shovel_redstone_trim": {
+      "textures": "textures/items/trimmed/creeperite_shovel_redstone_trim"
+    },
+    "steveo_creeperite_shovel_copper_trim": {
+      "textures": "textures/items/trimmed/creeperite_shovel_copper_trim"
+    },
+    "steveo_creeperite_shovel_gold_trim": {
+      "textures": "textures/items/trimmed/creeperite_shovel_gold_trim"
+    },
+    "steveo_creeperite_shovel_emerald_trim": {
+      "textures": "textures/items/trimmed/creeperite_shovel_emerald_trim"
+    },
+    "steveo_creeperite_shovel_diamond_trim": {
+      "textures": "textures/items/trimmed/creeperite_shovel_diamond_trim"
+    },
+    "steveo_creeperite_shovel_lapis_trim": {
+      "textures": "textures/items/trimmed/creeperite_shovel_lapis_trim"
+    },
+    "steveo_creeperite_shovel_amethyst_trim": {
+      "textures": "textures/items/trimmed/creeperite_shovel_amethyst_trim"
+    },
+    "steveo_creeperite_shovel_resin_trim": {
+      "textures": "textures/items/trimmed/creeperite_shovel_resin_trim"
+    },
+    "steveo_creeperite_hoe_quartz_trim": {
+      "textures": "textures/items/trimmed/creeperite_hoe_quartz_trim"
+    },
+    "steveo_creeperite_hoe_iron_trim": {
+      "textures": "textures/items/trimmed/creeperite_hoe_iron_trim"
+    },
+    "steveo_creeperite_hoe_netherite_trim": {
+      "textures": "textures/items/trimmed/creeperite_hoe_netherite_trim"
+    },
+    "steveo_creeperite_hoe_redstone_trim": {
+      "textures": "textures/items/trimmed/creeperite_hoe_redstone_trim"
+    },
+    "steveo_creeperite_hoe_copper_trim": {
+      "textures": "textures/items/trimmed/creeperite_hoe_copper_trim"
+    },
+    "steveo_creeperite_hoe_gold_trim": {
+      "textures": "textures/items/trimmed/creeperite_hoe_gold_trim"
+    },
+    "steveo_creeperite_hoe_emerald_trim": {
+      "textures": "textures/items/trimmed/creeperite_hoe_emerald_trim"
+    },
+    "steveo_creeperite_hoe_diamond_trim": {
+      "textures": "textures/items/trimmed/creeperite_hoe_diamond_trim"
+    },
+    "steveo_creeperite_hoe_lapis_trim": {
+      "textures": "textures/items/trimmed/creeperite_hoe_lapis_trim"
+    },
+    "steveo_creeperite_hoe_amethyst_trim": {
+      "textures": "textures/items/trimmed/creeperite_hoe_amethyst_trim"
+    },
+    "steveo_creeperite_hoe_resin_trim": {
+      "textures": "textures/items/trimmed/creeperite_hoe_resin_trim"
     }
   }
 }
