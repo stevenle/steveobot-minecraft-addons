@@ -20,7 +20,7 @@
         "protection": 2
       },
       "minecraft:durability": {
-        "max_durability": 165
+        "max_durability": 407
       },
       "minecraft:repairable": {
         "repair_items": [
@@ -28,7 +28,7 @@
             "items": [
               "minecraft:blaze_rod"
             ],
-            "repair_amount": 41
+            "repair_amount": 102
           }
         ]
       },
