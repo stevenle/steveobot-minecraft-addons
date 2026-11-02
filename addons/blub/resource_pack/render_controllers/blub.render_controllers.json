@@ -1,0 +1,38 @@
+{
+  "format_version": "1.10.0",
+  "render_controllers": {
+    "controller.render.steveo_blub": {
+      "arrays": {
+        "textures": {
+          "array.coats": [
+            "texture.lucy",
+            "texture.cyan",
+            "texture.gold",
+            "texture.wild",
+            "texture.blue",
+            "texture.lucy"
+          ]
+        }
+      },
+      "geometry": "geometry.default",
+      "materials": [
+        { "*": "material.default" },
+        { "*arm": "material.limbs" },
+        { "*leg": "material.limbs" }
+      ],
+      "textures": ["array.coats[query.variant]"],
+      "overlay_color": {
+        "r": "query.variant == 5 ? math.sin(query.life_time * 120) * 0.5 + 0.5 : this",
+        "g": "query.variant == 5 ? math.sin(query.life_time * 120 + 120) * 0.5 + 0.5 : this",
+        "b": "query.variant == 5 ? math.sin(query.life_time * 120 + 240) * 0.5 + 0.5 : this",
+        "a": "query.variant == 5 ? 0.6 : this"
+      }
+    },
+    "controller.render.steveo_blub_crown": {
+      "rebuild_animation_matrices": true,
+      "geometry": "geometry.crown",
+      "materials": [{ "*": "material.crown" }],
+      "textures": ["texture.crown"]
+    }
+  }
+}

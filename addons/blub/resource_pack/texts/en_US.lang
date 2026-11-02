@@ -1,0 +1,57 @@
+## Strings for the Blub the Axolotl add-on.
+## Client-side translations live in the resource pack; the behavior pack
+## references them by key with RawMessage { translate: ... }.
+
+entity.steveo:blub.name=Blub
+item.spawn_egg.entity.steveo:blub.name=Spawn Blub
+
+item.steveo:blub_egg.name=Blub Egg
+item.steveo:blub_crown.name=Blub Crown
+
+action.interact.steveo.blub_stay=Stay / Follow
+
+blub.default_name=Blub
+
+blub.coat.0=pink
+blub.coat.1=cyan
+blub.coat.2=gold
+blub.coat.3=brown
+blub.coat.4=blue
+blub.coat.5=rainbow
+
+blub.stage.0=Tiny
+blub.stage.1=Little
+blub.stage.2=Big
+blub.stage.3=Huge
+blub.stage.4=Giant
+
+blub.hatched=A %s axolotl hatched! Feed it a fish to make it yours.
+blub.hatched_blue=WOW! A rare blue axolotl hatched! Feed it a fish to make it yours.
+blub.rainbow.title=RAINBOW BLUB!
+blub.rainbow.subtitle=The rarest axolotl of all!
+blub.tamed=%s is yours now! Keep feeding it fish to help it grow.
+
+blub.fed=%s ate the fish! %s of %s fish until it grows.
+blub.grew=%s grew! Now it is %s.
+blub.giant.title=GIANT BLUB!
+blub.giant.subtitle=Tap with an empty hand to ride
+blub.full=%s is too full to eat, but it blows you a bubble.
+blub.hint.ride=Look where you want to go and hold forward. Hold jump to climb. Sneak to hop off. Someone else can sit behind you!
+
+blub.stay=%s will stay here.
+blub.follow=%s will follow you.
+
+blub.crowned=%s wears the crown. All hail!
+blub.already_crowned=%s already wears a crown.
+blub.uncrowned=You take the crown back from %s.
+
+blub.debug.egg=A Blub Egg has been placed in your inventory.
+blub.debug.crown=A Blub Crown has been placed in your inventory. Use it on a Blub to crown it; use shears to take it back.
+blub.debug.coats=Spawned one Blub of each coat in front of you.
+blub.debug.tamed=Tamed %s nearby Blub(s) to you.
+blub.debug.giant=%s is Giant now. Tap it with an empty hand to ride.
+blub.debug.baby=%s is Tiny again.
+blub.debug.dismissed=%s swam away.
+blub.debug.status=Your Blubs: %s
+blub.debug.none=There are no Blubs nearby. Try "/scriptevent steveo:blub egg" or "/scriptevent steveo:blub giant".
+blub.debug.help=Usage: /scriptevent steveo:blub <egg|crown|coats|tame|giant|baby|status|dismiss>

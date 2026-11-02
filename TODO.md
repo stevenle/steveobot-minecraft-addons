@@ -44,6 +44,17 @@ update packs, so removing it takes these steps, in this order:
 - [ ] Verify with `pnpm realm --realm 34568298 --list` after someone has joined
       (the download lags the upload until then).
 
+## Add-ons to build next
+
+- [ ] **Advent Presents** (new add-on). One present to open each real day in
+      December, ending in a Christmas Eve surprise. **Needs to ship by about
+      Nov 25.** `Date.now()` already works in portal-gun.
+- [ ] **Mob Arena** (new add-on). Place a block to start waves of mobs that keep
+      getting harder, with a boss every five waves and rewards between rounds.
+      Gives the super gear something to fight, and it is co-op.
+- [ ] **Mario Kart Race Kit** (improves `mario`). Boost pads, item boxes,
+      bananas, green shells, and a lap counter, so two players can race.
+
 ## Later
 
 - [ ] Parse the upload SSE events for progress and a clean failure signal

@@ -1,0 +1,20 @@
+{
+  "format_version": "1.10.0",
+  "animation_controllers": {
+    "controller.animation.steveo_blub.move": {
+      "initial_state": "idle",
+      "states": {
+        "idle": {
+          "animations": ["idle", "look_at_target"],
+          "transitions": [{ "moving": "variable.moving" }],
+          "blend_transition": 0.2
+        },
+        "moving": {
+          "animations": ["swim"],
+          "transitions": [{ "idle": "!variable.moving" }],
+          "blend_transition": 0.2
+        }
+      }
+    }
+  }
+}

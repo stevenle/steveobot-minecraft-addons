@@ -1,0 +1,21 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Blub the Axolotl RP",
+    "description": "A pet axolotl that floats through the air beside you and grows with every fish until it is big enough to ride, blowing bubbles as it flies.",
+    "uuid": "46bf8921-123c-42ff-aa96-35de6c3a4408",
+    "version": [1, 0, 0],
+    "min_engine_version": [1, 26, 40]
+  },
+  "modules": [
+    {
+      "type": "resources",
+      "uuid": "dc347cc2-210c-4a1d-a3f4-9f232a0ad3ad",
+      "version": [1, 0, 0]
+    }
+  ],
+  "metadata": {
+    "authors": ["Steven Le"],
+    "license": "MIT"
+  }
+}
