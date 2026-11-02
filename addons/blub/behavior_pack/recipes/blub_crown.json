@@ -1,0 +1,21 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "steveo:blub_crown_recipe"
+    },
+    "tags": ["crafting_table"],
+    "pattern": ["G G", "GPG", "GGG"],
+    "key": {
+      "G": { "item": "minecraft:gold_ingot" },
+      "P": { "item": "minecraft:prismarine_shard" }
+    },
+    "unlock": [
+      { "item": "minecraft:gold_ingot" },
+      { "item": "minecraft:prismarine_shard" }
+    ],
+    "result": {
+      "item": "steveo:blub_crown"
+    }
+  }
+}

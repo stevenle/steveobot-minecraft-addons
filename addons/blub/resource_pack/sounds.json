@@ -1,0 +1,16 @@
+{
+  "entity_sounds": {
+    "entities": {
+      "steveo:blub": {
+        "volume": 1.0,
+        "pitch": [0.9, 1.2],
+        "events": {
+          "ambient": "mob.axolotl.idle",
+          "ambient.in.water": "mob.axolotl.idle_water",
+          "hurt": "mob.axolotl.hurt",
+          "death": "mob.axolotl.death"
+        }
+      }
+    }
+  }
+}

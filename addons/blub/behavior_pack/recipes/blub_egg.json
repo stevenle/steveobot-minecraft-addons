@@ -1,0 +1,21 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:recipe_shapeless": {
+    "description": {
+      "identifier": "steveo:blub_egg_recipe"
+    },
+    "tags": ["crafting_table"],
+    "ingredients": [
+      { "item": "minecraft:egg" },
+      { "item": "minecraft:cod" },
+      { "item": "minecraft:kelp" }
+    ],
+    "unlock": [
+      { "item": "minecraft:egg" },
+      { "item": "minecraft:cod" }
+    ],
+    "result": {
+      "item": "steveo:blub_egg"
+    }
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "steveo:blub",
+      "materials": {
+        "default": "axolotl",
+        "limbs": "axolotl_limbs",
+        "crown": "entity_alphatest"
+      },
+      "textures": {
+        "lucy": "textures/entity/axolotl/axolotl_lucy",
+        "cyan": "textures/entity/axolotl/axolotl_cyan",
+        "gold": "textures/entity/axolotl/axolotl_gold",
+        "wild": "textures/entity/axolotl/axolotl_wild",
+        "blue": "textures/entity/axolotl/axolotl_blue",
+        "crown": "textures/entity/blub/crown"
+      },
+      "geometry": {
+        "default": "geometry.steveo_blub",
+        "crown": "geometry.steveo_blub_crown"
+      },
+      "animations": {
+        "idle": "animation.axolotl.idle_underwater",
+        "swim": "animation.axolotl.swim",
+        "swim_angle": "animation.axolotl.swim_angle",
+        "look_at_target": "animation.common.look_at_target",
+        "move": "controller.animation.steveo_blub.move"
+      },
+      "scripts": {
+        "pre_animation": [
+          "variable.moving = query.ground_speed > 0.05 || math.abs(query.vertical_speed) > 0.05;",
+          "variable.pitch = query.body_x_rotation;"
+        ],
+        "scale": "query.mark_variant == 4 ? 5.0 : (query.mark_variant == 3 ? 3.75 : (query.mark_variant == 2 ? 2.75 : (query.mark_variant == 1 ? 1.75 : 1.0)))",
+        "animate": [
+          "move",
+          { "swim_angle": "variable.moving" }
+        ]
+      },
+      "render_controllers": [
+        "controller.render.steveo_blub",
+        { "controller.render.steveo_blub_crown": "query.skin_id == 1" }
+      ],
+      "spawn_egg": { "base_color": "#F7B2C8", "overlay_color": "#E8567F" }
+    }
+  }
+}

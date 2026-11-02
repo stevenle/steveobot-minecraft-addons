@@ -1,0 +1,12 @@
+{
+  "resource_pack_name": "blub",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "steveo_blub_egg": {
+      "textures": "textures/items/blub_egg"
+    },
+    "steveo_blub_crown": {
+      "textures": "textures/items/blub_crown"
+    }
+  }
+}

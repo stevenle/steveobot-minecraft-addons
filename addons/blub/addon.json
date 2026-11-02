@@ -1,0 +1,5 @@
+{
+  "$schema": "../../tools/schemas/addon.schema.json",
+  "name": "Blub the Axolotl",
+  "description": "A pet axolotl that floats through the air beside you and grows with every fish until it is big enough to ride, blowing bubbles as it flies."
+}

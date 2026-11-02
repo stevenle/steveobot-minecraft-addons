@@ -1,0 +1,19 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:item": {
+    "description": {
+      "identifier": "steveo:blub_crown",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": "steveo_blub_crown",
+      "minecraft:display_name": {
+        "value": "item.steveo:blub_crown.name"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:rarity": "rare"
+    }
+  }
+}
