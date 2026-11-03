@@ -257,6 +257,17 @@ Three things constrain changes here:
   re-enter the world.
 - Placeholder `pack_icon.png` files are 128×128 and intentionally generic;
   replacing them is a real task, not a nicety.
+- An entity file's `format_version` decides which JSON shapes are legal, and
+  a shape from an older format gets the whole entity rejected: the type is never
+  registered, so its spawn item does nothing and `/summon` calls it a syntax
+  error, with nothing on a Realm to say why. Blub at `1.26.30` failed this way
+  (2026-11-02) on `random_hover.hover_height` as an array (`[1, 4]`, as the
+  1.26.10 bee writes it; the 1.26.30 Happy Ghast writes `{ "min": 1, "max": 4 }`).
+  When copying from a vanilla mob, copy from one at the same `format_version`.
+  A `randomize` that shares an event with `add`, legal at `1.21.0`, appears
+  in no current vanilla event; use a `sequence`. A script that subscribes
+  with an `entityTypes` filter for a type that failed to load throws at
+  startup, so filter by `typeId` by hand in an add-on whose entity may not load.
 - Do not set `isolated_physics: true` on a projectile entity that a script
   launches with `ProjectileComponent.shoot()`: on 1.26.50 the entity spawned
   but never moved (potato-gun, 2026-09-16). It is meant for projectiles fired

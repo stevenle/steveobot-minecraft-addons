@@ -137,10 +137,10 @@
           "y_dist": 3,
           "y_offset": -1,
           "interval": 1,
-          "hover_height": [
-            1,
-            2.5
-          ]
+          "hover_height": {
+            "min": 1,
+            "max": 2
+          }
         }
       },
       "steveo:tamed": {
@@ -183,10 +183,10 @@
           "y_dist": 3,
           "y_offset": -1,
           "interval": 1,
-          "hover_height": [
-            1,
-            2.5
-          ]
+          "hover_height": {
+            "min": 1,
+            "max": 2
+          }
         }
       },
       "steveo:crowned": {
@@ -290,62 +290,68 @@
     },
     "events": {
       "minecraft:entity_spawned": {
-        "randomize": [
+        "sequence": [
           {
-            "weight": 28,
-            "add": {
-              "component_groups": [
-                "steveo:coat_pink"
-              ]
-            }
+            "randomize": [
+              {
+                "weight": 28,
+                "add": {
+                  "component_groups": [
+                    "steveo:coat_pink"
+                  ]
+                }
+              },
+              {
+                "weight": 24,
+                "add": {
+                  "component_groups": [
+                    "steveo:coat_cyan"
+                  ]
+                }
+              },
+              {
+                "weight": 20,
+                "add": {
+                  "component_groups": [
+                    "steveo:coat_gold"
+                  ]
+                }
+              },
+              {
+                "weight": 20,
+                "add": {
+                  "component_groups": [
+                    "steveo:coat_brown"
+                  ]
+                }
+              },
+              {
+                "weight": 5,
+                "add": {
+                  "component_groups": [
+                    "steveo:coat_blue"
+                  ]
+                }
+              },
+              {
+                "weight": 3,
+                "add": {
+                  "component_groups": [
+                    "steveo:coat_rainbow"
+                  ]
+                }
+              }
+            ]
           },
           {
-            "weight": 24,
             "add": {
               "component_groups": [
-                "steveo:coat_cyan"
-              ]
-            }
-          },
-          {
-            "weight": 20,
-            "add": {
-              "component_groups": [
-                "steveo:coat_gold"
-              ]
-            }
-          },
-          {
-            "weight": 20,
-            "add": {
-              "component_groups": [
-                "steveo:coat_brown"
-              ]
-            }
-          },
-          {
-            "weight": 5,
-            "add": {
-              "component_groups": [
-                "steveo:coat_blue"
-              ]
-            }
-          },
-          {
-            "weight": 3,
-            "add": {
-              "component_groups": [
-                "steveo:coat_rainbow"
+                "steveo:wild",
+                "steveo:stage_0"
               ]
             }
           }
-        ],
-        "add": {
-          "component_groups": [
-            "steveo:wild",
-            "steveo:stage_0"
-          ]
-        }
+        ]
       },
       "steveo:on_tame": {
         "sequence": [

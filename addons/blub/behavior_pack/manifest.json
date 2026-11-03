@@ -4,21 +4,21 @@
     "name": "Blub the Axolotl BP",
     "description": "A pet axolotl that floats through the air beside you and grows with every fish until it is big enough to ride, blowing bubbles as it flies.",
     "uuid": "52284003-58b7-4b69-bcda-3cab7e7555df",
-    "version": [1, 0, 1],
+    "version": [1, 0, 2],
     "min_engine_version": [1, 26, 40]
   },
   "modules": [
     {
       "type": "data",
       "uuid": "b6b91a74-61d3-4a72-8f47-5e77abd3af25",
-      "version": [1, 0, 1]
+      "version": [1, 0, 2]
     },
     {
       "type": "script",
       "language": "javascript",
       "entry": "scripts/main.js",
       "uuid": "a0b0eebd-4374-4d8f-b37d-916fb490ba96",
-      "version": [1, 0, 1]
+      "version": [1, 0, 2]
     }
   ],
   "dependencies": [

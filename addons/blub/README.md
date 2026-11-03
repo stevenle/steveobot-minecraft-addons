@@ -55,8 +55,8 @@ Riding speed is `minecraft:flying_speed` in the `steveo:stage_4` group of
 one), tames it to you, and makes it Giant. `dismiss` is the only way to remove a
 Blub, since nothing else can hurt it.
 
-`check` reports whether the game registered Blub's entity, plus the probe
-entities. Version 1.0.0's entity was rejected on the Realm, and a Realm has no
-content log, so `behavior_pack/entities/blub_probe_*.json` each carry that
-original definition with one suspect removed. Whichever probes load point at
-the cause. Delete the probes, and `PROBES` in `src/main.ts`, once Blub loads.
+`check` reports whether the game registered Blub's entity. If it did not, the
+egg does nothing and `/summon steveo:blub` is a syntax error; players also get a
+chat note on joining. Versions 1.0.0 and 1.0.1 failed this way because the
+entity file used shapes from older vanilla formats (see the format-version
+gotcha in the repo's CLAUDE.md).

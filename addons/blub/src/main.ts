@@ -353,17 +353,12 @@ world.afterEvents.dataDrivenEntityTrigger.subscribe(
 // ---------------------------------------------------------------------------
 // Load check
 //
-// Blub 1.0.0's entity was rejected on the Realm (`/summon` called it a syntax
-// error) and a Realm has no content log to say why. Each probe entity is that
-// original definition with one suspect removed, so whichever probes load name
-// the culprit. Delete the probes once Blub loads.
-
-const PROBES = ['camera', 'vertical', 'ride', 'interact', 'nameable', 'toggle', 'teleport', 'base'] as const;
+// When the game rejects an entity definition, the type is simply never
+// registered: no error reaches chat, and a Realm has no content log. Blub 1.0.0
+// and 1.0.1 went that way, so the script says so on join and on demand.
 
 function loadReport(): string {
-  const loaded = (id: string): string => (EntityTypes.get(id) ? 'loaded' : 'MISSING');
-  const probes = PROBES.map((probe) => `${probe} ${loaded(`steveo:blub_probe_${probe}`)}`).join(', ');
-  return `blub ${loaded(BLUB)}; probes: ${probes}`;
+  return `blub ${EntityTypes.get(BLUB) ? 'loaded' : 'MISSING'}`;
 }
 
 world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
