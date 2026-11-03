@@ -175,8 +175,7 @@
           "speed_multiplier": 8,
           "start_distance": 5,
           "stop_distance": 2,
-          "can_teleport": true,
-          "post_teleport_distance": 2
+          "can_teleport": true
         },
         "minecraft:behavior.random_hover": {
           "priority": 9,
@@ -369,7 +368,9 @@
       },
       "steveo:toggle_stay": {
         "add": {
-          "component_groups": []
+          "component_groups": [
+            "steveo:tamed"
+          ]
         }
       },
       "steveo:stay": {

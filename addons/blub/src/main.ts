@@ -22,10 +22,11 @@
  *   off a Giant Blub at cloud height is a float rather than a death.
  * - **Crown.** Same as the King Charles crown. Shears take it back, because
  *   sneak + empty hand is the stay/follow toggle here.
- * - **Debug.** `/scriptevent steveo:blub <egg|crown|coats|tame|giant|baby|status|dismiss>`.
+ * - **Debug.** `/scriptevent steveo:blub <egg|crown|coats|tame|giant|baby|status|dismiss|check>`.
  */
 import {
   EntityInitializationCause,
+  EntityTypes,
   EquipmentSlot,
   GameMode,
   ItemStack,
@@ -318,8 +319,11 @@ world.beforeEvents.playerInteractWithEntity.subscribe((event) => {
   }
 });
 
+// The entity filters below are checked by hand: an `entityTypes` filter naming
+// a type the game failed to load throws, which would stop this whole script.
 world.afterEvents.dataDrivenEntityTrigger.subscribe(
   ({ entity: blub }) => {
+    if (blub.typeId !== BLUB) return;
     const staying = !blub.hasTag(STAYING);
     if (staying) blub.addTag(STAYING);
     else blub.removeTag(STAYING);
@@ -327,11 +331,12 @@ world.afterEvents.dataDrivenEntityTrigger.subscribe(
     const owner = ownerOf(blub);
     if (owner) say(owner, staying ? 'blub.stay' : 'blub.follow', nameOf(blub));
   },
-  { entityTypes: [BLUB], eventTypes: ['steveo:toggle_stay'] },
+  { eventTypes: ['steveo:toggle_stay'] },
 );
 
 world.afterEvents.dataDrivenEntityTrigger.subscribe(
   ({ entity: blub }) => {
+    if (blub.typeId !== BLUB) return;
     // The owner is set after the tame event, so look for it a tick later.
     system.run(() => {
       if (!blub.isValid) return;
@@ -342,8 +347,29 @@ world.afterEvents.dataDrivenEntityTrigger.subscribe(
       say(owner, 'blub.tamed', nameOf(blub));
     });
   },
-  { entityTypes: [BLUB], eventTypes: ['steveo:on_tame'] },
+  { eventTypes: ['steveo:on_tame'] },
 );
+
+// ---------------------------------------------------------------------------
+// Load check
+//
+// Blub 1.0.0's entity was rejected on the Realm (`/summon` called it a syntax
+// error) and a Realm has no content log to say why. Each probe entity is that
+// original definition with one suspect removed, so whichever probes load name
+// the culprit. Delete the probes once Blub loads.
+
+const PROBES = ['camera', 'vertical', 'ride', 'interact', 'nameable', 'toggle', 'teleport', 'base'] as const;
+
+function loadReport(): string {
+  const loaded = (id: string): string => (EntityTypes.get(id) ? 'loaded' : 'MISSING');
+  const probes = PROBES.map((probe) => `${probe} ${loaded(`steveo:blub_probe_${probe}`)}`).join(', ');
+  return `blub ${loaded(BLUB)}; probes: ${probes}`;
+}
+
+world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
+  if (!initialSpawn || EntityTypes.get(BLUB)) return;
+  say(player, 'blub.broken', loadReport());
+});
 
 // ---------------------------------------------------------------------------
 // Riders and idle bubbles
@@ -408,7 +434,7 @@ world.afterEvents.playerLeave.subscribe(({ playerId }) => {
 });
 
 // ---------------------------------------------------------------------------
-// Debug: /scriptevent steveo:blub <egg|crown|coats|tame|giant|baby|status|dismiss>
+// Debug: /scriptevent steveo:blub <egg|crown|coats|tame|giant|baby|status|dismiss|check>
 
 function nearbyBlubs(player: Player): Entity[] {
   return player.dimension.getEntities({
@@ -533,11 +559,16 @@ system.afterEvents.scriptEventReceive.subscribe(
         case 'dismiss':
           debugDismiss(player);
           break;
+        case 'check':
+          say(player, 'blub.debug.check', loadReport());
+          break;
         default:
           say(player, 'blub.debug.help');
       }
     } catch (err) {
+      // No content log on a Realm, so failures go to chat.
       log.error(`debug ${event.message} failed`, err);
+      say(player, 'blub.debug.error', String(err));
     }
   },
   { namespaces: ['steveo'] },

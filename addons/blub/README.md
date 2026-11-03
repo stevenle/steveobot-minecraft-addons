@@ -49,8 +49,14 @@ Riding speed is `minecraft:flying_speed` in the `steveo:stage_4` group of
 
 ## Debug
 
-`/scriptevent steveo:blub <egg|crown|coats|tame|giant|baby|status|dismiss>`
+`/scriptevent steveo:blub <egg|crown|coats|tame|giant|baby|status|dismiss|check>`
 
 `giant` is the quick way to test riding: it takes the nearest Blub (or spawns
 one), tames it to you, and makes it Giant. `dismiss` is the only way to remove a
 Blub, since nothing else can hurt it.
+
+`check` reports whether the game registered Blub's entity, plus the probe
+entities. Version 1.0.0's entity was rejected on the Realm, and a Realm has no
+content log, so `behavior_pack/entities/blub_probe_*.json` each carry that
+original definition with one suspect removed. Whichever probes load point at
+the cause. Delete the probes, and `PROBES` in `src/main.ts`, once Blub loads.
