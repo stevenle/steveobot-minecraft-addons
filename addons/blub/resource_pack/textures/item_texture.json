@@ -7,6 +7,9 @@
     },
     "steveo_blub_crown": {
       "textures": "textures/items/blub_crown"
+    },
+    "steveo_blub_bucket": {
+      "textures": "textures/items/blub_bucket"
     }
   }
 }

@@ -42,15 +42,27 @@ Riding speed is `minecraft:flying_speed` in the `steveo:stage_4` group of
 
 ## Other controls
 
-- **Sneak + tap with an empty hand:** stay here, or follow me again.
+- **Sneak + tap with an empty hand:** stay around here, or follow me again. A
+  staying Blub roams within 8 blocks of where you told it to stay. To move that
+  spot, lead it somewhere on a lead and unhook it.
+- **Water bucket:** scoop Blub into a **Bucket of Blub**. The bucket keeps its
+  coat, size, fish count, name, and crown; use it to let Blub out again, and
+  whoever lets it out becomes its owner. A Blub being ridden cannot be scooped.
+  To get rid of a Blub for good, scoop it and get rid of the bucket.
 - **Blub Crown:** craft with seven gold ingots around a prismarine shard (the same
   shape as the Spaniel Crown), then use it on Blub. Shears take it back.
 - **Name tag:** rename it. Blub starts out named Blub.
 
 ## Debug
 
-`/scriptevent steveo:blub <egg|crown|coats|tame|giant|baby|status|dismiss>`
+`/scriptevent steveo:blub <egg|crown|coats|tame|giant|baby|status|dismiss|check>`
 
 `giant` is the quick way to test riding: it takes the nearest Blub (or spawns
-one), tames it to you, and makes it Giant. `dismiss` is the only way to remove a
-Blub, since nothing else can hurt it.
+one), tames it to you, and makes it Giant. `dismiss` removes the nearest Blub
+outright, with no bucket.
+
+`check` reports whether the game registered Blub's entity. If it did not, the
+egg does nothing and `/summon steveo:blub` is a syntax error; players also get a
+chat note on joining. Versions 1.0.0 and 1.0.1 failed this way because the
+entity file used shapes from older vanilla formats (see the format-version
+gotcha in the repo's CLAUDE.md).

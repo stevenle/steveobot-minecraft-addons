@@ -137,10 +137,10 @@
           "y_dist": 3,
           "y_offset": -1,
           "interval": 1,
-          "hover_height": [
-            1,
-            2.5
-          ]
+          "hover_height": {
+            "min": 1,
+            "max": 2
+          }
         }
       },
       "steveo:tamed": {
@@ -165,6 +165,19 @@
                 "target": "self"
               },
               "interact_text": "action.interact.steveo.blub_stay"
+            },
+            {
+              "on_interact": {
+                "filters": {
+                  "test": "has_equipment",
+                  "subject": "other",
+                  "domain": "hand",
+                  "value": "water_bucket"
+                },
+                "event": "steveo:scoop",
+                "target": "self"
+              },
+              "interact_text": "action.interact.steveo.blub_scoop"
             }
           ]
         }
@@ -175,8 +188,7 @@
           "speed_multiplier": 8,
           "start_distance": 5,
           "stop_distance": 2,
-          "can_teleport": true,
-          "post_teleport_distance": 2
+          "can_teleport": true
         },
         "minecraft:behavior.random_hover": {
           "priority": 9,
@@ -184,15 +196,32 @@
           "y_dist": 3,
           "y_offset": -1,
           "interval": 1,
-          "hover_height": [
-            1,
-            2.5
-          ]
+          "hover_height": {
+            "min": 1,
+            "max": 2
+          }
         }
       },
       "steveo:crowned": {
         "minecraft:skin_id": {
           "value": 1
+        }
+      },
+      "steveo:staying": {
+        "minecraft:home": {
+          "restriction_radius": 8,
+          "restriction_type": "random_movement"
+        },
+        "minecraft:behavior.random_hover": {
+          "priority": 9,
+          "xz_dist": 6,
+          "y_dist": 3,
+          "y_offset": -1,
+          "interval": 1,
+          "hover_height": {
+            "min": 1,
+            "max": 2
+          }
         }
       }
     },
@@ -241,7 +270,11 @@
             "hard_distance": 6,
             "max_distance": 10
           }
-        ]
+        ],
+        "on_unleash": {
+          "event": "steveo:on_unleash",
+          "target": "self"
+        }
       },
       "minecraft:nameable": {
         "always_show": true,
@@ -287,66 +320,89 @@
       },
       "minecraft:behavior.random_look_around": {
         "priority": 11
+      },
+      "minecraft:interact": {
+        "interactions": [
+          {
+            "on_interact": {
+              "filters": {
+                "test": "has_equipment",
+                "subject": "other",
+                "domain": "hand",
+                "value": "water_bucket"
+              },
+              "event": "steveo:scoop",
+              "target": "self"
+            },
+            "interact_text": "action.interact.steveo.blub_scoop"
+          }
+        ]
       }
     },
     "events": {
       "minecraft:entity_spawned": {
-        "randomize": [
+        "sequence": [
           {
-            "weight": 28,
-            "add": {
-              "component_groups": [
-                "steveo:coat_pink"
-              ]
-            }
+            "randomize": [
+              {
+                "weight": 28,
+                "add": {
+                  "component_groups": [
+                    "steveo:coat_pink"
+                  ]
+                }
+              },
+              {
+                "weight": 24,
+                "add": {
+                  "component_groups": [
+                    "steveo:coat_cyan"
+                  ]
+                }
+              },
+              {
+                "weight": 20,
+                "add": {
+                  "component_groups": [
+                    "steveo:coat_gold"
+                  ]
+                }
+              },
+              {
+                "weight": 20,
+                "add": {
+                  "component_groups": [
+                    "steveo:coat_brown"
+                  ]
+                }
+              },
+              {
+                "weight": 5,
+                "add": {
+                  "component_groups": [
+                    "steveo:coat_blue"
+                  ]
+                }
+              },
+              {
+                "weight": 3,
+                "add": {
+                  "component_groups": [
+                    "steveo:coat_rainbow"
+                  ]
+                }
+              }
+            ]
           },
           {
-            "weight": 24,
             "add": {
               "component_groups": [
-                "steveo:coat_cyan"
-              ]
-            }
-          },
-          {
-            "weight": 20,
-            "add": {
-              "component_groups": [
-                "steveo:coat_gold"
-              ]
-            }
-          },
-          {
-            "weight": 20,
-            "add": {
-              "component_groups": [
-                "steveo:coat_brown"
-              ]
-            }
-          },
-          {
-            "weight": 5,
-            "add": {
-              "component_groups": [
-                "steveo:coat_blue"
-              ]
-            }
-          },
-          {
-            "weight": 3,
-            "add": {
-              "component_groups": [
-                "steveo:coat_rainbow"
+                "steveo:wild",
+                "steveo:stage_0"
               ]
             }
           }
-        ],
-        "add": {
-          "component_groups": [
-            "steveo:wild",
-            "steveo:stage_0"
-          ]
-        }
+        ]
       },
       "steveo:on_tame": {
         "sequence": [
@@ -369,7 +425,9 @@
       },
       "steveo:toggle_stay": {
         "add": {
-          "component_groups": []
+          "component_groups": [
+            "steveo:tamed"
+          ]
         }
       },
       "steveo:stay": {
@@ -377,9 +435,20 @@
           "component_groups": [
             "steveo:following"
           ]
-        }
+        },
+        "add": {
+          "component_groups": [
+            "steveo:staying"
+          ]
+        },
+        "set_home_position": {}
       },
       "steveo:follow": {
+        "remove": {
+          "component_groups": [
+            "steveo:staying"
+          ]
+        },
         "add": {
           "component_groups": [
             "steveo:following"
@@ -563,6 +632,12 @@
             }
           }
         ]
+      },
+      "steveo:scoop": {
+        "set_home_position": {}
+      },
+      "steveo:on_unleash": {
+        "set_home_position": {}
       }
     }
   }

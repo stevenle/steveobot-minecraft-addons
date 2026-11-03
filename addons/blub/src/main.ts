@@ -22,10 +22,11 @@
  *   off a Giant Blub at cloud height is a float rather than a death.
  * - **Crown.** Same as the King Charles crown. Shears take it back, because
  *   sneak + empty hand is the stay/follow toggle here.
- * - **Debug.** `/scriptevent steveo:blub <egg|crown|coats|tame|giant|baby|status|dismiss>`.
+ * - **Debug.** `/scriptevent steveo:blub <egg|crown|coats|tame|giant|baby|status|dismiss|check>`.
  */
 import {
   EntityInitializationCause,
+  EntityTypes,
   EquipmentSlot,
   GameMode,
   ItemStack,
@@ -41,6 +42,7 @@ import {
 
 import { Format } from '@shared/chat';
 import { createLogger } from '@shared/log';
+import { onItemUse } from '@shared/use';
 
 const log = createLogger('blub');
 const TAG = `${Format.gray}[Blub]${Format.reset} `;
@@ -48,6 +50,9 @@ const TAG = `${Format.gray}[Blub]${Format.reset} `;
 const BLUB = 'steveo:blub';
 const EGG = 'steveo:blub_egg';
 const CROWN = 'steveo:blub_crown';
+const BUCKET = 'steveo:blub_bucket';
+/** On a Bucket of Blub: the scooped Blub, as JSON. */
+const BUCKETED = 'steveo:blub';
 const BUBBLE = 'steveo:blub_bubble';
 const TAMED = 'minecraft:is_tamed';
 const FISH_EATEN = 'steveo:fish_eaten';
@@ -192,8 +197,11 @@ function blowBubble(blub: Entity): void {
 // ---------------------------------------------------------------------------
 // Hatching
 
+/** Blubs being let out of a bucket: no hatching or taming fanfare for those. */
+const quiet = new Set<string>();
+
 function announceHatch(blub: Entity): void {
-  if (!blub.isValid) return;
+  if (!blub.isValid || quiet.has(blub.id)) return;
   if (!blub.nameTag) blub.nameTag = 'Blub';
   blowBubble(blub);
   playSound(blub.dimension, 'mob.axolotl.splash', blub.location);
@@ -294,6 +302,137 @@ function takeCrown(player: Player, blub: Entity): void {
 }
 
 // ---------------------------------------------------------------------------
+// The bucket
+//
+// A water bucket on a Blub scoops it into a Bucket of Blub, which remembers
+// everything that makes it that Blub. Using the bucket lets it out again,
+// owned by whoever let it out. That is also how a Blub leaves the world for
+// good: scoop it and get rid of the bucket.
+
+interface Bucketed {
+  coat: number;
+  stage: number;
+  fish: number;
+  crowned: boolean;
+  name: string;
+}
+
+function readBucket(item: ItemStack): Bucketed | undefined {
+  const raw = item.getDynamicProperty(BUCKETED);
+  if (typeof raw !== 'string') return undefined;
+  try {
+    const value: unknown = JSON.parse(raw);
+    if (typeof value !== 'object' || value === null) return undefined;
+    const v = value as Partial<Record<keyof Bucketed, unknown>>;
+    return {
+      coat: typeof v.coat === 'number' ? v.coat : 0,
+      stage: typeof v.stage === 'number' ? Math.min(Math.max(v.stage, 0), GIANT) : 0,
+      fish: typeof v.fish === 'number' ? v.fish : 0,
+      crowned: v.crowned === true,
+      name: typeof v.name === 'string' ? v.name : '',
+    };
+  } catch {
+    return undefined;
+  }
+}
+
+function mainhand(player: Player) {
+  return player.getComponent('minecraft:equippable')?.getEquipmentSlot(EquipmentSlot.Mainhand);
+}
+
+/** Puts `item` in the player's hand in survival; in creative the hand keeps what it had. */
+function swapHeld(player: Player, item: ItemStack): void {
+  if (player.getGameMode() === GameMode.Creative) {
+    giveItem(player, item);
+    return;
+  }
+  const slot = mainhand(player);
+  if (slot) slot.setItem(item);
+  else giveItem(player, item);
+}
+
+function scoop(player: Player, blub: Entity): void {
+  if (!blub.isValid || !player.isValid) return;
+  if ((blub.getComponent('minecraft:rideable')?.getRiders() ?? []).length > 0) {
+    say(player, 'blub.scoop_ridden', nameOf(blub));
+    return;
+  }
+  const saved: Bucketed = {
+    coat: coatOf(blub),
+    stage: stageOf(blub),
+    fish: fishEaten(blub),
+    crowned: isCrowned(blub),
+    name: blub.nameTag,
+  };
+  const bucket = new ItemStack(BUCKET, 1);
+  bucket.setDynamicProperty(BUCKETED, JSON.stringify(saved));
+  const lore: RawMessage[] = [
+    { text: saved.name || 'Blub' },
+    text('blub.bucket.lore', { translate: `blub.stage.${saved.stage}` }, { translate: `blub.coat.${saved.coat}` }),
+  ];
+  if (saved.crowned) lore.push({ translate: 'blub.bucket.crowned' });
+  bucket.setLore(lore);
+
+  const name = nameOf(blub);
+  blowBubble(blub);
+  playSound(blub.dimension, 'bucket.fill_fish', blub.location);
+  blub.remove();
+  swapHeld(player, bucket);
+  say(player, 'blub.scooped', name);
+}
+
+/** Where a bucket lets Blub out: the block you are looking at, or just in front of you. */
+function releaseSpot(player: Player): Vector3 {
+  const hit = player.getBlockFromViewDirection({ maxDistance: 5 });
+  if (!hit) return inFront(player, 2, 0);
+  const view = player.getViewDirection();
+  const { x, y, z } = hit.block.location;
+  // Back off the hit face toward the player so Blub is not inside the block.
+  return {
+    x: x + hit.faceLocation.x - view.x * 0.8,
+    y: y + hit.faceLocation.y - view.y * 0.8 + 0.2,
+    z: z + hit.faceLocation.z - view.z * 0.8,
+  };
+}
+
+function release(player: Player, item: ItemStack): void {
+  const saved = readBucket(item);
+  const at = releaseSpot(player);
+  const coat = saved ? COATS[saved.coat] : undefined;
+  // A bucket with nothing recorded (one from the creative menu) lets out a new Blub.
+  const blub = coat
+    ? player.dimension.spawnEntity(BLUB, at, { spawnEvent: `steveo:hatch_${coat}` })
+    : player.dimension.spawnEntity(BLUB, at);
+  if (saved && coat) {
+    quiet.add(blub.id);
+    system.runTimeout(() => quiet.delete(blub.id), 20);
+    tameTo(player, blub);
+    setStage(blub, saved.stage);
+    blub.setDynamicProperty(FISH_EATEN, saved.fish);
+    if (saved.crowned) blub.triggerEvent('steveo:crown_on');
+    blub.nameTag = saved.name || 'Blub';
+    hearts(blub.dimension, blub.location, 4);
+  }
+  blowBubble(blub);
+  playSound(player.dimension, 'bucket.empty_fish', at);
+  // Creative keeps the full bucket in hand, so there is no empty one to hand back.
+  if (player.getGameMode() !== GameMode.Creative) swapHeld(player, new ItemStack('minecraft:bucket', 1));
+  if (saved) say(player, 'blub.released', saved.name ? { text: saved.name } : { translate: 'blub.default_name' });
+}
+
+onItemUse(
+  (typeId) => typeId === BUCKET,
+  (player, item) => {
+    try {
+      release(player, item);
+    } catch (err) {
+      log.error('release failed', err);
+      say(player, 'blub.debug.error', String(err));
+    }
+  },
+);
+
+// ---------------------------------------------------------------------------
 // Interaction
 
 world.beforeEvents.playerInteractWithEntity.subscribe((event) => {
@@ -303,6 +442,9 @@ world.beforeEvents.playerInteractWithEntity.subscribe((event) => {
   if (itemStack.typeId === CROWN) {
     event.cancel = true;
     system.run(() => putCrown(player, target));
+  } else if (itemStack.typeId === 'minecraft:water_bucket') {
+    event.cancel = true;
+    system.run(() => scoop(player, target));
   } else if (itemStack.typeId === 'minecraft:shears' && isCrowned(target)) {
     event.cancel = true;
     system.run(() => takeCrown(player, target));
@@ -318,8 +460,11 @@ world.beforeEvents.playerInteractWithEntity.subscribe((event) => {
   }
 });
 
+// The entity filters below are checked by hand: an `entityTypes` filter naming
+// a type the game failed to load throws, which would stop this whole script.
 world.afterEvents.dataDrivenEntityTrigger.subscribe(
   ({ entity: blub }) => {
+    if (blub.typeId !== BLUB) return;
     const staying = !blub.hasTag(STAYING);
     if (staying) blub.addTag(STAYING);
     else blub.removeTag(STAYING);
@@ -327,14 +472,15 @@ world.afterEvents.dataDrivenEntityTrigger.subscribe(
     const owner = ownerOf(blub);
     if (owner) say(owner, staying ? 'blub.stay' : 'blub.follow', nameOf(blub));
   },
-  { entityTypes: [BLUB], eventTypes: ['steveo:toggle_stay'] },
+  { eventTypes: ['steveo:toggle_stay'] },
 );
 
 world.afterEvents.dataDrivenEntityTrigger.subscribe(
   ({ entity: blub }) => {
+    if (blub.typeId !== BLUB) return;
     // The owner is set after the tame event, so look for it a tick later.
     system.run(() => {
-      if (!blub.isValid) return;
+      if (!blub.isValid || quiet.has(blub.id)) return;
       const owner = ownerOf(blub);
       if (!owner) return;
       hearts(blub.dimension, blub.location, 6);
@@ -342,8 +488,24 @@ world.afterEvents.dataDrivenEntityTrigger.subscribe(
       say(owner, 'blub.tamed', nameOf(blub));
     });
   },
-  { entityTypes: [BLUB], eventTypes: ['steveo:on_tame'] },
+  { eventTypes: ['steveo:on_tame'] },
 );
+
+// ---------------------------------------------------------------------------
+// Load check
+//
+// When the game rejects an entity definition, the type is simply never
+// registered: no error reaches chat, and a Realm has no content log. Blub 1.0.0
+// and 1.0.1 went that way, so the script says so on join and on demand.
+
+function loadReport(): string {
+  return `blub ${EntityTypes.get(BLUB) ? 'loaded' : 'MISSING'}`;
+}
+
+world.afterEvents.playerSpawn.subscribe(({ player, initialSpawn }) => {
+  if (!initialSpawn || EntityTypes.get(BLUB)) return;
+  say(player, 'blub.broken', loadReport());
+});
 
 // ---------------------------------------------------------------------------
 // Riders and idle bubbles
@@ -408,7 +570,7 @@ world.afterEvents.playerLeave.subscribe(({ playerId }) => {
 });
 
 // ---------------------------------------------------------------------------
-// Debug: /scriptevent steveo:blub <egg|crown|coats|tame|giant|baby|status|dismiss>
+// Debug: /scriptevent steveo:blub <egg|crown|coats|tame|giant|baby|status|dismiss|check>
 
 function nearbyBlubs(player: Player): Entity[] {
   return player.dimension.getEntities({
@@ -533,11 +695,16 @@ system.afterEvents.scriptEventReceive.subscribe(
         case 'dismiss':
           debugDismiss(player);
           break;
+        case 'check':
+          say(player, 'blub.debug.check', loadReport());
+          break;
         default:
           say(player, 'blub.debug.help');
       }
     } catch (err) {
+      // No content log on a Realm, so failures go to chat.
       log.error(`debug ${event.message} failed`, err);
+      say(player, 'blub.debug.error', String(err));
     }
   },
   { namespaces: ['steveo'] },
