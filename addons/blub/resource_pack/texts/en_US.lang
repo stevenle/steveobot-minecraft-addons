@@ -7,8 +7,10 @@ item.spawn_egg.entity.steveo:blub.name=Spawn Blub
 
 item.steveo:blub_egg.name=Blub Egg
 item.steveo:blub_crown.name=Blub Crown
+item.steveo:blub_bucket.name=Bucket of Blub
 
 action.interact.steveo.blub_stay=Stay / Follow
+action.interact.steveo.blub_scoop=Scoop up
 
 blub.default_name=Blub
 
@@ -38,7 +40,7 @@ blub.giant.subtitle=Tap with an empty hand to ride
 blub.full=%s is too full to eat, but it blows you a bubble.
 blub.hint.ride=Look where you want to go and hold forward. Hold jump to climb. Sneak to hop off. Someone else can sit behind you!
 
-blub.stay=%s will stay here.
+blub.stay=%s will stay around here.
 blub.follow=%s will follow you.
 
 blub.crowned=%s wears the crown. All hail!
@@ -58,3 +60,9 @@ blub.debug.help=Usage: /scriptevent steveo:blub <egg|crown|coats|tame|giant|baby
 blub.debug.check=Load check: %s
 blub.debug.error=That failed: %s
 blub.broken=Blub could not load, so Blub Eggs will not hatch. Please send this to whoever set up the add-ons: %s
+
+blub.scooped=You scooped %s into a bucket. Use the bucket to let it out again.
+blub.scoop_ridden=Someone is riding %s. Wait until they hop off.
+blub.released=%s is back!
+blub.bucket.lore=%s %s axolotl
+blub.bucket.crowned=Wears a crown

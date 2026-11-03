@@ -127,6 +127,28 @@ const crownIcon = art(
   { g: GOLD, d: GOLD_DARK, c: GEM },
 );
 
+const bucketIcon = art(
+  [
+    '................',
+    '................',
+    '................',
+    '...ssssssssss...',
+    '..sbbbbbbbbbbs..',
+    '..swwpwwwwwpws..',
+    '..swppppppppws..',
+    '...swpkppkpws...',
+    '...swppppppws...',
+    '...swwwwwwwws...',
+    '....swwwwwws....',
+    '....sssssss.....',
+    '................',
+    '................',
+    '................',
+    '................',
+  ],
+  { s: [150, 150, 160], b: [70, 70, 80], w: [64, 120, 220], p: [247, 178, 200], k: [44, 26, 40] },
+);
+
 // ---------- Pack icon: Blub's face, 128x128 ----------
 const packIcon = art(
   [
@@ -158,6 +180,7 @@ fs.mkdirSync(path.join(rp, 'textures', 'items'), { recursive: true });
 fs.writeFileSync(path.join(rp, 'textures', 'entity', 'blub', 'crown.png'), paintCrown());
 fs.writeFileSync(path.join(rp, 'textures', 'items', 'blub_egg.png'), eggIcon);
 fs.writeFileSync(path.join(rp, 'textures', 'items', 'blub_crown.png'), crownIcon);
+fs.writeFileSync(path.join(rp, 'textures', 'items', 'blub_bucket.png'), bucketIcon);
 fs.writeFileSync(path.join(rp, 'pack_icon.png'), packIcon);
 fs.writeFileSync(path.join(out, 'behavior_pack', 'pack_icon.png'), packIcon);
 console.log('wrote crown texture, item icons, and pack icons to', out);

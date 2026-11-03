@@ -165,6 +165,19 @@
                 "target": "self"
               },
               "interact_text": "action.interact.steveo.blub_stay"
+            },
+            {
+              "on_interact": {
+                "filters": {
+                  "test": "has_equipment",
+                  "subject": "other",
+                  "domain": "hand",
+                  "value": "water_bucket"
+                },
+                "event": "steveo:scoop",
+                "target": "self"
+              },
+              "interact_text": "action.interact.steveo.blub_scoop"
             }
           ]
         }
@@ -192,6 +205,23 @@
       "steveo:crowned": {
         "minecraft:skin_id": {
           "value": 1
+        }
+      },
+      "steveo:staying": {
+        "minecraft:home": {
+          "restriction_radius": 8,
+          "restriction_type": "random_movement"
+        },
+        "minecraft:behavior.random_hover": {
+          "priority": 9,
+          "xz_dist": 6,
+          "y_dist": 3,
+          "y_offset": -1,
+          "interval": 1,
+          "hover_height": {
+            "min": 1,
+            "max": 2
+          }
         }
       }
     },
@@ -240,7 +270,11 @@
             "hard_distance": 6,
             "max_distance": 10
           }
-        ]
+        ],
+        "on_unleash": {
+          "event": "steveo:on_unleash",
+          "target": "self"
+        }
       },
       "minecraft:nameable": {
         "always_show": true,
@@ -286,6 +320,23 @@
       },
       "minecraft:behavior.random_look_around": {
         "priority": 11
+      },
+      "minecraft:interact": {
+        "interactions": [
+          {
+            "on_interact": {
+              "filters": {
+                "test": "has_equipment",
+                "subject": "other",
+                "domain": "hand",
+                "value": "water_bucket"
+              },
+              "event": "steveo:scoop",
+              "target": "self"
+            },
+            "interact_text": "action.interact.steveo.blub_scoop"
+          }
+        ]
       }
     },
     "events": {
@@ -384,9 +435,20 @@
           "component_groups": [
             "steveo:following"
           ]
-        }
+        },
+        "add": {
+          "component_groups": [
+            "steveo:staying"
+          ]
+        },
+        "set_home_position": {}
       },
       "steveo:follow": {
+        "remove": {
+          "component_groups": [
+            "steveo:staying"
+          ]
+        },
         "add": {
           "component_groups": [
             "steveo:following"
@@ -570,6 +632,12 @@
             }
           }
         ]
+      },
+      "steveo:scoop": {
+        "set_home_position": {}
+      },
+      "steveo:on_unleash": {
+        "set_home_position": {}
       }
     }
   }

@@ -1,0 +1,18 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:item": {
+    "description": {
+      "identifier": "steveo:blub_bucket",
+      "menu_category": {
+        "category": "nature"
+      }
+    },
+    "components": {
+      "minecraft:icon": "steveo_blub_bucket",
+      "minecraft:display_name": {
+        "value": "item.steveo:blub_bucket.name"
+      },
+      "minecraft:max_stack_size": 1
+    }
+  }
+}
