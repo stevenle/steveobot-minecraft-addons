@@ -137,6 +137,22 @@ world.afterEvents.entityDie.subscribe((event) => {
   }
 });
 
+// Damage to arena mobs, for the leaderboards. Arrows and tridents report
+// the shooter as the damaging entity.
+world.afterEvents.entityHurt.subscribe((event) => {
+  const attacker = event.damageSource.damagingEntity;
+  if (!(attacker instanceof Player)) return;
+  const hurt = event.hurtEntity;
+  try {
+    if (!hurt.hasTag(MOB_TAG)) return;
+    const key = hurt.getDynamicProperty(MOB_PROPERTY);
+    const arena = typeof key === 'string' ? arenas.get(key) : undefined;
+    arena?.recordDamage(attacker, event.damage);
+  } catch {
+    // The mob is already gone.
+  }
+});
+
 world.afterEvents.playerLeave.subscribe((event) => {
   for (const arena of arenas.values()) arena.onFighterLeft(event.playerId);
 });

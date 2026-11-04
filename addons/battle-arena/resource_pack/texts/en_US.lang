@@ -34,6 +34,8 @@ arena.countdown.final=§4§lFINAL BOSS§r incoming in §l%s
 arena.wave.title=§6Wave %s§7/%s
 arena.wave.subtitle=%s §7(x%s)
 arena.wave.cleared=§aWave %s cleared!§r Catch your breath.
+arena.wave.cleared_title=§aWave %s cleared!
+arena.boss.cleared_title=§aRound cleared!
 arena.status.wave=§6Wave %s/%s§r - §c%s§r enemies left
 
 arena.theme.zombies=The Restless Dead
@@ -50,6 +52,13 @@ arena.boss.subtitle=%s
 arena.boss.defeated=%s§r has been defeated! Spoils lie at the arena.
 arena.boss.returns=%s§r returns to the arena!
 arena.status.boss=%s§r - §c%s HP§r - %s escorts
+
+## Damage
+arena.damage.top=Top damage: §e%s§r (%s)
+arena.damage.header_wave=§6Damage this wave:
+arena.damage.header_boss=§6Damage this round:
+arena.damage.header_total=§6Damage this battle:
+arena.damage.line=§7%s.§r %s - §c%s
 
 ## Fighters
 arena.fighter.fallen=§c%s has fallen!§r (%s of %s fighters down)

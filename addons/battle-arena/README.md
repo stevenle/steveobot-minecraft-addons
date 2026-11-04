@@ -23,8 +23,12 @@ Or `/scriptevent steveo:arena give`.
 | Epic | 20 (4 per boss) | 5 | The Warden |
 
 - **Countdown** before every fight: 10 s before the first wave, 8 s between
-  waves, 12 s before a boss. The last three seconds flash on screen. Everyone
-  nearby gets a few seconds of Regeneration II between fights.
+  waves, 12 s before a boss. The last three seconds flash on screen.
+- **Intermission** after each cleared wave or round: a 6 s pause first, with a
+  "Wave cleared!" title naming the top damage dealer. In a multiplayer battle,
+  chat gets a damage leaderboard for that wave (or the whole round after a
+  boss), and the full-battle leaderboard is posted when the battle ends.
+  Everyone nearby gets a few seconds of Regeneration II.
 - **Waves** each get a random theme: The Restless Dead (zombies, husks),
   Bone Archers (skeletons, strays, bogged), Illager Raid, Witchcraft
   (witches, breezes), Nether Legion (wither skeletons, blazes), and The Horde

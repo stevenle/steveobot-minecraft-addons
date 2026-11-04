@@ -58,6 +58,10 @@ const ABANDON_TICKS = 60 * 20;
 /** Mobs spawn on a ring this far from the block. */
 const RING = { min: 6, max: 11 };
 const COUNTDOWN = { first: 10, wave: 8, boss: 12 };
+/** The pause after a fight is cleared, before the next countdown starts. */
+const INTERMISSION_TICKS = 6 * 20;
+/** How many players a damage leaderboard lists. */
+const LEADERBOARD_SIZE = 5;
 /** After this long in one fight, stragglers get pulled back every REGROUP_TICKS. */
 const STRAGGLER_TICKS = 90 * 20;
 const REGROUP_TICKS = 20 * 20;
@@ -159,7 +163,11 @@ export class Arena {
 
   /** Index into `fights` of the current (or upcoming) fight. */
   index = 0;
-  phase: 'countdown' | 'fighting' = 'countdown';
+  phase: 'countdown' | 'fighting' | 'intermission' = 'countdown';
+  private intermissionEnd = 0;
+  /** Damage dealt to arena mobs by player id, this fight and this whole battle. */
+  private fightDamage = new Map<string, { name: string; damage: number }>();
+  private totalDamage = new Map<string, { name: string; damage: number }>();
   private countdownEnd: number;
   private lastSecond = -1;
   private fightStart = 0;
@@ -420,6 +428,7 @@ export class Arena {
     }
 
     if (this.phase === 'countdown') this.tickCountdown(now);
+    else if (this.phase === 'intermission') this.tickIntermission(now);
     else this.tickFight(now);
   }
 
@@ -432,6 +441,7 @@ export class Arena {
       this.fightStart = now;
       this.lastRegroup = now;
       this.lastSecond = -1;
+      this.fightDamage.clear();
       if (fight.kind === 'wave') this.startWave();
       else this.startBoss(fight.boss);
       return;
@@ -489,14 +499,51 @@ export class Arena {
       this.finish('victory');
       return;
     }
-    if (cleared?.kind === 'wave') {
-      this.tell(msg('arena.wave.cleared', String(this.waveNumber - 1)));
-      this.sound('random.orb', 0.8);
-    }
+    // A pause to breathe: announce the clear and who hit hardest, then
+    // start the next countdown once the intermission is over.
+    const top = topDamage(this.fightDamage)[0];
+    const clearedTitle =
+      cleared?.kind === 'boss' ? msg('arena.boss.cleared_title') : msg('arena.wave.cleared_title', String(this.waveNumber - 1));
+    this.title(clearedTitle, top ? msg('arena.damage.top', top.name, String(Math.round(top.damage))) : undefined, 50);
+    if (cleared?.kind === 'wave') this.tell(msg('arena.wave.cleared', String(this.waveNumber - 1)));
+    this.postLeaderboard(this.fightDamage, cleared?.kind === 'boss' ? 'arena.damage.header_boss' : 'arena.damage.header_wave');
+    this.sound('random.orb', 0.8);
     this.healFighters();
+    this.phase = 'intermission';
+    this.intermissionEnd = now + INTERMISSION_TICKS;
+  }
+
+  private tickIntermission(now: number): void {
+    if (now < this.intermissionEnd) return;
     const next = this.current;
     this.phase = 'countdown';
+    this.lastSecond = -1;
     this.countdownEnd = now + (next?.kind === 'boss' ? COUNTDOWN.boss : COUNTDOWN.wave) * 20;
+  }
+
+  /** Called by main.ts when a player hurts one of this arena's mobs. */
+  recordDamage(player: Player, amount: number): void {
+    if (amount <= 0) return;
+    for (const table of [this.fightDamage, this.totalDamage]) {
+      const entry = table.get(player.id) ?? { name: player.name, damage: 0 };
+      entry.damage += amount;
+      table.set(player.id, entry);
+    }
+  }
+
+  /**
+   * Posts a damage leaderboard to chat. Only in a multiplayer battle: with
+   * one fighter it would always be the same name at the top.
+   */
+  private postLeaderboard(table: Map<string, { name: string; damage: number }>, header: string): void {
+    if (this.fighters.size < 2 && table.size < 2) return;
+    const ranked = topDamage(table).slice(0, LEADERBOARD_SIZE);
+    if (ranked.length === 0) return;
+    const lines: RawMessage[] = [msg(header)];
+    ranked.forEach((entry, i) => {
+      lines.push({ text: '\n' }, msg('arena.damage.line', String(i + 1), entry.name, String(Math.round(entry.damage))));
+    });
+    this.tell({ rawtext: lines });
   }
 
   /** A short breather between fights: a few seconds of regeneration for anyone nearby. */
@@ -591,11 +638,13 @@ export class Arena {
         this.tell(msg('arena.end.victory_chat', String(this.waveCount), String(this.bossesDefeated)));
         this.sound('random.totem');
         this.sound('random.levelup', 1.2);
+        this.postLeaderboard(this.totalDamage, 'arena.damage.header_total');
         break;
       case 'defeat':
         this.title(msg('arena.end.defeat'), msg('arena.end.defeat_sub', reached, String(this.bossesDefeated)), 80);
         this.tell(msg('arena.end.defeat_chat', reached, String(this.bossesDefeated)));
         this.sound('mob.wither.death', 1, 0.6);
+        this.postLeaderboard(this.totalDamage, 'arena.damage.header_total');
         break;
       default:
         this.tell(msg(`arena.end.${outcome}`));
@@ -613,7 +662,8 @@ export class Arena {
 
   /** Debug: clears the current fight's mobs, as if the players had killed them. */
   skipFight(): void {
-    if (this.phase === 'countdown') {
+    if (this.phase !== 'fighting') {
+      this.intermissionEnd = system.currentTick;
       this.countdownEnd = system.currentTick;
       return;
     }
@@ -653,6 +703,11 @@ export class Arena {
     this.phase = 'countdown';
     this.countdownEnd = system.currentTick + 3 * 20;
   }
+}
+
+/** Leaderboard order: most damage first. */
+function topDamage(table: Map<string, { name: string; damage: number }>): { name: string; damage: number }[] {
+  return [...table.values()].sort((a, b) => b.damage - a.damage);
 }
 
 /**
