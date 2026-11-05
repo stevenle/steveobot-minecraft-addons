@@ -1,0 +1,42 @@
+{
+  "format_version": "1.21.90",
+  "minecraft:block": {
+    "description": {
+      "identifier": "steveo:battle_arena",
+      "menu_category": {
+        "category": "construction"
+      }
+    },
+    "components": {
+      "minecraft:display_name": "tile.steveo:battle_arena.name",
+      "minecraft:geometry": "minecraft:geometry.full_block",
+      "minecraft:material_instances": {
+        "*": {
+          "texture": "steveo_battle_arena_side",
+          "render_method": "opaque"
+        },
+        "up": {
+          "texture": "steveo_battle_arena_top",
+          "render_method": "opaque"
+        },
+        "down": {
+          "texture": "steveo_battle_arena_bottom",
+          "render_method": "opaque"
+        }
+      },
+      "minecraft:map_color": "#7A1F1F",
+      "minecraft:light_emission": 8,
+      "minecraft:destructible_by_explosion": false,
+      "minecraft:destructible_by_mining": {
+        "seconds_to_destroy": 3,
+        "item_specific_speeds": [
+          {
+            "item": { "tags": "q.any_tag('minecraft:is_pickaxe')" },
+            "destroy_speed": 0.75
+          }
+        ]
+      },
+      "steveo:battle_arena": {}
+    }
+  }
+}

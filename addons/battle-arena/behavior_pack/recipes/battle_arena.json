@@ -1,0 +1,35 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "steveo:battle_arena_recipe"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "SGS",
+      "GDG",
+      "SGS"
+    ],
+    "key": {
+      "S": {
+        "item": "minecraft:iron_sword"
+      },
+      "G": {
+        "item": "minecraft:gold_ingot"
+      },
+      "D": {
+        "item": "minecraft:diamond"
+      }
+    },
+    "unlock": [
+      {
+        "item": "minecraft:iron_sword"
+      }
+    ],
+    "result": {
+      "item": "steveo:battle_arena"
+    }
+  }
+}

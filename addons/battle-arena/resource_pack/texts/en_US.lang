@@ -1,0 +1,92 @@
+## Pack
+pack.name=Battle Arena
+pack.description=Place the arena block and survive escalating waves of mobs and bosses.
+
+## Block
+tile.steveo:battle_arena.name=Battle Arena
+
+## Bosses (also their boss-bar names)
+entity.steveo:zombie_titan.name=§2Zombie Titan
+entity.steveo:executioner.name=§4The Executioner
+entity.steveo:bone_colossus.name=§fBone Colossus
+entity.steveo:iron_tyrant.name=§7Iron Tyrant
+entity.steveo:alpha_ravager.name=§cAlpha Ravager
+entity.steveo:wither_king.name=§8Wither King
+
+## Menu
+arena.menu.title=Battle Arena
+arena.menu.body=Choose a battle. Every player within %s blocks joins the fight.\n\nThe battle is won when the final boss falls, and lost once every fighter has died at least once.
+arena.menu.quick=§2Quick§r\n%s waves, %s bosses
+arena.menu.standard=§6Standard§r\n%s waves, %s bosses
+arena.menu.epic=§4Epic§r\n%s waves, %s bosses
+
+arena.mode.quick=Quick
+arena.mode.standard=Standard
+arena.mode.epic=Epic
+
+## Starting
+arena.start.chat=§e%s§r started a §l%s§r battle! Fighters: §b%s
+arena.start.title=§c§lBATTLE!
+arena.start.subtitle=§e%s waves§r, §c%s bosses
+arena.start.too_close=Another battle is already running nearby.
+arena.use.running=The battle is on: wave %s of %s.
+arena.use.boss=The battle is on: boss %s is in the arena!
+arena.break.blocked=You cannot break the arena while a battle is running.
+
+## Countdown
+arena.countdown.wave=§eWave %s§r starts in §l%s
+arena.countdown.boss=§c§lBOSS§r incoming in §l%s
+arena.countdown.final=§4§lFINAL BOSS§r incoming in §l%s
+
+## Waves
+arena.wave.title=§6Wave %s§7/%s
+arena.wave.subtitle=%s §7(x%s)
+arena.wave.cleared=§aWave %s cleared!§r Catch your breath.
+arena.cleared_title=§aCleared!
+arena.status.wave=§6Wave %s/%s§r - §c%s§r enemies left
+
+arena.theme.zombies=The Restless Dead
+arena.theme.skeletons=Bone Archers
+arena.theme.illagers=Illager Raid
+arena.theme.nether=Nether Legion
+arena.theme.witchcraft=Witchcraft
+arena.theme.horde=The Horde
+
+## Bosses
+arena.boss.title=§c§lBOSS
+arena.boss.final_title=§4§lFINAL BOSS
+arena.boss.defeated=%s§r has been defeated! Spoils lie at the arena.
+arena.boss.returns=%s§r returns to the arena!
+arena.boss.failed=§cThe boss (%s) could not be summoned, so it is skipped.§r Its entity may have failed to load.
+arena.status.boss=%s§r - §c%s HP
+
+## Damage
+arena.damage.top=§7Top damage:§r §e%s
+arena.damage.header_wave=§6Damage this wave:
+arena.damage.header_boss=§6Damage this round:
+arena.damage.header_total=§6Damage this battle:
+arena.damage.line=§7%s.§r %s - §c%s
+
+## Fighters
+arena.fighter.fallen=§c%s has fallen!§r (%s of %s fighters down)
+
+## Ending
+arena.end.victory=§6§lVICTORY!
+arena.end.victory_sub=%s bosses defeated
+arena.end.victory_chat=§6The arena is conquered!§r All %s waves and %s bosses defeated. Claim your reward at the arena.
+arena.end.defeat=§4§lDEFEAT
+arena.end.defeat_sub=Wave %s - %s bosses down
+arena.end.defeat_chat=§cEvery fighter has fallen.§r The battle ended on wave %s with %s bosses defeated.
+arena.end.abandoned=The battle was abandoned: no fighter came near the arena for a minute.
+arena.end.stopped=The battle was stopped.
+arena.end.broken=The arena block is gone, so the battle is over.
+
+## Debug
+arena.debug.help=Usage: /scriptevent steveo:arena <status|start [quick|standard|epic]|skip|boss|summon <boss>|stop|give>
+arena.debug.summon_help=Bosses: %s
+arena.debug.summoned=Summoned %s (not part of any battle).
+arena.debug.summon_failed=Could not summon %s: %s
+arena.debug.given=Here is a Battle Arena block.
+arena.debug.none=No battle within 128 blocks.
+arena.debug.status_none=No battle within 128 blocks (%s running in the world).
+arena.debug.status=Mode %s - fights %s - %s - %s mobs - %s bosses down - fighters: %s - %s running
