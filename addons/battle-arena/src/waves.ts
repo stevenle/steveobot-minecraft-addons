@@ -103,7 +103,7 @@ function custom(key: string, height: number): BossDef {
 
 /** Bosses by tier. Boss slots are spread across the tiers; see `planBosses`. */
 const BOSS_TIERS: readonly (readonly BossDef[])[] = [
-  [custom('zombie_titan', 5), custom('brood_mother', 3)],
+  [custom('zombie_titan', 5), custom('executioner', 5)],
   [custom('bone_colossus', 5), custom('iron_tyrant', 5)],
   [custom('alpha_ravager', 4), custom('wither_king', 4)],
 ];

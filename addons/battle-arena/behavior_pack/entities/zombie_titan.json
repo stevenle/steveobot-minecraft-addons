@@ -67,8 +67,8 @@
       },
       "minecraft:conditional_bandwidth_optimization": {},
       "minecraft:health": {
-        "value": 220,
-        "max": 220
+        "value": 280,
+        "max": 280
       },
       "minecraft:is_hidden_when_invisible": {},
       "minecraft:jump.static": {},

@@ -47,12 +47,12 @@ Or `/scriptevent steveo:arena give`.
 
   | Tier | Boss | Based on | Size | Health | Notes |
   |---|---|---|---|---|---|
-  | 1 | Zombie Titan | zombie | 2.5× | 220 | hits for 10 |
-  | 1 | Brood Mother | spider | 2.5× | 180 | poison bite, leaps, climbs |
-  | 2 | Bone Colossus | skeleton | 2.5× | 200 | rapid slowness arrows |
-  | 2 | Iron Tyrant | iron golem | 1.6× | 320 | hits for 10–24, flings you |
-  | 3 | Alpha Ravager | ravager | 1.5× | 360 | hits for 16, roars |
-  | 3 | Wither King | wither skeleton | 2.2× | 300 | hits for 12 plus Wither |
+  | 1 | Zombie Titan | zombie | 2.5× | 280 | hits for 10 |
+  | 1 | The Executioner | vindicator | 2.4× | 280 | swings a giant axe for 13 |
+  | 2 | Bone Colossus | skeleton | 2.5× | 250 | rapid slowness arrows |
+  | 2 | Iron Tyrant | iron golem | 1.6× | 400 | hits for 10–24, flings you |
+  | 3 | Alpha Ravager | ravager | 1.5× | 450 | hits for 16, roars |
+  | 3 | Wither King | wither skeleton | 2.2× | 375 | hits for 12 plus Wither |
   | Epic final | The Warden | vanilla | 1× | 500 | |
 
   The final boss of Quick and Standard is a tier 3 boss. Each extra fighter
@@ -76,7 +76,8 @@ Or `/scriptevent steveo:arena give`.
 - **Abandoned**: no fighter within 64 blocks of the block for a minute.
 
 The block cannot be mined while its battle is running, and explosions do not
-break it. Mobs that wander more than 32 blocks off are pulled back into the
+break it. Mobs spawn on a ring 5 to 9 blocks from the block, so an arena
+about 10 blocks in radius holds them. Mobs that wander more than 32 blocks off are pulled back into the
 ring, and after 90 s in one fight stragglers are pulled back every 20 s.
 
 Battles live in memory. If the world reloads mid-battle, the battle is gone

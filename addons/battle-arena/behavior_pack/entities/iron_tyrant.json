@@ -76,8 +76,8 @@
         "max": 64
       },
       "minecraft:health": {
-        "value": 320,
-        "max": 320
+        "value": 400,
+        "max": 400
       },
       "minecraft:is_hidden_when_invisible": {},
       "minecraft:jump.static": {},

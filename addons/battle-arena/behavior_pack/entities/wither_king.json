@@ -71,8 +71,8 @@
       },
       "minecraft:fire_immune": {},
       "minecraft:health": {
-        "value": 300,
-        "max": 300
+        "value": 375,
+        "max": 375
       },
       "minecraft:is_hidden_when_invisible": {},
       "minecraft:jump.static": {},

@@ -7,7 +7,7 @@ tile.steveo:battle_arena.name=Battle Arena
 
 ## Bosses (also their boss-bar names)
 entity.steveo:zombie_titan.name=§2Zombie Titan
-entity.steveo:brood_mother.name=§4Brood Mother
+entity.steveo:executioner.name=§4The Executioner
 entity.steveo:bone_colossus.name=§fBone Colossus
 entity.steveo:iron_tyrant.name=§7Iron Tyrant
 entity.steveo:alpha_ravager.name=§cAlpha Ravager

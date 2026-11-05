@@ -111,7 +111,7 @@ const BOSSES = [
     key: 'zombie_titan',
     from: 'zombie',
     fold: ['minecraft:zombie_adult'],
-    health: 220,
+    health: 280,
     attack: { damage: 10 },
     movement: 0.25,
     scale: 2.5,
@@ -119,20 +119,25 @@ const BOSSES = [
     color: '#4F7A3A',
   },
   {
-    key: 'brood_mother',
-    from: 'spider',
-    fold: ['minecraft:spider_hostile', 'minecraft:spider_angry'],
-    health: 180,
-    attack: { damage: 8, effect_name: 'poison', effect_duration: 6 },
-    movement: 0.32,
-    scale: 2.5,
-    box: { width: 3.5, height: 2.25 },
+    key: 'executioner',
+    from: 'vindicator',
+    fold: [],
+    // Raising the axe is driven by the aggro group, added and removed by
+    // these events when a target is acquired or lost.
+    keep: ['minecraft:on_target_acquired', 'minecraft:on_target_escape', 'minecraft:angry'],
+    keepGroups: ['minecraft:vindicator_aggro'],
+    keepEvents: ['minecraft:become_aggro', 'minecraft:stop_aggro'],
+    health: 280,
+    attack: { damage: 13 },
+    movement: 0.3,
+    scale: 2.4,
+    box: { width: 1.45, height: 4.6 },
   },
   {
     key: 'bone_colossus',
     from: 'skeleton',
     fold: ['minecraft:ranged_attack_hard'],
-    health: 200,
+    health: 250,
     movement: 0.25,
     scale: 2.5,
     box: { width: 1.5, height: 4.75 },
@@ -145,7 +150,7 @@ const BOSSES = [
     key: 'iron_tyrant',
     from: 'iron_golem',
     fold: [],
-    health: 320,
+    health: 400,
     attack: { damage: { range_min: 10, range_max: 24 } },
     scale: 1.6,
     box: { width: 2.2, height: 4.6 },
@@ -158,7 +163,7 @@ const BOSSES = [
     // these groups (hostile included), so they stay real groups.
     keepGroups: ['minecraft:hostile', 'stunned', 'roaring'],
     keepEvents: ['minecraft:become_stunned', 'minecraft:start_roar', 'minecraft:end_roar'],
-    health: 360,
+    health: 450,
     attack: { damage: 16 },
     scale: 1.5,
     box: { width: 2.9, height: 3.3 },
@@ -167,7 +172,7 @@ const BOSSES = [
     key: 'wither_king',
     from: 'wither_skeleton',
     fold: [],
-    health: 300,
+    health: 375,
     attack: { damage: 12, effect_name: 'wither', effect_duration: 10 },
     movement: 0.3,
     scale: 2.2,
@@ -184,7 +189,8 @@ for (const boss of BOSSES) {
     if (!groups[g]) throw new Error(`${boss.from} has no group ${g}`);
     Object.assign(c, groups[g]);
   }
-  for (const key of DROP) delete c[key];
+  const drop = DROP.filter((key) => !boss.keep?.includes(key));
+  for (const key of drop) delete c[key];
 
   c['minecraft:health'] = { value: boss.health, max: boss.health };
   if (boss.attack) c['minecraft:attack'] = boss.attack;
@@ -208,7 +214,7 @@ for (const boss of BOSSES) {
   const keptGroups = Object.fromEntries(
     (boss.keepGroups ?? []).map((g) => {
       const group = { ...groups[g] };
-      for (const key of DROP) delete group[key];
+      for (const key of drop) delete group[key];
       if (group['minecraft:behavior.nearest_attackable_target']) {
         group['minecraft:behavior.nearest_attackable_target'] = TARGET_PLAYERS;
       }

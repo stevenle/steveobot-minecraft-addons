@@ -68,8 +68,8 @@
       },
       "minecraft:freezing_immune": {},
       "minecraft:health": {
-        "value": 200,
-        "max": 200
+        "value": 250,
+        "max": 250
       },
       "minecraft:is_hidden_when_invisible": {},
       "minecraft:jump.static": {},

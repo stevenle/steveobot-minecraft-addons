@@ -55,7 +55,7 @@ const LEASH_RANGE = 32;
 const ABANDON_RANGE = 64;
 const ABANDON_TICKS = 60 * 20;
 /** Mobs spawn on a ring this far from the block. */
-const RING = { min: 6, max: 11 };
+const RING = { min: 5, max: 9 };
 const COUNTDOWN = { first: 10, wave: 8, boss: 12 };
 /** The pause after a fight is cleared, before the next countdown starts. */
 const INTERMISSION_TICKS = 6 * 20;
