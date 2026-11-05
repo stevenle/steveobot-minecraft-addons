@@ -1,0 +1,130 @@
+{
+  "format_version": "1.26.50",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "steveo:zombie_titan",
+      "runtime_identifier": "minecraft:zombie",
+      "is_spawnable": false,
+      "is_summonable": true
+    },
+    "component_groups": {},
+    "components": {
+      "minecraft:attack": {
+        "damage": 10
+      },
+      "minecraft:behavior.hurt_by_target": {
+        "priority": 1
+      },
+      "minecraft:behavior.look_at_player": {
+        "look_distance": 6,
+        "priority": 8
+      },
+      "minecraft:behavior.melee_box_attack": {
+        "can_spread_on_fire": true,
+        "priority": 4
+      },
+      "minecraft:behavior.nearest_attackable_target": {
+        "priority": 2,
+        "reselect_targets": true,
+        "must_see": false,
+        "within_radius": 48,
+        "entity_types": [
+          {
+            "filters": {
+              "test": "is_family",
+              "subject": "other",
+              "value": "player"
+            },
+            "max_dist": 48
+          }
+        ]
+      },
+      "minecraft:behavior.random_look_around": {
+        "priority": 9
+      },
+      "minecraft:behavior.random_stroll": {
+        "priority": 7,
+        "speed_multiplier": 1
+      },
+      "minecraft:behavior.stomp_turtle_egg": {
+        "goal_radius": 1.14,
+        "priority": 5,
+        "search_height": 2,
+        "interval": 20,
+        "search_range": 10,
+        "speed_multiplier": 1
+      },
+      "minecraft:breathable": {
+        "breathes_air": true,
+        "breathes_water": true,
+        "suffocate_time": 0,
+        "total_supply": 15
+      },
+      "minecraft:can_climb": {},
+      "minecraft:collision_box": {
+        "width": 1.5,
+        "height": 4.75
+      },
+      "minecraft:conditional_bandwidth_optimization": {},
+      "minecraft:health": {
+        "value": 220,
+        "max": 220
+      },
+      "minecraft:is_hidden_when_invisible": {},
+      "minecraft:jump.static": {},
+      "minecraft:movement.basic": {},
+      "minecraft:nameable": {},
+      "minecraft:navigation.walk": {
+        "can_break_doors": true,
+        "is_amphibious": true,
+        "can_pass_doors": true,
+        "can_walk": true
+      },
+      "minecraft:physics": {},
+      "minecraft:pushable_by_entity": {},
+      "minecraft:pushable_by_block": {},
+      "minecraft:rotation_locked_to_vehicle": {},
+      "minecraft:type_family": {
+        "family": [
+          "zombie",
+          "undead",
+          "monster",
+          "mob",
+          "steveo_arena_boss"
+        ]
+      },
+      "minecraft:experience_reward": {
+        "on_death": "100"
+      },
+      "minecraft:movement": {
+        "value": 0.25
+      },
+      "minecraft:scale": {
+        "value": 2.5
+      },
+      "minecraft:knockback_resistance": {
+        "value": 1
+      },
+      "minecraft:follow_range": {
+        "value": 64,
+        "max": 64
+      },
+      "minecraft:persistent": {},
+      "minecraft:fire_immune": {},
+      "minecraft:damage_sensor": {
+        "triggers": {
+          "cause": "fall",
+          "deals_damage": "no"
+        }
+      },
+      "minecraft:loot": {
+        "table": "loot_tables/empty.json"
+      },
+      "minecraft:boss": {
+        "should_darken_sky": false,
+        "hud_range": 55
+      }
+    },
+    "events": {}
+  }
+}

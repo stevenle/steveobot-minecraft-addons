@@ -30,12 +30,11 @@ import {
   GEAR_ITEMS,
   planBosses,
   planWave,
-  rollKit,
-  themeByKey,
   type BossDef,
   type Kit,
   type MobKind,
   type Mode,
+  type WavePlan,
 } from './waves';
 
 export const log = createLogger('battle-arena');
@@ -60,6 +59,14 @@ const RING = { min: 6, max: 11 };
 const COUNTDOWN = { first: 10, wave: 8, boss: 12 };
 /** The pause after a fight is cleared, before the next countdown starts. */
 const INTERMISSION_TICKS = 6 * 20;
+/**
+ * A fight's title stays this long (plus 5 ticks in, 10 out); its mobs
+ * spawn ANNOUNCE_TICKS after it appears, once it is off the screen.
+ */
+const TITLE_STAY = 30;
+const ANNOUNCE_TICKS = 50;
+/** A boss that fails to spawn this many times in a row (once per tick pass) is skipped. */
+const BOSS_SPAWN_TRIES = 5;
 /** How many players a damage leaderboard lists. */
 const LEADERBOARD_SIZE = 5;
 /** After this long in one fight, stragglers get pulled back every REGROUP_TICKS. */
@@ -163,7 +170,10 @@ export class Arena {
 
   /** Index into `fights` of the current (or upcoming) fight. */
   index = 0;
-  phase: 'countdown' | 'fighting' | 'intermission' = 'countdown';
+  phase: 'countdown' | 'announcing' | 'fighting' | 'intermission' = 'countdown';
+  /** While announcing: what to spawn, and when (after the title fades). */
+  private pendingSpawn: (() => void) | undefined;
+  private spawnAt = 0;
   private intermissionEnd = 0;
   /** Damage dealt to arena mobs by player id, this fight and this whole battle. */
   private fightDamage = new Map<string, { name: string; damage: number }>();
@@ -178,6 +188,9 @@ export class Arena {
   private bossDef: BossDef | undefined;
   /** True from a boss's spawn until it dies; a boss that vanishes is respawned while this holds. */
   private bossPending = false;
+  /** Whether the current boss has spawned at least once, and failed spawns so far. */
+  private bossSpawned = false;
+  private bossSpawnFailures = 0;
   bossesDefeated = 0;
   ended = false;
 
@@ -269,17 +282,21 @@ export class Arena {
   // ---------------------------------------------------------------- spawning
 
   private spawnMob(kind: MobKind, kit: Kit, at: Vector3): Entity | undefined {
+    const entity = this.spawnTracked(kind.id, at, kind.spawnEvent);
+    if (entity) applyKit(entity, kit);
+    return entity;
+  }
+
+  /** Spawns an entity and marks it as this arena's. */
+  private spawnTracked(id: string, at: Vector3, spawnEvent?: string): Entity | undefined {
     try {
-      const entity = kind.spawnEvent
-        ? this.dimension.spawnEntity(kind.id, at, { spawnEvent: kind.spawnEvent })
-        : this.dimension.spawnEntity(kind.id, at);
+      const entity = spawnEvent ? this.dimension.spawnEntity(id, at, { spawnEvent }) : this.dimension.spawnEntity(id, at);
       entity.addTag(MOB_TAG);
       entity.setDynamicProperty(MOB_PROPERTY, this.key);
-      applyKit(entity, kit);
       this.mobs.set(entity.id, entity);
       return entity;
     } catch (err) {
-      log.warn(`spawning ${kind.id} failed: ${String(err)}`);
+      log.warn(`spawning ${id} failed: ${String(err)}`);
       return undefined;
     }
   }
@@ -292,64 +309,89 @@ export class Arena {
     }
   }
 
-  private startWave(): void {
-    const gear = gearLevel(this.index, this.fights.length);
+  /**
+   * Shows the wave's title now and spawns its mobs once the title has faded,
+   * so the text is not covering the screen as they arrive.
+   */
+  private announceWave(now: number): void {
     const plan = planWave(this.index, this.fights.length, this.fighters.size);
+    this.title(
+      msg('arena.wave.title', String(this.waveNumber), String(this.waveCount)),
+      msg('arena.wave.subtitle', { translate: `arena.theme.${plan.theme.key}` }, String(plan.mobs.length)),
+      TITLE_STAY,
+    );
+    this.sound('raid.horn', 1, 0.6);
+    this.pendingSpawn = () => this.spawnWave(plan);
+    this.spawnAt = now + ANNOUNCE_TICKS;
+  }
+
+  private spawnWave(plan: WavePlan): void {
     for (const mob of plan.mobs) {
       const at = findSpot(this.dimension, this.center);
       if (this.spawnMob(mob.kind, mob.kit, at)) this.puff(at);
     }
+    const gear = gearLevel(this.index, this.fights.length);
     log.info(`${this.key} wave ${this.waveNumber}: ${plan.theme.key} x${plan.mobs.length} at gear ${gear.toFixed(2)}`);
-    this.title(
-      msg('arena.wave.title', String(this.waveNumber), String(this.waveCount)),
-      msg('arena.wave.subtitle', { translate: `arena.theme.${plan.theme.key}` }, String(plan.mobs.length)),
-    );
-    this.sound('raid.horn', 1, 0.6);
   }
 
-  private startBoss(def: BossDef): void {
-    const gear = Math.min(4, gearLevel(this.index, this.fights.length) + def.gearBonus);
-    const tall = def.kind.id === 'minecraft:warden' || def.kind.id === 'minecraft:ravager' ? 3 : 2;
-    const at = findSpot(this.dimension, this.center, tall);
-    const boss = this.spawnMob(def.kind, { ...rollKit(def.kind, gear, true), effects: def.effects }, at);
-    if (boss) {
-      boss.nameTag = def.name;
-      this.boss = boss;
-      this.puff(at);
-    }
-    this.bossDef = def;
-    this.bossPending = true;
-    const escortTheme = themeByKey(def.escortTheme);
-    const escorts = def.escorts === 0 ? 0 : def.escorts + Math.max(0, this.fighters.size - 1);
-    const escortGear = gearLevel(this.index, this.fights.length);
-    for (let i = 0; i < escorts; i++) {
-      const kind = escortTheme.mobs[Math.floor(Math.random() * escortTheme.mobs.length)];
-      if (!kind) continue;
-      const spot = findSpot(this.dimension, this.center);
-      if (this.spawnMob(kind, rollKit(kind, escortGear), spot)) this.puff(spot);
-    }
+  private announceBoss(def: BossDef, now: number): void {
     this.title(
       msg(this.isFinal ? 'arena.boss.final_title' : 'arena.boss.title'),
-      msg('arena.boss.subtitle', def.name),
-      60,
+      { translate: def.nameKey },
+      TITLE_STAY,
     );
     this.sound('mob.enderdragon.growl', 0.8, 1);
-    this.sound('ambient.weather.thunder', 1, 0.8);
+    this.bossDef = def;
+    this.bossPending = true;
+    this.bossSpawned = false;
+    this.bossSpawnFailures = 0;
+    this.pendingSpawn = () => {
+      this.spawnBoss(def);
+      this.sound('ambient.weather.thunder', 1, 0.8);
+    };
+    this.spawnAt = now + ANNOUNCE_TICKS;
   }
 
-  /** Brings a vanished boss back at full strength. */
-  private respawnBoss(): void {
-    if (!this.bossDef) return;
-    const def = this.bossDef;
-    const gear = Math.min(4, gearLevel(this.index, this.fights.length) + def.gearBonus);
-    const at = findSpot(this.dimension, this.center, 3);
-    const boss = this.spawnMob(def.kind, { ...rollKit(def.kind, gear, true), effects: def.effects }, at);
-    if (boss) {
-      boss.nameTag = def.name;
-      this.boss = boss;
-      this.puff(at);
-      this.tell(msg('arena.boss.returns', def.name));
+  /**
+   * Spawns the boss: one big creature. Its health is fixed in its entity
+   * file, so extra fighters are met with Resistance instead.
+   */
+  private spawnBoss(def: BossDef): void {
+    const at = findSpot(this.dimension, this.center, def.height);
+    const boss = this.spawnTracked(def.entity, at);
+    if (!boss) return;
+    this.boss = boss;
+    this.bossSpawned = true;
+    this.puff(at);
+    const extra = this.fighters.size - 1;
+    if (extra > 0) {
+      try {
+        boss.addEffect('resistance', EFFECT_TICKS, { amplifier: Math.min(2, extra - 1), showParticles: false });
+      } catch (err) {
+        log.warn(`boss resistance failed: ${String(err)}`);
+      }
     }
+  }
+
+  /**
+   * Brings a vanished boss back at full strength, or spawns it if the first
+   * spawn failed. A boss whose entity never spawns (its file failed to load,
+   * which leaves no trace on a Realm) is skipped with a note in chat, rather
+   * than hanging the battle.
+   */
+  private respawnBoss(): void {
+    const def = this.bossDef;
+    if (!def) return;
+    const firstSpawn = !this.bossSpawned;
+    this.spawnBoss(def);
+    if (this.boss) {
+      if (!firstSpawn) this.tell(msg('arena.boss.returns', { translate: def.nameKey }));
+      return;
+    }
+    if (++this.bossSpawnFailures < BOSS_SPAWN_TRIES) return;
+    log.error(`boss ${def.entity} could not be spawned; skipping it`);
+    this.tell(msg('arena.boss.failed', def.entity));
+    this.bossDefeated();
   }
 
   // ------------------------------------------------------------------- events
@@ -373,7 +415,7 @@ export class Arena {
       this.finish('victory');
       return;
     }
-    this.tell(msg('arena.boss.defeated', def?.name ?? '?'));
+    this.tell(msg('arena.boss.defeated', def ? { translate: def.nameKey } : '?'));
     this.sound('random.levelup', 0.8);
   }
 
@@ -429,6 +471,7 @@ export class Arena {
 
     if (this.phase === 'countdown') this.tickCountdown(now);
     else if (this.phase === 'intermission') this.tickIntermission(now);
+    else if (this.phase === 'announcing') this.tickAnnouncing(now);
     else this.tickFight(now);
   }
 
@@ -437,13 +480,11 @@ export class Arena {
     const fight = this.current;
     if (!fight) return;
     if (left <= 0) {
-      this.phase = 'fighting';
-      this.fightStart = now;
-      this.lastRegroup = now;
+      this.phase = 'announcing';
       this.lastSecond = -1;
       this.fightDamage.clear();
-      if (fight.kind === 'wave') this.startWave();
-      else this.startBoss(fight.boss);
+      if (fight.kind === 'wave') this.announceWave(now);
+      else this.announceBoss(fight.boss, now);
       return;
     }
     if (left === this.lastSecond) return;
@@ -502,15 +543,23 @@ export class Arena {
     // A pause to breathe: announce the clear and who hit hardest, then
     // start the next countdown once the intermission is over.
     const top = topDamage(this.fightDamage)[0];
-    const clearedTitle =
-      cleared?.kind === 'boss' ? msg('arena.boss.cleared_title') : msg('arena.wave.cleared_title', String(this.waveNumber - 1));
-    this.title(clearedTitle, top ? msg('arena.damage.top', top.name, String(Math.round(top.damage))) : undefined, 50);
+    this.title(msg('arena.cleared_title'), top ? msg('arena.damage.top', top.name) : undefined, 50);
     if (cleared?.kind === 'wave') this.tell(msg('arena.wave.cleared', String(this.waveNumber - 1)));
     this.postLeaderboard(this.fightDamage, cleared?.kind === 'boss' ? 'arena.damage.header_boss' : 'arena.damage.header_wave');
     this.sound('random.orb', 0.8);
     this.healFighters();
     this.phase = 'intermission';
     this.intermissionEnd = now + INTERMISSION_TICKS;
+  }
+
+  private tickAnnouncing(now: number): void {
+    if (now < this.spawnAt) return;
+    const spawn = this.pendingSpawn;
+    this.pendingSpawn = undefined;
+    this.phase = 'fighting';
+    this.fightStart = now;
+    this.lastRegroup = now;
+    spawn?.();
   }
 
   private tickIntermission(now: number): void {
@@ -562,8 +611,7 @@ export class Arena {
     if (this.boss) {
       const health = this.boss.getComponent('minecraft:health');
       const hp = health ? `${Math.ceil(health.currentValue)}/${Math.ceil(health.effectiveMax)}` : '?';
-      const extra = this.mobs.size - 1;
-      line = msg('arena.status.boss', this.bossDef?.name ?? '?', hp, String(Math.max(0, extra)));
+      line = msg('arena.status.boss', this.bossDef ? { translate: this.bossDef.nameKey } : '?', hp);
     } else {
       line = msg('arena.status.wave', String(this.waveNumber), String(this.waveCount), String(this.mobs.size));
     }
@@ -665,6 +713,7 @@ export class Arena {
     if (this.phase !== 'fighting') {
       this.intermissionEnd = system.currentTick;
       this.countdownEnd = system.currentTick;
+      this.spawnAt = system.currentTick;
       return;
     }
     if (this.bossPending && this.isFinal) {

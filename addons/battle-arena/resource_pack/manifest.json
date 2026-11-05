@@ -4,32 +4,18 @@
     "name": "Battle Arena RP",
     "description": "A placeable arena block that starts escalating, randomized waves of geared mobs, with bosses, until the final boss falls or every fighter has died.",
     "uuid": "bf1303a4-642e-4ce1-9db5-c9e9fbe86842",
-    "version": [
-      1,
-      0,
-      1
-    ],
-    "min_engine_version": [
-      1,
-      26,
-      40
-    ]
+    "version": [1, 0, 2],
+    "min_engine_version": [1, 26, 40]
   },
   "modules": [
     {
       "type": "resources",
       "uuid": "c18c89ee-a051-4af2-ab07-5bfe38100f47",
-      "version": [
-        1,
-        0,
-        1
-      ]
+      "version": [1, 0, 2]
     }
   ],
   "metadata": {
-    "authors": [
-      "Steven Le"
-    ],
+    "authors": ["Steven Le"],
     "license": "MIT"
   }
 }

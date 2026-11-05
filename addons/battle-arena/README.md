@@ -23,7 +23,9 @@ Or `/scriptevent steveo:arena give`.
 | Epic | 20 (4 per boss) | 5 | The Warden |
 
 - **Countdown** before every fight: 10 s before the first wave, 8 s between
-  waves, 12 s before a boss. The last three seconds flash on screen.
+  waves, 12 s before a boss. The last three seconds flash on screen. Then
+  the fight's title shows, and its mobs spawn 2.5 s later, once the title is
+  off the screen.
 - **Intermission** after each cleared wave or round: a 6 s pause first, with a
   "Wave cleared!" title naming the top damage dealer. In a multiplayer battle,
   chat gets a damage leaderboard for that wave (or the whole round after a
@@ -39,11 +41,26 @@ Or `/scriptevent steveo:arena give`.
   pieces, so a wave looks mismatched rather than uniformed. Later mobs also
   carry Speed, Strength, or Resistance. Waves grow with the battle and add two
   mobs per extra fighter.
-- **Bosses** wear full kit a tier above the waves, carry Resistance (and often
-  Strength and Speed), and bring escorts: Zombie Warlord, Frost Marksman,
-  Evoker Archmage, Storm Caller, The Ravager, Wither Skeleton King, The
-  Warden. The boss's health shows in the action bar. A boss that vanishes
-  without dying (a Warden digging away) comes back.
+- **Bosses** are one big creature each, alone, with a boss bar: giant
+  versions of vanilla mobs with their own health. Two per tier, picked at
+  random, easiest first:
+
+  | Tier | Boss | Based on | Size | Health | Notes |
+  |---|---|---|---|---|---|
+  | 1 | Zombie Titan | zombie | 2.5× | 220 | hits for 10 |
+  | 1 | Brood Mother | spider | 2.5× | 180 | poison bite, leaps, climbs |
+  | 2 | Bone Colossus | skeleton | 2.5× | 200 | rapid slowness arrows |
+  | 2 | Iron Tyrant | iron golem | 1.6× | 320 | hits for 10–24, flings you |
+  | 3 | Alpha Ravager | ravager | 1.5× | 360 | hits for 16, roars |
+  | 3 | Wither King | wither skeleton | 2.2× | 300 | hits for 12 plus Wither |
+  | Epic final | The Warden | vanilla | 1× | 500 | |
+
+  The final boss of Quick and Standard is a tier 3 boss. Each extra fighter
+  gives the boss more Resistance (I for two players, II for three, III for
+  four or more), since
+  its health is fixed. All are knockback-proof and fall-proof, and never
+  despawn. A boss that vanishes without dying (a Warden digging away) comes
+  back. One that cannot spawn at all is skipped with a note in chat.
 - **Rewards** drop at the arena block when a boss dies: diamonds, emeralds,
   golden apples, experience bottles. The final boss adds an enchanted golden
   apple, a totem of undying, and netherite (scrap, or an ingot on Epic). The
@@ -72,6 +89,7 @@ and its leftover mobs are removed as they load.
 /scriptevent steveo:arena start [quick|standard|epic]   arena block at your feet, start
 /scriptevent steveo:arena skip                end the countdown, or clear the fight
 /scriptevent steveo:arena boss                jump to the next boss's countdown
+/scriptevent steveo:arena summon <boss>       one boss on its own, outside any battle
 /scriptevent steveo:arena stop                end the nearest battle
 /scriptevent steveo:arena give                one arena block
 ```
@@ -81,7 +99,12 @@ and its leftover mobs are removed as they load.
 - Gear goes on through `replaceitem` commands run on each mob, which work on
   any armor-wearing mob regardless of what the script API's equipment
   component supports.
-- Boss name tags are literal English: name tags cannot be translated.
+- The boss entities come from `assets/bosses.mjs`, which patches the vanilla
+  entity files in `assets/vanilla/` (Mojang/bedrock-samples, tag
+  `v1.26.50.4`). Each keeps its vanilla file's `format_version` and shapes,
+  and its client entity is the vanilla one renamed, so it reuses vanilla
+  models, textures and animations. To change a boss, edit the script and
+  rerun it rather than editing the generated JSON.
 - Creepers, piglins, and spiders are left out on purpose: creepers blow up the
   arena, piglins turn into neutral zombified piglins in the Overworld, and
   spiders are neutral by day, any of which could leave a wave unfinishable.

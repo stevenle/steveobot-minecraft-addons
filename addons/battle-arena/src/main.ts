@@ -6,13 +6,13 @@
  *   arena.ts  one running battle: countdown, fights, fighters, ending
  *   main.ts   the block, the menu, events, the debug command
  *
- * Debug: /scriptevent steveo:arena <status|start [quick|standard|epic]|skip|boss|stop|give>
+ * Debug: /scriptevent steveo:arena <status|start [quick|standard|epic]|skip|boss|summon <boss>|stop|give>
  */
 import { ItemStack, Player, system, world, type Block, type Vector3 } from '@minecraft/server';
 import { ActionFormData } from '@minecraft/server-ui';
 
 import { Arena, ARENA_BLOCK, JOIN_RANGE, log, MOB_PROPERTY, MOB_TAG, msg, PREFIX } from './arena';
-import { MODES, type Mode } from './waves';
+import { ALL_BOSSES, MODES, type Mode } from './waves';
 
 /** Two arenas this close would fight over the same mobs. */
 const MIN_ARENA_SPACING = 48;
@@ -207,6 +207,23 @@ system.afterEvents.scriptEventReceive.subscribe(
         if (block.typeId !== ARENA_BLOCK) block.setType(ARENA_BLOCK);
         player.teleport({ x: at.x + 0.5, y: at.y + 1, z: at.z + 0.5 });
         start(player, block, mode);
+        break;
+      }
+      case 'summon': {
+        // A boss on its own, outside any battle, to check that it loads and fights.
+        const boss = ALL_BOSSES.find((b) => b.key === arg);
+        if (!boss) {
+          say(player, 'arena.debug.summon_help', ALL_BOSSES.map((b) => b.key).join(', '));
+          break;
+        }
+        const view = player.getViewDirection();
+        const at = { x: player.location.x + view.x * 6, y: player.location.y, z: player.location.z + view.z * 6 };
+        try {
+          player.dimension.spawnEntity(boss.entity, at);
+          say(player, 'arena.debug.summoned', boss.entity);
+        } catch (err) {
+          say(player, 'arena.debug.summon_failed', boss.entity, String(err));
+        }
         break;
       }
       case 'skip':
