@@ -56,6 +56,8 @@ function write(rel, data) {
   console.log(`wrote ${file}`);
 }
 
+const OWN_RENDER_CONTROLLER = 'controller.render.steveo_arena_boss';
+
 /** Components no boss keeps. */
 const DROP = [
   'minecraft:despawn',
@@ -111,6 +113,12 @@ const BOSSES = [
     key: 'zombie_titan',
     from: 'zombie',
     fold: ['minecraft:zombie_adult'],
+    // The 1.26 zombie client file (spears, kinetic weapons, public
+    // variables) rendered nothing on a custom entity; the 1.21.50 one
+    // (assets/vanilla/rp/zombie.legacy.entity.json, bedrock-samples tag
+    // v1.21.50.7), a plain 1.8.0 file like the skeleton's, is used instead.
+    client: 'zombie.legacy',
+    ownRenderController: true,
     health: 280,
     attack: { damage: 10 },
     movement: 0.25,
@@ -136,20 +144,27 @@ const BOSSES = [
   {
     key: 'bone_colossus',
     from: 'skeleton',
-    fold: ['minecraft:ranged_attack_hard'],
+    // Melee, not the vanilla bow AI: as a giant, the bow attack barely
+    // fired (2026-11-05). It swings a stone sword instead.
+    fold: ['minecraft:melee_attack'],
     health: 250,
-    movement: 0.25,
+    attack: { damage: 11 },
+    movement: 0.27,
     scale: 2.5,
     box: { width: 1.5, height: 4.75 },
-    // Slowness-tipped arrows, as a stray shoots.
     patch: (c) => {
-      c['minecraft:shooter'] = { def: 'minecraft:arrow', aux_val: 19 };
+      delete c['minecraft:behavior.ranged_attack'];
+      delete c['minecraft:shooter'];
+      c['minecraft:equipment'] = { table: 'loot_tables/entities/wither_skeleton_gear.json' };
     },
   },
   {
     key: 'iron_tyrant',
     from: 'iron_golem',
     fold: [],
+    // The vanilla client file names controller.render.iron_golem, which no
+    // published render controller file defines; the boss rendered nothing.
+    ownRenderController: true,
     health: 400,
     attack: { damage: { range_min: 10, range_max: 24 } },
     scale: 1.6,
@@ -241,12 +256,26 @@ for (const boss of BOSSES) {
     },
   });
 
-  const client = read(`rp/${boss.from}.entity.json`);
+  const client = read(`rp/${boss.client ?? boss.from}.entity.json`);
   const description = client['minecraft:client_entity'].description;
   description.identifier = `steveo:${boss.key}`;
   delete description.spawn_egg;
+  if (boss.ownRenderController) description.render_controllers = [OWN_RENDER_CONTROLLER];
   write(`resource_pack/entity/${boss.key}.entity.json`, client);
 }
+
+// A plain render controller (default geometry, material and texture) for
+// bosses whose vanilla controller cannot be relied on.
+write('resource_pack/render_controllers/bosses.render_controllers.json', {
+  format_version: '1.8.0',
+  render_controllers: {
+    [OWN_RENDER_CONTROLLER]: {
+      geometry: 'Geometry.default',
+      materials: [{ '*': 'Material.default' }],
+      textures: ['Texture.default'],
+    },
+  },
+});
 
 // The empty loot table the bosses point at: rewards come from the script.
 write('behavior_pack/loot_tables/empty.json', { pools: [] });

@@ -36,8 +36,7 @@
         }
       ],
       "render_controllers": [
-        "controller.render.iron_golem",
-        "controller.render.iron_golem_cracks"
+        "controller.render.steveo_arena_boss"
       ],
       "scripts": {
         "pre_animation": [

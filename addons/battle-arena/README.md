@@ -4,6 +4,20 @@ A block that starts an arena battle. Place it, use it (right-click or tap),
 pick a length, and every player within 24 blocks joins the fight against
 escalating waves of mobs, with a boss at the end of each round.
 
+## The block
+
+The Altar of Blades: a stepped stone dais with a gold trim and three swords
+driven point-first into a cracked slab on top. While a battle runs, the block
+switches to its battle look (the `steveo:active` block state): a ring of
+flame tongues burns along the gold trim, the cracks and blade edges glow, the
+light rises from 6 to 12, and embers drift up off the trim. It catches with a
+whoosh and a clang when a battle starts and goes out when it ends. A block
+left lit with no battle behind it (the world reloaded mid-battle) puts itself
+out within two seconds of loading.
+
+The hilts reach about 1.4 blocks up, but you only collide with the bottom
+block. The flames are decoration: they burn nothing and hurt no one.
+
 ## Crafting
 
 ```
@@ -49,7 +63,7 @@ Or `/scriptevent steveo:arena give`.
   |---|---|---|---|---|---|
   | 1 | Zombie Titan | zombie | 2.5× | 280 | hits for 10 |
   | 1 | The Executioner | vindicator | 2.4× | 280 | swings a giant axe for 13 |
-  | 2 | Bone Colossus | skeleton | 2.5× | 250 | rapid slowness arrows |
+  | 2 | Bone Colossus | skeleton | 2.5× | 250 | swings a stone sword for 11 |
   | 2 | Iron Tyrant | iron golem | 1.6× | 400 | hits for 10–24, flings you |
   | 3 | Alpha Ravager | ravager | 1.5× | 450 | hits for 16, roars |
   | 3 | Wither King | wither skeleton | 2.2× | 375 | hits for 12 plus Wither |
@@ -109,4 +123,6 @@ and its leftover mobs are removed as they load.
 - Creepers, piglins, and spiders are left out on purpose: creepers blow up the
   arena, piglins turn into neutral zombified piglins in the Overworld, and
   spiders are neutral by day, any of which could leave a wave unfinishable.
-- Textures and the pack icon come from `assets/generate.mjs`.
+- The block's model, textures and flame flipbook, and the pack icon (a render
+  of the lit model), come from `assets/block.mjs`. Edit it and rerun it
+  rather than editing the generated files.

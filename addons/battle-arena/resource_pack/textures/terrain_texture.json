@@ -4,14 +4,14 @@
   "padding": 8,
   "num_mip_levels": 4,
   "texture_data": {
-    "steveo_battle_arena_top": {
-      "textures": "textures/blocks/battle_arena_top"
+    "steveo_battle_arena": {
+      "textures": "textures/blocks/battle_arena"
     },
-    "steveo_battle_arena_side": {
-      "textures": "textures/blocks/battle_arena_side"
+    "steveo_battle_arena_lit": {
+      "textures": "textures/blocks/battle_arena_lit"
     },
-    "steveo_battle_arena_bottom": {
-      "textures": "textures/blocks/battle_arena_bottom"
+    "steveo_battle_arena_flame": {
+      "textures": "textures/blocks/battle_arena_flame"
     }
   }
 }

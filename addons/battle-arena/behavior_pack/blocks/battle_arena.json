@@ -5,27 +5,31 @@
       "identifier": "steveo:battle_arena",
       "menu_category": {
         "category": "construction"
+      },
+      "states": {
+        "steveo:active": [false, true]
       }
     },
     "components": {
       "minecraft:display_name": "tile.steveo:battle_arena.name",
-      "minecraft:geometry": "minecraft:geometry.full_block",
+      "minecraft:geometry": "geometry.steveo_battle_arena",
       "minecraft:material_instances": {
         "*": {
-          "texture": "steveo_battle_arena_side",
-          "render_method": "opaque"
-        },
-        "up": {
-          "texture": "steveo_battle_arena_top",
-          "render_method": "opaque"
-        },
-        "down": {
-          "texture": "steveo_battle_arena_bottom",
-          "render_method": "opaque"
+          "texture": "steveo_battle_arena",
+          "render_method": "alpha_test"
         }
       },
+      "minecraft:collision_box": {
+        "origin": [-8, 0, -8],
+        "size": [16, 16, 16]
+      },
+      "minecraft:selection_box": {
+        "origin": [-8, 0, -8],
+        "size": [16, 16, 16]
+      },
       "minecraft:map_color": "#7A1F1F",
-      "minecraft:light_emission": 8,
+      "minecraft:light_emission": 6,
+      "minecraft:light_dampening": 0,
       "minecraft:destructible_by_explosion": false,
       "minecraft:destructible_by_mining": {
         "seconds_to_destroy": 3,
@@ -36,7 +40,32 @@
           }
         ]
       },
+      "minecraft:tick": {
+        "interval_range": [40, 40],
+        "looping": true
+      },
       "steveo:battle_arena": {}
-    }
+    },
+    "permutations": [
+      {
+        "condition": "q.block_state('steveo:active')",
+        "components": {
+          "minecraft:geometry": "geometry.steveo_battle_arena_lit",
+          "minecraft:material_instances": {
+            "*": {
+              "texture": "steveo_battle_arena_lit",
+              "render_method": "alpha_test"
+            },
+            "flame": {
+              "texture": "steveo_battle_arena_flame",
+              "render_method": "alpha_test",
+              "ambient_occlusion": false,
+              "face_dimming": false
+            }
+          },
+          "minecraft:light_emission": 12
+        }
+      }
+    ]
   }
 }
