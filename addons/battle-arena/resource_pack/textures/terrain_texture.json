@@ -1,0 +1,17 @@
+{
+  "resource_pack_name": "battle-arena",
+  "texture_name": "atlas.terrain",
+  "padding": 8,
+  "num_mip_levels": 4,
+  "texture_data": {
+    "steveo_battle_arena": {
+      "textures": "textures/blocks/battle_arena"
+    },
+    "steveo_battle_arena_lit": {
+      "textures": "textures/blocks/battle_arena_lit"
+    },
+    "steveo_battle_arena_flame": {
+      "textures": "textures/blocks/battle_arena_flame"
+    }
+  }
+}

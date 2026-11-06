@@ -1,0 +1,5 @@
+{
+  "$schema": "../../tools/schemas/addon.schema.json",
+  "name": "Battle Arena",
+  "description": "A placeable arena block that starts escalating, randomized waves of geared mobs, with bosses, until the final boss falls or every fighter has died."
+}

@@ -268,6 +268,14 @@ Three things constrain changes here:
   in no current vanilla event; use a `sequence`. A script that subscribes
   with an `entityTypes` filter for a type that failed to load throws at
   startup, so filter by `typeId` by hand in an add-on whose entity may not load.
+- A custom entity whose client file is a renamed vanilla one can spawn
+  invisible. battle-arena's Zombie Titan (vanilla 1.26 zombie client file)
+  and Iron Tyrant (vanilla iron golem, whose `controller.render.iron_golem`
+  no published render controller file defines) both did on 2026-11-05, while
+  the skeleton, wither skeleton, ravager and vindicator copies rendered.
+  Give such an entity its own plain render controller (default geometry,
+  material, texture), and prefer an older 1.8.0-format vanilla client file
+  over a heavy current one.
 - Do not set `isolated_physics: true` on a projectile entity that a script
   launches with `ProjectileComponent.shoot()`: on 1.26.50 the entity spawned
   but never moved (potato-gun, 2026-09-16). It is meant for projectiles fired

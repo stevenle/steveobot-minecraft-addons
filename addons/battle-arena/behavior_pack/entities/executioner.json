@@ -1,0 +1,174 @@
+{
+  "format_version": "1.26.0",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "steveo:executioner",
+      "runtime_identifier": "minecraft:vindicator",
+      "is_spawnable": false,
+      "is_summonable": true
+    },
+    "component_groups": {
+      "minecraft:vindicator_aggro": {
+        "minecraft:angry": {
+          "broadcast_anger": false,
+          "calm_event": {
+            "event": "minecraft:stop_aggro",
+            "target": "self"
+          },
+          "duration": -1
+        }
+      }
+    },
+    "components": {
+      "minecraft:attack": {
+        "damage": 13
+      },
+      "minecraft:behavior.float": {
+        "priority": 0
+      },
+      "minecraft:behavior.hurt_by_target": {
+        "priority": 1
+      },
+      "minecraft:behavior.look_at_player": {
+        "look_time": {
+          "min": 1,
+          "max": 2
+        },
+        "priority": 10
+      },
+      "minecraft:behavior.melee_box_attack": {
+        "priority": 3
+      },
+      "minecraft:behavior.random_stroll": {
+        "priority": 9,
+        "speed_multiplier": 1
+      },
+      "minecraft:breathable": {
+        "suffocate_time": 0,
+        "total_supply": 15
+      },
+      "minecraft:collision_box": {
+        "width": 1.45,
+        "height": 4.6
+      },
+      "minecraft:conditional_bandwidth_optimization": {},
+      "minecraft:equipment": {
+        "table": "loot_tables/entities/vindicator_gear.json"
+      },
+      "minecraft:experience_reward": {
+        "on_death": "100"
+      },
+      "minecraft:follow_range": {
+        "value": 64,
+        "max": 64
+      },
+      "minecraft:health": {
+        "value": 280,
+        "max": 280
+      },
+      "minecraft:is_hidden_when_invisible": {},
+      "minecraft:jump.static": {},
+      "minecraft:loot": {
+        "table": "loot_tables/empty.json"
+      },
+      "minecraft:movement": {
+        "value": 0.3
+      },
+      "minecraft:movement.basic": {},
+      "minecraft:nameable": {
+        "default_trigger": {
+          "event": "minecraft:stop_johnny",
+          "target": "self"
+        },
+        "name_actions": [
+          {
+            "name_filter": "Johnny",
+            "on_named": {
+              "event": "minecraft:start_johnny",
+              "target": "self"
+            }
+          }
+        ]
+      },
+      "minecraft:navigation.walk": {
+        "can_path_over_water": true,
+        "using_door_annotation": true
+      },
+      "minecraft:on_target_acquired": {
+        "event": "minecraft:become_aggro",
+        "target": "self"
+      },
+      "minecraft:on_target_escape": {
+        "event": "minecraft:stop_aggro",
+        "target": "self"
+      },
+      "minecraft:physics": {},
+      "minecraft:pushable": {
+        "is_pushable": true,
+        "is_pushable_by_piston": true
+      },
+      "minecraft:type_family": {
+        "family": [
+          "vindicator",
+          "monster",
+          "illager",
+          "mob",
+          "steveo_arena_boss"
+        ]
+      },
+      "minecraft:variant": {
+        "value": 0
+      },
+      "minecraft:scale": {
+        "value": 2.4
+      },
+      "minecraft:knockback_resistance": {
+        "value": 1
+      },
+      "minecraft:persistent": {},
+      "minecraft:fire_immune": {},
+      "minecraft:damage_sensor": {
+        "triggers": {
+          "cause": "fall",
+          "deals_damage": "no"
+        }
+      },
+      "minecraft:boss": {
+        "should_darken_sky": false,
+        "hud_range": 55
+      },
+      "minecraft:behavior.nearest_attackable_target": {
+        "priority": 2,
+        "reselect_targets": true,
+        "must_see": false,
+        "within_radius": 48,
+        "entity_types": [
+          {
+            "filters": {
+              "test": "is_family",
+              "subject": "other",
+              "value": "player"
+            },
+            "max_dist": 48
+          }
+        ]
+      }
+    },
+    "events": {
+      "minecraft:become_aggro": {
+        "add": {
+          "component_groups": [
+            "minecraft:vindicator_aggro"
+          ]
+        }
+      },
+      "minecraft:stop_aggro": {
+        "remove": {
+          "component_groups": [
+            "minecraft:vindicator_aggro"
+          ]
+        }
+      }
+    }
+  }
+}

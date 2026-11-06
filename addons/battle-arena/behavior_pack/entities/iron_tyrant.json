@@ -1,0 +1,136 @@
+{
+  "format_version": "1.26.20",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "steveo:iron_tyrant",
+      "runtime_identifier": "minecraft:iron_golem",
+      "is_spawnable": false,
+      "is_summonable": true
+    },
+    "component_groups": {},
+    "components": {
+      "minecraft:attack": {
+        "damage": {
+          "range_min": 10,
+          "range_max": 24
+        }
+      },
+      "minecraft:behavior.hurt_by_target": {
+        "priority": 1
+      },
+      "minecraft:behavior.look_at_player": {
+        "look_time": {
+          "min": 1,
+          "max": 2
+        },
+        "look_distance": 6,
+        "priority": 7
+      },
+      "minecraft:behavior.melee_box_attack": {
+        "track_target": true,
+        "priority": 1
+      },
+      "minecraft:behavior.move_towards_target": {
+        "priority": 2,
+        "speed_multiplier": 0.9,
+        "within_radius": 32
+      },
+      "minecraft:behavior.nearest_attackable_target": {
+        "priority": 2,
+        "reselect_targets": true,
+        "must_see": false,
+        "within_radius": 48,
+        "entity_types": [
+          {
+            "filters": {
+              "test": "is_family",
+              "subject": "other",
+              "value": "player"
+            },
+            "max_dist": 48
+          }
+        ]
+      },
+      "minecraft:behavior.random_look_around": {
+        "priority": 8
+      },
+      "minecraft:behavior.random_stroll": {
+        "priority": 6,
+        "speed_multiplier": 0.6,
+        "xz_dist": 16
+      },
+      "minecraft:can_climb": {},
+      "minecraft:collision_box": {
+        "width": 2.2,
+        "height": 4.6
+      },
+      "minecraft:conditional_bandwidth_optimization": {},
+      "minecraft:damage_sensor": {
+        "triggers": {
+          "cause": "fall",
+          "deals_damage": "no"
+        }
+      },
+      "minecraft:follow_range": {
+        "value": 64,
+        "max": 64
+      },
+      "minecraft:health": {
+        "value": 400,
+        "max": 400
+      },
+      "minecraft:is_hidden_when_invisible": {},
+      "minecraft:jump.static": {},
+      "minecraft:knockback_resistance": {
+        "value": 1
+      },
+      "minecraft:loot": {
+        "table": "loot_tables/empty.json"
+      },
+      "minecraft:movement": {
+        "value": 0.25
+      },
+      "minecraft:movement.basic": {},
+      "minecraft:nameable": {},
+      "minecraft:navigation.walk": {
+        "avoid_damage_blocks": true,
+        "avoid_water": true,
+        "can_path_over_water": false,
+        "using_door_annotation": true
+      },
+      "minecraft:persistent": {},
+      "minecraft:physics": {},
+      "minecraft:pushable_by_block": {},
+      "minecraft:pushable_by_entity": {},
+      "minecraft:type_family": {
+        "family": [
+          "irongolem",
+          "mob",
+          "monster",
+          "steveo_arena_boss"
+        ]
+      },
+      "minecraft:apply_knockback_rules": {
+        "presets": [
+          {
+            "horizontal_power": 0.52,
+            "vertical_power": 0.39,
+            "vertical_velocity_cap": 0.8
+          }
+        ]
+      },
+      "minecraft:scale": {
+        "value": 1.6
+      },
+      "minecraft:fire_immune": {},
+      "minecraft:experience_reward": {
+        "on_death": "100"
+      },
+      "minecraft:boss": {
+        "should_darken_sky": false,
+        "hud_range": 55
+      }
+    },
+    "events": {}
+  }
+}
