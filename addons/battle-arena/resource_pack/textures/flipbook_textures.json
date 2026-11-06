@@ -1,0 +1,8 @@
+[
+  {
+    "flipbook_texture": "textures/blocks/battle_arena_flame",
+    "atlas_tile": "steveo_battle_arena_flame",
+    "ticks_per_frame": 2,
+    "blend_frames": false
+  }
+]

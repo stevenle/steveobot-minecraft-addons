@@ -12,6 +12,7 @@
  * gone, and the sweep in main.ts removes its leftover mobs as they load.
  */
 import {
+  BlockPermutation,
   ItemStack,
   system,
   world,
@@ -210,6 +211,31 @@ export class Arena {
     for (const p of players) this.fighters.set(p.id, { id: p.id, name: p.name, died: false, left: false });
     this.countdownEnd = system.currentTick + COUNTDOWN.first * 20;
     this.lastNear = system.currentTick;
+    setLit(dimension, this.block, true);
+    this.ignite();
+  }
+
+  /** The block catching fire as the battle starts: a whoosh, a clang, a burst of flame on the trim. */
+  private ignite(): void {
+    this.sound('mob.blaze.shoot', 0.7, 1);
+    this.sound('random.anvil_land', 0.6, 0.5);
+    for (let i = 0; i < 16; i++) this.trimParticle('minecraft:basic_flame_particle');
+  }
+
+  /** A particle at a random point on the gold trim's ring of flames. */
+  private trimParticle(id: string): void {
+    const u = Math.random() * 14 - 7;
+    const side = Math.floor(Math.random() * 4);
+    const [dx, dz] = side === 0 ? [u, -7] : side === 1 ? [u, 7] : side === 2 ? [-7, u] : [7, u];
+    try {
+      this.dimension.spawnParticle(id, {
+        x: this.block.x + 0.5 + dx / 16,
+        y: this.block.y + (5 + Math.random() * 4) / 16,
+        z: this.block.z + 0.5 + dz / 16,
+      });
+    } catch {
+      // Unloaded chunk.
+    }
   }
 
   get dimension(): Dimension {
@@ -469,6 +495,10 @@ export class Arena {
       return;
     }
 
+    // Embers rising off the ring of flames on the block's trim.
+    this.trimParticle('minecraft:basic_flame_particle');
+    if (Math.random() < 0.5) this.trimParticle('minecraft:lava_particle');
+
     if (this.phase === 'countdown') this.tickCountdown(now);
     else if (this.phase === 'intermission') this.tickIntermission(now);
     else if (this.phase === 'announcing') this.tickAnnouncing(now);
@@ -661,6 +691,7 @@ export class Arena {
   finish(outcome: Outcome): void {
     if (this.ended) return;
     this.ended = true;
+    setLit(this.dimension, this.block, false);
     for (const mob of this.mobs.values()) {
       try {
         if (mob.isValid) mob.remove();
@@ -757,6 +788,27 @@ export class Arena {
 /** Leaderboard order: most damage first. */
 function topDamage(table: Map<string, { name: string; damage: number }>): { name: string; damage: number }[] {
   return [...table.values()].sort((a, b) => b.damage - a.damage);
+}
+
+/**
+ * Switches the arena block between its idle and battle looks (the
+ * `steveo:active` state: flames on the trim, glowing cracks, more light).
+ * Does nothing if the block is gone or its chunk is unloaded; the block's
+ * own tick puts a stale lit block out (see main.ts).
+ */
+export function setLit(dimension: Dimension, at: Vector3, lit: boolean): void {
+  try {
+    const block = dimension.getBlock(at);
+    if (block?.typeId !== ARENA_BLOCK) return;
+    if (isLit(block.permutation) === lit) return;
+    block.setPermutation(BlockPermutation.resolve(ARENA_BLOCK, { 'steveo:active': lit }));
+  } catch (err) {
+    log.warn(`switching the arena block ${lit ? 'on' : 'off'} failed: ${String(err)}`);
+  }
+}
+
+export function isLit(permutation: BlockPermutation): boolean {
+  return permutation.getAllStates()['steveo:active'] === true;
 }
 
 /**

@@ -11,7 +11,7 @@
 import { ItemStack, Player, system, world, type Block, type Vector3 } from '@minecraft/server';
 import { ActionFormData } from '@minecraft/server-ui';
 
-import { Arena, ARENA_BLOCK, JOIN_RANGE, log, MOB_PROPERTY, MOB_TAG, msg, PREFIX } from './arena';
+import { Arena, ARENA_BLOCK, isLit, JOIN_RANGE, log, MOB_PROPERTY, MOB_TAG, msg, PREFIX, setLit } from './arena';
 import { ALL_BOSSES, MODES, type Mode } from './waves';
 
 /** Two arenas this close would fight over the same mobs. */
@@ -104,6 +104,16 @@ system.beforeEvents.startup.subscribe((event) => {
       system.run(() => {
         if (player.isValid) onUse(player, block);
       });
+    },
+    // A block left lit with no battle behind it (the world reloaded
+    // mid-battle, or it ended while the block was unloaded) goes out.
+    onTick: (e) => {
+      const block = e.block;
+      if (!isLit(block.permutation)) return;
+      if (arenas.has(keyOf(block.dimension.id, block.location))) return;
+      const dimension = block.dimension;
+      const at = block.location;
+      system.run(() => setLit(dimension, at, false));
     },
   });
 });
