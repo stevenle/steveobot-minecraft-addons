@@ -67,7 +67,7 @@ function start(player: Player, block: Block, mode: Mode): void {
 }
 
 async function openMenu(player: Player, block: Block): Promise<void> {
-  const form = new ActionFormData().title({ translate: 'arena.menu.title' }).body(msg('arena.menu.body', String(JOIN_RANGE)));
+  const form = new ActionFormData().title({ translate: 'arena.menu.title' }).body({ translate: 'arena.menu.body' });
   for (const mode of MODES) {
     form.button(msg(`arena.menu.${mode.key}`, String(mode.bosses * mode.wavesPerBoss), String(mode.bosses)));
   }

@@ -15,10 +15,10 @@ entity.steveo:wither_king.name=§8Wither King
 
 ## Menu
 arena.menu.title=Battle Arena
-arena.menu.body=Choose a battle. Every player within %s blocks joins the fight.\n\nThe battle is won when the final boss falls, and lost once every fighter has died at least once.
-arena.menu.quick=§2Quick§r\n%s waves, %s bosses
-arena.menu.standard=§6Standard§r\n%s waves, %s bosses
-arena.menu.epic=§4Epic§r\n%s waves, %s bosses
+arena.menu.body=Select a challenge to begin. Nearby players automatically join the fight.\n\nSurvive the waves and defeat the final boss to claim victory. Each fighter gets one life - if everyone falls, the battle is lost.
+arena.menu.quick=§2Quick§r\n%s waves + %s bosses
+arena.menu.standard=§6Standard§r\n%s waves + %s bosses
+arena.menu.epic=§4Epic§r\n%s waves + %s bosses
 
 arena.mode.quick=Quick
 arena.mode.standard=Standard
