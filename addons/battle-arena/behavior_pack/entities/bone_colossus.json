@@ -38,17 +38,6 @@
         "priority": 6,
         "speed_multiplier": 1
       },
-      "minecraft:behavior.ranged_attack": {
-        "attack_interval": {
-          "min": 2,
-          "max": 2
-        },
-        "attack_range": {
-          "min": 0,
-          "max": 15
-        },
-        "priority": 0
-      },
       "minecraft:breathable": {
         "breathes_water": true,
         "suffocate_time": 0,
@@ -61,7 +50,7 @@
       },
       "minecraft:conditional_bandwidth_optimization": {},
       "minecraft:equipment": {
-        "table": "loot_tables/entities/skeleton_gear.json"
+        "table": "loot_tables/entities/wither_skeleton_gear.json"
       },
       "minecraft:experience_reward": {
         "on_death": "100"
@@ -77,7 +66,7 @@
         "table": "loot_tables/empty.json"
       },
       "minecraft:movement": {
-        "value": 0.25
+        "value": 0.27
       },
       "minecraft:movement.basic": {},
       "minecraft:nameable": {},
@@ -90,10 +79,6 @@
       "minecraft:pushable_by_block": {},
       "minecraft:pushable_by_entity": {},
       "minecraft:rotation_locked_to_vehicle": {},
-      "minecraft:shooter": {
-        "def": "minecraft:arrow",
-        "aux_val": 19
-      },
       "minecraft:type_family": {
         "family": [
           "skeleton",
@@ -102,6 +87,14 @@
           "mob",
           "steveo_arena_boss"
         ]
+      },
+      "minecraft:attack": {
+        "damage": 11
+      },
+      "minecraft:behavior.melee_box_attack": {
+        "speed_multiplier": 1.25,
+        "track_target": true,
+        "priority": 4
       },
       "minecraft:scale": {
         "value": 2.5
