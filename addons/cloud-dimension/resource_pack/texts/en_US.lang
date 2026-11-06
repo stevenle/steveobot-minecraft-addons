@@ -1,0 +1,21 @@
+## Strings for the Cloud Dimension add-on.
+## Client-side translations live in the resource pack; the behavior pack
+## references them by key with RawMessage { translate: ... }.
+
+tile.steveo:cloud_portal.name=Cloud Portal
+tile.steveo:cloud_block.name=Cloud Block
+
+clouds.arrive.title=The Cloud Dimension
+clouds.arrive.subtitle=Mind the edge!
+clouds.arrive.first=You float up into the clouds. Step on the Cloud Portal to go home. Fall off the edge and you will drift back down home too.
+clouds.home=You drift back down through the clouds.
+clouds.fell=You fell through the clouds! You float down near where you left.
+clouds.building=Building the cloud islands...
+clouds.broken=The Cloud Dimension could not load, so Cloud Portals will not work. Please send this to whoever set up the add-ons: %s
+clouds.island_portal=This Cloud Portal is the way home. It cannot be broken.
+
+clouds.debug.help=Usage: /scriptevent steveo:clouds <check|go|home|portal|rebuild>
+clouds.debug.check=Load check: %s
+clouds.debug.portal=A Cloud Portal has been placed in your inventory.
+clouds.debug.rebuilt=The starter island was rebuilt.
+clouds.debug.error=That failed: %s

@@ -1,0 +1,32 @@
+{
+  "format_version": "1.21.90",
+  "minecraft:block": {
+    "description": {
+      "identifier": "steveo:cloud_portal",
+      "menu_category": {
+        "category": "construction"
+      }
+    },
+    "components": {
+      "minecraft:display_name": "tile.steveo:cloud_portal.name",
+      "minecraft:geometry": "minecraft:geometry.full_block",
+      "minecraft:material_instances": {
+        "*": {
+          "texture": "steveo_cloud_portal_side",
+          "render_method": "opaque"
+        },
+        "up": {
+          "texture": "steveo_cloud_portal_top",
+          "render_method": "opaque"
+        }
+      },
+      "minecraft:map_color": "#9AD8FF",
+      "minecraft:light_emission": 10,
+      "minecraft:destructible_by_explosion": false,
+      "minecraft:destructible_by_mining": {
+        "seconds_to_destroy": 1
+      },
+      "steveo:cloud_portal": {}
+    }
+  }
+}

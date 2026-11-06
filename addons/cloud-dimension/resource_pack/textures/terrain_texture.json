@@ -1,0 +1,17 @@
+{
+  "resource_pack_name": "cloud-dimension",
+  "texture_name": "atlas.terrain",
+  "padding": 8,
+  "num_mip_levels": 4,
+  "texture_data": {
+    "steveo_cloud_portal_top": {
+      "textures": "textures/blocks/cloud_portal_top"
+    },
+    "steveo_cloud_portal_side": {
+      "textures": "textures/blocks/cloud_portal_side"
+    },
+    "steveo_cloud_block": {
+      "textures": "textures/blocks/cloud_block"
+    }
+  }
+}
