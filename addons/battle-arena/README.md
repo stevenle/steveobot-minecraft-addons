@@ -63,7 +63,7 @@ Or `/scriptevent steveo:arena give`.
   |---|---|---|---|---|---|
   | 1 | Zombie Titan | zombie | 2.5× | 280 | hits for 10 |
   | 1 | The Executioner | vindicator | 2.4× | 280 | swings a giant axe for 13 |
-  | 2 | Bone Colossus | skeleton | 2.5× | 250 | rapid slowness arrows |
+  | 2 | Bone Colossus | skeleton | 2.5× | 250 | swings a stone sword for 11 |
   | 2 | Iron Tyrant | iron golem | 1.6× | 400 | hits for 10–24, flings you |
   | 3 | Alpha Ravager | ravager | 1.5× | 450 | hits for 16, roars |
   | 3 | Wither King | wither skeleton | 2.2× | 375 | hits for 12 plus Wither |
