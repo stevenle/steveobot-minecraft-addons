@@ -4,7 +4,7 @@
     "description": {
       "identifier": "steveo:iron_tyrant",
       "materials": {
-        "default": "iron_golem"
+        "default": "entity_alphatest"
       },
       "textures": {
         "default": "textures/entity/iron_golem",
