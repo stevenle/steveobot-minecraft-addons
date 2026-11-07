@@ -1,0 +1,36 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:attachable": {
+    "description": {
+      "identifier": "steveo:cloud_staff",
+      "materials": {
+        "default": "entity_emissive_alpha",
+        "enchanted": "entity_alphatest_glint"
+      },
+      "textures": {
+        "default": "textures/entity/cloud_staff",
+        "enchanted": "textures/misc/enchanted_item_glint"
+      },
+      "geometry": {
+        "default": "geometry.steveo_cloud_staff"
+      },
+      "animations": {
+        "first_person": "animation.steveo_cloud_staff.first_person",
+        "third_person": "animation.steveo_cloud_staff.third_person"
+      },
+      "scripts": {
+        "animate": [
+          {
+            "first_person": "context.is_first_person"
+          },
+          {
+            "third_person": "!context.is_first_person"
+          }
+        ]
+      },
+      "render_controllers": [
+        "controller.render.item_default"
+      ]
+    }
+  }
+}

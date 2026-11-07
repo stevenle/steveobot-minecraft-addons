@@ -1,0 +1,39 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.steveo_cloud_staff.first_person": {
+      "loop": true,
+      "bones": {
+        "root": {
+          "rotation": [
+            90,
+            60,
+            -40
+          ],
+          "position": [
+            4,
+            1,
+            2
+          ]
+        }
+      }
+    },
+    "animation.steveo_cloud_staff.third_person": {
+      "loop": true,
+      "bones": {
+        "root": {
+          "rotation": [
+            90,
+            0,
+            -20
+          ],
+          "position": [
+            0,
+            3,
+            1
+          ]
+        }
+      }
+    }
+  }
+}
