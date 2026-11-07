@@ -1,0 +1,189 @@
+{
+  "format_version": "1.8.0",
+  "render_controllers": {
+    "controller.render.steveo_nimbus_king": {
+      "geometry": "Geometry.default",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.default"
+      ],
+      "overlay_color": {
+        "r": "1.0",
+        "g": "1.0",
+        "b": "1.0",
+        "a": "0.55"
+      }
+    },
+    "controller.render.steveo_nimbus_king_eyes": {
+      "geometry": "Geometry.breeze_eyes",
+      "materials": [
+        {
+          "*": "Material.breeze_eyes"
+        }
+      ],
+      "textures": [
+        "Texture.breeze_eyes"
+      ],
+      "ignore_lighting": true
+    },
+    "controller.render.steveo_nimbus_king_wind_top": {
+      "geometry": "Geometry.breeze_wind_top",
+      "materials": [
+        {
+          "*": "Material.breeze_wind"
+        }
+      ],
+      "textures": [
+        "Texture.breeze_wind"
+      ],
+      "uv_anim": {
+        "offset": [
+          "((Math.floor(query.life_time * 20.0) + query.frame_alpha) * 0.02)",
+          "(0.0)"
+        ],
+        "scale": [
+          1,
+          1
+        ]
+      },
+      "light_color_multiplier": 1.8
+    },
+    "controller.render.steveo_nimbus_king_wind_mid": {
+      "geometry": "Geometry.breeze_wind_mid",
+      "materials": [
+        {
+          "*": "Material.breeze_wind"
+        }
+      ],
+      "textures": [
+        "Texture.breeze_wind"
+      ],
+      "uv_anim": {
+        "offset": [
+          "((Math.floor(query.life_time * 20.0) + query.frame_alpha) * 0.025)",
+          "(0.0)"
+        ],
+        "scale": [
+          1,
+          1
+        ]
+      },
+      "light_color_multiplier": 1.8
+    },
+    "controller.render.steveo_nimbus_king_wind_bottom": {
+      "geometry": "Geometry.breeze_wind_bottom",
+      "materials": [
+        {
+          "*": "Material.breeze_wind"
+        }
+      ],
+      "textures": [
+        "Texture.breeze_wind"
+      ],
+      "uv_anim": {
+        "offset": [
+          "((Math.floor(query.life_time * 20.0) + query.frame_alpha) * 0.03)",
+          "(0.0)"
+        ],
+        "scale": [
+          1,
+          1
+        ]
+      },
+      "light_color_multiplier": 1.8
+    },
+    "controller.render.steveo_charge": {
+      "geometry": "Geometry.default",
+      "materials": [
+        {
+          "*": "Material.default"
+        }
+      ],
+      "textures": [
+        "Texture.default"
+      ]
+    },
+    "controller.render.steveo_charge_eyes": {
+      "geometry": "Geometry.breeze_eyes",
+      "materials": [
+        {
+          "*": "Material.breeze_eyes"
+        }
+      ],
+      "textures": [
+        "Texture.breeze_eyes"
+      ],
+      "ignore_lighting": true
+    },
+    "controller.render.steveo_charge_wind_top": {
+      "geometry": "Geometry.breeze_wind_top",
+      "materials": [
+        {
+          "*": "Material.breeze_wind"
+        }
+      ],
+      "textures": [
+        "Texture.breeze_wind"
+      ],
+      "uv_anim": {
+        "offset": [
+          "((Math.floor(query.life_time * 20.0) + query.frame_alpha) * 0.02)",
+          "(0.0)"
+        ],
+        "scale": [
+          1,
+          1
+        ]
+      },
+      "light_color_multiplier": 1.8
+    },
+    "controller.render.steveo_charge_wind_mid": {
+      "geometry": "Geometry.breeze_wind_mid",
+      "materials": [
+        {
+          "*": "Material.breeze_wind"
+        }
+      ],
+      "textures": [
+        "Texture.breeze_wind"
+      ],
+      "uv_anim": {
+        "offset": [
+          "((Math.floor(query.life_time * 20.0) + query.frame_alpha) * 0.025)",
+          "(0.0)"
+        ],
+        "scale": [
+          1,
+          1
+        ]
+      },
+      "light_color_multiplier": 1.8
+    },
+    "controller.render.steveo_charge_wind_bottom": {
+      "geometry": "Geometry.breeze_wind_bottom",
+      "materials": [
+        {
+          "*": "Material.breeze_wind"
+        }
+      ],
+      "textures": [
+        "Texture.breeze_wind"
+      ],
+      "uv_anim": {
+        "offset": [
+          "((Math.floor(query.life_time * 20.0) + query.frame_alpha) * 0.03)",
+          "(0.0)"
+        ],
+        "scale": [
+          1,
+          1
+        ]
+      },
+      "light_color_multiplier": 1.8
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "entity_sounds": {
+    "entities": {
+      "steveo:floatato": {
+        "volume": 0.8,
+        "pitch": [1.2, 1.5],
+        "events": {
+          "ambient": "mob.allay.idle",
+          "hurt": "mob.allay.hurt"
+        }
+      },
+      "steveo:nimbus_king": {
+        "volume": 1.0,
+        "pitch": [0.5, 0.6],
+        "events": {
+          "ambient": "mob.breeze.idle_air",
+          "ambient.in.air": "mob.breeze.idle_air",
+          "hurt": "mob.breeze.hurt",
+          "death": "mob.breeze.death"
+        }
+      },
+      "steveo:charge": {
+        "volume": 1.0,
+        "pitch": [1.2, 1.4],
+        "events": {
+          "ambient": "mob.breeze.idle_air",
+          "ambient.in.air": "mob.breeze.idle_air",
+          "hurt": "mob.breeze.hurt",
+          "death": "mob.breeze.death"
+        }
+      }
+    }
+  }
+}

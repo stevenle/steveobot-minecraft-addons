@@ -1,0 +1,194 @@
+{
+  "format_version": "1.26.30",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "steveo:floatato",
+      "is_spawnable": true,
+      "is_summonable": true
+    },
+    "component_groups": {
+      "steveo:plain": {
+        "minecraft:variant": {
+          "value": 0
+        }
+      },
+      "steveo:golden": {
+        "minecraft:variant": {
+          "value": 1
+        }
+      },
+      "steveo:wild": {
+        "minecraft:behavior.random_hover": {
+          "priority": 9,
+          "xz_dist": 2,
+          "y_dist": 1,
+          "y_offset": -1,
+          "interval": 1,
+          "hover_height": {
+            "min": 1,
+            "max": 2
+          }
+        },
+        "minecraft:tameable": {
+          "probability": 1,
+          "tame_items": [
+            "minecraft:potato",
+            "minecraft:baked_potato"
+          ],
+          "tame_event": {
+            "event": "steveo:on_tame",
+            "target": "self"
+          }
+        }
+      },
+      "steveo:tamed": {
+        "minecraft:is_tamed": {},
+        "minecraft:behavior.follow_owner": {
+          "priority": 3,
+          "speed_multiplier": 8,
+          "start_distance": 4,
+          "stop_distance": 2,
+          "can_teleport": true
+        },
+        "minecraft:behavior.random_hover": {
+          "priority": 9,
+          "xz_dist": 4,
+          "y_dist": 2,
+          "y_offset": -1,
+          "interval": 1,
+          "hover_height": {
+            "min": 1,
+            "max": 2
+          }
+        }
+      }
+    },
+    "components": {
+      "minecraft:type_family": {
+        "family": [
+          "steveo_floatato",
+          "mob"
+        ]
+      },
+      "minecraft:health": {
+        "value": 10,
+        "max": 10
+      },
+      "minecraft:collision_box": {
+        "width": 0.5,
+        "height": 0.6
+      },
+      "minecraft:physics": {
+        "has_gravity": false
+      },
+      "minecraft:can_fly": {},
+      "minecraft:jump.static": {},
+      "minecraft:movement": {
+        "value": 0.1
+      },
+      "minecraft:flying_speed": {
+        "value": 0.1
+      },
+      "minecraft:movement.hover": {},
+      "minecraft:navigation.hover": {
+        "can_path_over_water": true,
+        "can_sink": false,
+        "can_pass_doors": false,
+        "can_path_from_air": true,
+        "avoid_water": false,
+        "avoid_damage_blocks": true,
+        "avoid_sun": false
+      },
+      "minecraft:breathable": {
+        "total_supply": 15,
+        "suffocate_time": 0,
+        "breathes_air": true,
+        "breathes_water": true
+      },
+      "minecraft:pushable_by_block": {},
+      "minecraft:persistent": {},
+      "minecraft:nameable": {
+        "always_show": false,
+        "allow_name_tag_renaming": true
+      },
+      "minecraft:fire_immune": {},
+      "minecraft:ambient_sound_interval": {
+        "value": 10,
+        "range": 16,
+        "event_name": "ambient"
+      },
+      "minecraft:damage_sensor": {
+        "triggers": [
+          {
+            "cause": "void",
+            "deals_damage": "yes"
+          },
+          {
+            "cause": "all",
+            "deals_damage": "no"
+          }
+        ]
+      },
+      "minecraft:conditional_bandwidth_optimization": {},
+      "minecraft:behavior.look_at_player": {
+        "priority": 10,
+        "look_distance": 8,
+        "probability": 0.05
+      },
+      "minecraft:behavior.random_look_around": {
+        "priority": 11
+      }
+    },
+    "events": {
+      "minecraft:entity_spawned": {
+        "sequence": [
+          {
+            "randomize": [
+              {
+                "weight": 9,
+                "add": {
+                  "component_groups": ["steveo:plain"]
+                }
+              },
+              {
+                "weight": 1,
+                "add": {
+                  "component_groups": ["steveo:golden"]
+                }
+              }
+            ]
+          },
+          {
+            "add": {
+              "component_groups": ["steveo:wild"]
+            }
+          }
+        ]
+      },
+      "steveo:make_golden": {
+        "remove": {
+          "component_groups": ["steveo:plain"]
+        },
+        "add": {
+          "component_groups": ["steveo:golden"]
+        }
+      },
+      "steveo:make_plain": {
+        "remove": {
+          "component_groups": ["steveo:golden"]
+        },
+        "add": {
+          "component_groups": ["steveo:plain"]
+        }
+      },
+      "steveo:on_tame": {
+        "remove": {
+          "component_groups": ["steveo:wild"]
+        },
+        "add": {
+          "component_groups": ["steveo:tamed"]
+        }
+      }
+    }
+  }
+}

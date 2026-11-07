@@ -1,0 +1,35 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "steveo:storm_crystal_recipe"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "FGF",
+      "GDG",
+      "FGF"
+    ],
+    "key": {
+      "F": {
+        "item": "minecraft:feather"
+      },
+      "G": {
+        "item": "minecraft:glass"
+      },
+      "D": {
+        "item": "minecraft:diamond"
+      }
+    },
+    "unlock": [
+      {
+        "item": "minecraft:diamond"
+      }
+    ],
+    "result": {
+      "item": "steveo:storm_crystal"
+    }
+  }
+}

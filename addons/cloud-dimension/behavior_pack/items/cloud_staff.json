@@ -1,0 +1,26 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:item": {
+    "description": {
+      "identifier": "steveo:cloud_staff",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": "steveo_cloud_staff",
+      "minecraft:display_name": {
+        "value": "item.steveo:cloud_staff.name"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:hand_equipped": true,
+      "minecraft:rarity": "epic",
+      "minecraft:glint": true,
+      "minecraft:can_destroy_in_creative": false,
+      "minecraft:cooldown": {
+        "category": "steveo_cloud_staff",
+        "duration": 3
+      }
+    }
+  }
+}

@@ -4,18 +4,51 @@
 
 tile.steveo:cloud_portal.name=Cloud Portal
 tile.steveo:cloud_block.name=Cloud Block
+tile.steveo:gust_pad.name=Gust Pad
+tile.steveo:storm_altar.name=Storm Altar
+
+item.steveo:cloud_staff.name=Cloud Staff
+item.steveo:storm_crystal.name=Storm Crystal
+
+entity.steveo:floatato.name=Floatato
+entity.steveo:charge.name=Charge
+entity.steveo:nimbus_king.name=Nimbus King
+item.spawn_egg.entity.steveo:floatato.name=Spawn Floatato
+item.spawn_egg.entity.steveo:charge.name=Spawn Charge
+item.spawn_egg.entity.steveo:nimbus_king.name=Spawn Nimbus King
 
 clouds.arrive.title=The Cloud Dimension
 clouds.arrive.subtitle=Mind the edge!
-clouds.arrive.first=You float up into the clouds. Step on the Cloud Portal to go home. Fall off the edge and you will drift back down home too.
+clouds.arrive.first=You float up into the clouds. Step on the Cloud Portal to go home. Fall off the edge and you will drift back down home too. Look where you want to go and step on a Gust Pad to fly to the next island.
 clouds.home=You drift back down through the clouds.
 clouds.fell=You fell through the clouds! You float down near where you left.
 clouds.building=Building the cloud islands...
-clouds.broken=The Cloud Dimension could not load, so Cloud Portals will not work. Please send this to whoever set up the add-ons: %s
+clouds.castle_building=Far away, the Sky Castle is rising out of the clouds...
+clouds.castle_ready=The Sky Castle has appeared at the end of the islands! Follow the Gust Pads.
+clouds.broken=The Cloud Dimension could not load everything, so parts of it will not work. Please send this to whoever set up the add-ons: %s
 clouds.island_portal=This Cloud Portal is the way home. It cannot be broken.
 
-clouds.debug.help=Usage: /scriptevent steveo:clouds <check|go|home|portal|rebuild>
+clouds.altar.need_crystal=The altar hums. Hold a Storm Crystal and tap it to call the Nimbus King.
+clouds.altar.busy=The Nimbus King is already here!
+clouds.altar.unbreakable=The Storm Altar cannot be broken.
+clouds.king.title=THE NIMBUS KING
+clouds.king.subtitle=Ruler of the clouds
+clouds.king.defeated.title=VICTORY!
+clouds.king.defeated.subtitle=The Nimbus King dropped the Cloud Staff
+
+clouds.staff.lore=§bFires a wind charge
+clouds.staff.lore_cooldown=§7Rests 3 seconds between shots
+
+clouds.floatato.tamed=The Floatato is yours! It will follow you, and catch you if you fall.
+clouds.floatato.golden.title=GOLDEN FLOATATO!
+clouds.floatato.golden.subtitle=The rarest potato in the sky
+clouds.floatato.caught=Your Floatato caught you!
+clouds.floatato.caught_golden=Your Golden Floatato caught you!
+
+clouds.debug.help=Usage: /scriptevent steveo:clouds <check|go|home|castle|arena|build|rebuild [start|start_pad|chain|castle]|boss|floatato [golden]|floatatoes|padpower [forward up]|portal|pad|crystal|staff>
 clouds.debug.check=Load check: %s
-clouds.debug.portal=A Cloud Portal has been placed in your inventory.
-clouds.debug.rebuilt=The starter island was rebuilt.
+clouds.debug.rebuilt=Rebuilt: %s
+clouds.debug.spawned=Spawned a %s.
+clouds.debug.case=Floatatoes in the glass case: %s
+clouds.debug.padpower=Gust Pad power: forward %s, up %s. Set it with: /scriptevent steveo:clouds padpower <forward> <up>
 clouds.debug.error=That failed: %s

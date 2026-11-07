@@ -54,18 +54,15 @@ update packs, so removing it takes these steps, in this order:
       Gives the super gear something to fight, and it is co-op.
 - [ ] **Mario Kart Race Kit** (improves `mario`). Boost pads, item boxes,
       bananas, green shells, and a lap counter, so two players can race.
-- [ ] **Cloud Dimension** (`cloud-dimension`, in progress). Built in steps,
-      each checked on the Realm before the next:
-  - [x] Custom dimension, Cloud Portal, starter island, falling-home safety net
-  - [ ] More islands to hop between, with Gust Pads that launch you
-  - [ ] Sky Castle, with Charge minions guarding it
-  - [ ] Floatatoes: only in the castle, behind normal glass; tame with a potato,
-        they follow you and catch you when you fall (golden ones are rare)
-  - [ ] Nimbus King: giant breeze, 1500 HP, boss bar, wind charge volleys,
-        summons Charge minions (10/15/20/25 HP); called with a Storm Crystal
-        on the throne altar
-  - [ ] Cloud Staff: dropped by the Nimbus King, fires a wind charge,
-        fixed 3 second cooldown, never breaks
+- [ ] **Cloud Dimension** (`cloud-dimension`). Dimension, portal, starter
+      island and safety net verified on the Realm (1.0.0, 2026-11-06). 1.1.0
+      adds the rest, not yet tried in-game:
+  - [ ] Island chain with Gust Pads (launch strength may need tuning with
+        `/scriptevent steveo:clouds padpower`)
+  - [ ] Sky Castle with Charge minions in the courtyard and tower chests
+  - [ ] Floatatoes in the glass case: tame with a potato, follow, catch falls
+  - [ ] Nimbus King: 1500 HP, boss bar, volleys, summons Charges, Storm Altar
+  - [ ] Cloud Staff: wind charge, 3 second cooldown
 
 ## Later
 

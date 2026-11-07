@@ -12,6 +12,15 @@
     },
     "steveo_cloud_block": {
       "textures": "textures/blocks/cloud_block"
+    },
+    "steveo_gust_pad_top": {
+      "textures": "textures/blocks/gust_pad_top"
+    },
+    "steveo_storm_altar_side": {
+      "textures": "textures/blocks/storm_altar_side"
+    },
+    "steveo_storm_altar_top": {
+      "textures": "textures/blocks/storm_altar_top"
     }
   }
 }

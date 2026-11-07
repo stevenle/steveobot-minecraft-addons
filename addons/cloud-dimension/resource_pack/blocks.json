@@ -5,5 +5,11 @@
   },
   "steveo:cloud_block": {
     "sound": "cloth"
+  },
+  "steveo:gust_pad": {
+    "sound": "cloth"
+  },
+  "steveo:storm_altar": {
+    "sound": "stone"
   }
 }

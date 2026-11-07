@@ -1,0 +1,32 @@
+{
+  "format_version": "1.21.90",
+  "minecraft:block": {
+    "description": {
+      "identifier": "steveo:storm_altar",
+      "menu_category": {
+        "category": "construction"
+      }
+    },
+    "components": {
+      "minecraft:display_name": "tile.steveo:storm_altar.name",
+      "minecraft:geometry": "minecraft:geometry.full_block",
+      "minecraft:material_instances": {
+        "*": {
+          "texture": "steveo_storm_altar_side",
+          "render_method": "opaque"
+        },
+        "up": {
+          "texture": "steveo_storm_altar_top",
+          "render_method": "opaque"
+        }
+      },
+      "minecraft:map_color": "#5A6E9A",
+      "minecraft:light_emission": 8,
+      "minecraft:destructible_by_explosion": false,
+      "minecraft:destructible_by_mining": {
+        "seconds_to_destroy": 2
+      },
+      "steveo:storm_altar": {}
+    }
+  }
+}
