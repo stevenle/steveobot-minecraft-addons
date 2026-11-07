@@ -275,7 +275,10 @@ Three things constrain changes here:
   the skeleton, wither skeleton, ravager and vindicator copies rendered.
   Give such an entity its own plain render controller (default geometry,
   material, texture), and prefer an older 1.8.0-format vanilla client file
-  over a heavy current one.
+  over a heavy current one. Check the material too: the Iron Tyrant stayed
+  invisible with the plain controller (2026-11-06) until its `iron_golem`
+  material, which expects a second crack-overlay texture, was swapped for
+  `entity_alphatest`.
 - Do not set `isolated_physics: true` on a projectile entity that a script
   launches with `ProjectileComponent.shoot()`: on 1.26.50 the entity spawned
   but never moved (potato-gun, 2026-09-16). It is meant for projectiles fired

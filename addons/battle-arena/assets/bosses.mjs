@@ -164,7 +164,12 @@ const BOSSES = [
     fold: [],
     // The vanilla client file names controller.render.iron_golem, which no
     // published render controller file defines; the boss rendered nothing.
+    // With our plain controller it was still invisible (2026-11-06): the
+    // vanilla iron_golem material layers the crack overlay as a second
+    // texture, and the plain controller hands it only one. entity_alphatest
+    // is the ordinary single-texture mob material.
     ownRenderController: true,
+    material: 'entity_alphatest',
     health: 400,
     attack: { damage: { range_min: 10, range_max: 24 } },
     scale: 1.6,
@@ -261,6 +266,7 @@ for (const boss of BOSSES) {
   description.identifier = `steveo:${boss.key}`;
   delete description.spawn_egg;
   if (boss.ownRenderController) description.render_controllers = [OWN_RENDER_CONTROLLER];
+  if (boss.material) description.materials = { default: boss.material };
   write(`resource_pack/entity/${boss.key}.entity.json`, client);
 }
 
