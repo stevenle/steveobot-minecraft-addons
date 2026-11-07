@@ -242,8 +242,11 @@ Three things constrain changes here:
   { Authflow } from 'prismarine-auth'` type-checks and then throws at runtime,
   so `auth.ts` goes through `createRequire`. Do not "tidy" that back to a named
   import.
-- **`.realms-auth/` holds live Xbox tokens.** It is git-ignored; keep it that
-  way, and never log token contents.
+- **The token cache holds live Xbox tokens.** It lives outside the repo, at
+  `~/.config/steveobot-minecraft-addons/realms-auth/` (`REALMS_AUTH_DIR`
+  overrides it), so worktrees share one sign-in and nothing needs a symlink.
+  Never log token contents, and keep `.realms-auth/` in `.gitignore` in case
+  an old checkout still has one.
 
 ## Gotchas
 

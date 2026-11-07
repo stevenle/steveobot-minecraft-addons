@@ -510,7 +510,7 @@ describe('realm.ts against a stand-in Realms service', () => {
     assert.match(err.stdout, /refused to start an upload\s+session/);
     assert.match(err.stdout, /not an auth failure/);
     assert.ok(
-      !err.stderr.includes('Delete .realms-auth/'),
+      !err.stderr.includes('Realms rejected the credentials'),
       'must not give the generic bad-credentials advice',
     );
     assert.ok(
