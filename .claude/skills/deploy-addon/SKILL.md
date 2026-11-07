@@ -23,7 +23,7 @@ Run `pnpm check` first; never deploy a build that has not passed it.
 ## Realm upload
 
 ```bash
-pnpm realm --list-realms                                    # find the id; needs cached login (.realms-auth/)
+pnpm realm --list-realms                                    # find the id; needs a cached login (~/.config/steveobot-minecraft-addons/realms-auth/)
 pnpm realm <slug> --realm <id> --upload --close --yes       # pull live world, bake packs, upload
 ```
 

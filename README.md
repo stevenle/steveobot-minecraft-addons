@@ -233,8 +233,10 @@ so you are never applying packs to a stale export. `--slot <n>` and
 `--backup <id>` override that.
 
 Sign-in uses Microsoft's device-code flow: it prints a URL and a code, you
-approve in a browser, and the resulting tokens are cached in `.realms-auth/`
-(git-ignored — treat that folder like a password). No password ever reaches
+approve in a browser, and the resulting tokens are cached in
+`~/.config/steveobot-minecraft-addons/realms-auth/` (treat that folder like a
+password; `REALMS_AUTH_DIR` overrides it). It sits outside the repo so every
+clone and git worktree shares the one sign-in. No password ever reaches
 this tooling. Add `--account you@example.com` to keep several accounts apart,
 and `--preview` for Preview Realms, which hold entirely separate worlds.
 

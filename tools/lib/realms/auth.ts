@@ -10,10 +10,10 @@
  * happens on Microsoft's own page; we only ever hold the resulting tokens, and
  * they live in the cache directory below.
  */
+import fs from 'node:fs';
 import { createRequire } from 'node:module';
+import os from 'node:os';
 import path from 'node:path';
-
-import { repoRoot } from '../paths.ts';
 
 // prismarine-auth is CommonJS and builds its exports with inline require()
 // calls, which Node's CJS-to-ESM lexer cannot see. `import { Authflow }` type-
@@ -27,8 +27,22 @@ const { Authflow, Titles } = require('prismarine-auth') as typeof import('prisma
  */
 export const REALMS_RELYING_PARTY = 'https://pocket.realms.minecraft.net/';
 
-/** Where cached Microsoft/Xbox tokens are written. Git-ignored. */
-export const DEFAULT_CACHE_DIR = path.join(repoRoot, '.realms-auth');
+/**
+ * Where cached Microsoft/Xbox tokens are written: REALMS_AUTH_DIR if set,
+ * otherwise $XDG_CONFIG_HOME/steveobot-minecraft-addons/realms-auth, which is
+ * ~/.config/... on every platform this tooling runs on. It lives outside the
+ * repository so every checkout and worktree shares one sign-in, and so the
+ * tokens can never end up in a commit.
+ */
+export const DEFAULT_CACHE_DIR = resolveCacheDir();
+
+function resolveCacheDir(): string {
+  const override = process.env['REALMS_AUTH_DIR'];
+  if (override !== undefined && override !== '') return path.resolve(override);
+  const xdg = process.env['XDG_CONFIG_HOME'];
+  const configHome = xdg !== undefined && xdg !== '' ? xdg : path.join(os.homedir(), '.config');
+  return path.join(configHome, 'steveobot-minecraft-addons', 'realms-auth');
+}
 
 export type AuthFlowKind = 'live' | 'msal' | 'sisu';
 
@@ -86,6 +100,10 @@ export async function authorizeRealms(
     flow = 'live',
     onDeviceCode,
   } = options;
+
+  // prismarine-auth creates the folder too, but with default permissions;
+  // these are live account tokens, so keep them readable by this user only.
+  fs.mkdirSync(cacheDir, { recursive: true, mode: 0o700 });
 
   const authflow = new Authflow(
     username,

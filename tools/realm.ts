@@ -333,7 +333,7 @@ function explainApiError(err: unknown): never {
     if (err.status === 401 || err.status === 403) {
       log.error(err.message);
       fail(
-        'Realms rejected the credentials. Delete .realms-auth/ and sign in again, and check ' +
+        `Realms rejected the credentials. Delete ${rel(DEFAULT_CACHE_DIR)} and sign in again, and check ` +
           'the account actually owns or has joined a Realm.',
       );
     }
