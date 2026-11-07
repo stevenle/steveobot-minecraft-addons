@@ -19,7 +19,7 @@
       "minecraft:can_destroy_in_creative": false,
       "minecraft:cooldown": {
         "category": "steveo_cloud_staff",
-        "duration": 3
+        "duration": 1.5
       }
     }
   }

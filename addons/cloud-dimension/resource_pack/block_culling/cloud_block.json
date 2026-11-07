@@ -1,0 +1,202 @@
+{
+  "format_version": "1.21.90",
+  "minecraft:block_culling_rules": {
+    "description": {
+      "identifier": "steveo:cloud_block_culling"
+    },
+    "rules": [
+      {
+        "geometry_part": {
+          "bone": "bulge_west"
+        },
+        "direction": "west",
+        "condition": "default"
+      },
+      {
+        "geometry_part": {
+          "bone": "core",
+          "cube": 0,
+          "face": "west"
+        },
+        "direction": "west",
+        "condition": "default"
+      },
+      {
+        "geometry_part": {
+          "bone": "bulge_west"
+        },
+        "direction": "west",
+        "condition": "same_culling_layer"
+      },
+      {
+        "geometry_part": {
+          "bone": "core",
+          "cube": 0,
+          "face": "west"
+        },
+        "direction": "west",
+        "condition": "same_culling_layer"
+      },
+      {
+        "geometry_part": {
+          "bone": "bulge_east"
+        },
+        "direction": "east",
+        "condition": "default"
+      },
+      {
+        "geometry_part": {
+          "bone": "core",
+          "cube": 0,
+          "face": "east"
+        },
+        "direction": "east",
+        "condition": "default"
+      },
+      {
+        "geometry_part": {
+          "bone": "bulge_east"
+        },
+        "direction": "east",
+        "condition": "same_culling_layer"
+      },
+      {
+        "geometry_part": {
+          "bone": "core",
+          "cube": 0,
+          "face": "east"
+        },
+        "direction": "east",
+        "condition": "same_culling_layer"
+      },
+      {
+        "geometry_part": {
+          "bone": "bulge_north"
+        },
+        "direction": "north",
+        "condition": "default"
+      },
+      {
+        "geometry_part": {
+          "bone": "core",
+          "cube": 0,
+          "face": "north"
+        },
+        "direction": "north",
+        "condition": "default"
+      },
+      {
+        "geometry_part": {
+          "bone": "bulge_north"
+        },
+        "direction": "north",
+        "condition": "same_culling_layer"
+      },
+      {
+        "geometry_part": {
+          "bone": "core",
+          "cube": 0,
+          "face": "north"
+        },
+        "direction": "north",
+        "condition": "same_culling_layer"
+      },
+      {
+        "geometry_part": {
+          "bone": "bulge_south"
+        },
+        "direction": "south",
+        "condition": "default"
+      },
+      {
+        "geometry_part": {
+          "bone": "core",
+          "cube": 0,
+          "face": "south"
+        },
+        "direction": "south",
+        "condition": "default"
+      },
+      {
+        "geometry_part": {
+          "bone": "bulge_south"
+        },
+        "direction": "south",
+        "condition": "same_culling_layer"
+      },
+      {
+        "geometry_part": {
+          "bone": "core",
+          "cube": 0,
+          "face": "south"
+        },
+        "direction": "south",
+        "condition": "same_culling_layer"
+      },
+      {
+        "geometry_part": {
+          "bone": "bulge_up"
+        },
+        "direction": "up",
+        "condition": "default"
+      },
+      {
+        "geometry_part": {
+          "bone": "core",
+          "cube": 0,
+          "face": "up"
+        },
+        "direction": "up",
+        "condition": "default"
+      },
+      {
+        "geometry_part": {
+          "bone": "bulge_up"
+        },
+        "direction": "up",
+        "condition": "same_culling_layer"
+      },
+      {
+        "geometry_part": {
+          "bone": "core",
+          "cube": 0,
+          "face": "up"
+        },
+        "direction": "up",
+        "condition": "same_culling_layer"
+      },
+      {
+        "geometry_part": {
+          "bone": "bulge_down"
+        },
+        "direction": "down",
+        "condition": "default"
+      },
+      {
+        "geometry_part": {
+          "bone": "core",
+          "cube": 0,
+          "face": "down"
+        },
+        "direction": "down",
+        "condition": "default"
+      },
+      {
+        "geometry_part": {
+          "bone": "bulge_down"
+        },
+        "direction": "down",
+        "condition": "same_culling_layer"
+      },
+      {
+        "geometry_part": {
+          "bone": "core",
+          "cube": 0,
+          "face": "down"
+        },
+        "direction": "down",
+        "condition": "same_culling_layer"
+      }
+    ]
+  }
+}

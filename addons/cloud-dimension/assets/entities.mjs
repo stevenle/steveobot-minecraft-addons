@@ -13,12 +13,11 @@
 //   - players are the only targets;
 //   - health, scale, collision box and family are set; the king also gets a
 //     boss bar, knockback immunity and persistence, the Charge a random
-//     health of 10, 15, 20 or 25.
+//     health of 10, 15, 20 or 25. The collision box follows the custom
+//     model (a 3.5x box for the king; the Spark Orb's for the Charge).
 //
-// The client entities are the vanilla breeze's with their own copies of the
-// published breeze render controllers (a renamed vanilla client file whose
-// controllers resolve to nothing spawns invisible; see CLAUDE.md). The king's
-// copies add a white overlay so it reads as a cloud.
+// The client side (models, textures, animations, client entities) comes from
+// assets/models.mjs; the breeze's runtime identifier only drives behaviour.
 // The generated output is what gets committed.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -64,7 +63,7 @@ function patchBreeze({ id, health, scale, family, extra, groups, events }) {
   c['minecraft:behavior.hurt_by_target'] = { priority: 4 };
   c['minecraft:health'] = { value: health, max: health };
   c['minecraft:scale'] = { value: scale };
-  c['minecraft:collision_box'] = {
+  c['minecraft:collision_box'] = extra.collision ?? {
     width: Math.round(0.6 * scale * 100) / 100,
     height: Math.round(1.77 * scale * 100) / 100,
   };
@@ -116,7 +115,8 @@ const charge = patchBreeze({
   health: 20,
   scale: 0.75,
   family: ['steveo_charge'],
-  extra: { targetRadius: 20 },
+  // The Spark Orb model is about 16 pixels tall and 13 wide before the 0.75 scale.
+  extra: { targetRadius: 20, collision: { width: 0.6, height: 0.8 } },
   groups: chargeGroups,
   events: {
     'minecraft:entity_spawned': {
@@ -129,33 +129,3 @@ const charge = patchBreeze({
   },
 });
 write('behavior_pack/entities/charge.json', charge);
-
-// ---------- Client entities ----------
-const controllers = read('rp/breeze.render_controllers.json').render_controllers;
-const ownControllers = {};
-function clientFor(id, prefix, overlay) {
-  const file = read('rp/breeze.entity.json');
-  const d = file['minecraft:client_entity'].description;
-  d.identifier = id;
-  delete d.spawn_egg;
-  d.spawn_egg = { base_color: overlay ? '#F4F8FF' : '#9AD8FF', overlay_color: '#4A7FB5' };
-  d.render_controllers = Object.keys(controllers).map((name) => {
-    const own = name.replace('controller.render.breeze', `controller.render.${prefix}`);
-    const copy = structuredClone(controllers[name]);
-    if (overlay && name === 'controller.render.breeze') copy.overlay_color = overlay;
-    ownControllers[own] = copy;
-    return own;
-  });
-  return file;
-}
-write('resource_pack/entity/nimbus_king.entity.json', clientFor('steveo:nimbus_king', 'steveo_nimbus_king', {
-  r: '1.0',
-  g: '1.0',
-  b: '1.0',
-  a: '0.55',
-}));
-write('resource_pack/entity/charge.entity.json', clientFor('steveo:charge', 'steveo_charge'));
-write('resource_pack/render_controllers/breezes.render_controllers.json', {
-  format_version: '1.8.0',
-  render_controllers: ownControllers,
-});

@@ -37,7 +37,7 @@ clouds.king.defeated.title=VICTORY!
 clouds.king.defeated.subtitle=The Nimbus King dropped the Cloud Staff
 
 clouds.staff.lore=§bFires a wind charge
-clouds.staff.lore_cooldown=§7Rests 3 seconds between shots
+clouds.staff.lore_cooldown=§7Rests 1.5 seconds between shots
 
 clouds.floatato.tamed=The Floatato is yours! It will follow you, and catch you if you fall.
 clouds.floatato.golden.title=GOLDEN FLOATATO!

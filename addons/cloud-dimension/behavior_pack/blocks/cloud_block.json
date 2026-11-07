@@ -9,7 +9,11 @@
     },
     "components": {
       "minecraft:display_name": "tile.steveo:cloud_block.name",
-      "minecraft:geometry": "minecraft:geometry.full_block",
+      "minecraft:geometry": {
+        "identifier": "geometry.steveo_cloud_block",
+        "culling": "steveo:cloud_block_culling",
+        "culling_layer": "steveo:cloud"
+      },
       "minecraft:material_instances": {
         "*": {
           "texture": "steveo_cloud_block",

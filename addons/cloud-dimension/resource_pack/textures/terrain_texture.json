@@ -4,23 +4,17 @@
   "padding": 8,
   "num_mip_levels": 4,
   "texture_data": {
-    "steveo_cloud_portal_top": {
-      "textures": "textures/blocks/cloud_portal_top"
-    },
-    "steveo_cloud_portal_side": {
-      "textures": "textures/blocks/cloud_portal_side"
+    "steveo_cloud_portal": {
+      "textures": "textures/blocks/cloud_portal"
     },
     "steveo_cloud_block": {
       "textures": "textures/blocks/cloud_block"
     },
-    "steveo_gust_pad_top": {
-      "textures": "textures/blocks/gust_pad_top"
+    "steveo_gust_pad": {
+      "textures": "textures/blocks/gust_pad"
     },
-    "steveo_storm_altar_side": {
-      "textures": "textures/blocks/storm_altar_side"
-    },
-    "steveo_storm_altar_top": {
-      "textures": "textures/blocks/storm_altar_top"
+    "steveo_storm_altar": {
+      "textures": "textures/blocks/storm_altar"
     }
   }
 }

@@ -1,4 +1,4 @@
-// The Cloud Staff: fires a vanilla wind charge, then rests for 3 seconds.
+// The Cloud Staff: fires a vanilla wind charge, then rests for 1.5 seconds.
 //
 // The vanilla wind charge sets isolated_physics to false itself, so a
 // script-launched one moves (see the potato-gun gotcha in CLAUDE.md). It
@@ -10,7 +10,7 @@ import { onItemUse } from '@shared/use';
 import { CLOUD_STAFF } from './layout';
 
 const COOLDOWN_CATEGORY = 'steveo_cloud_staff';
-const COOLDOWN_TICKS = 60;
+const COOLDOWN_TICKS = 30;
 const SPEED = 1.5;
 const BONUS_DAMAGE = 6;
 /** Projectile id -> shooter, for the damage bonus; forgotten after a few seconds. */

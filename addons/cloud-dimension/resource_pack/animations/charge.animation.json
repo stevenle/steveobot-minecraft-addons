@@ -1,0 +1,38 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.steveo_charge.hover": {
+      "loop": true,
+      "bones": {
+        "head": {
+          "position": [
+            0,
+            "math.sin(query.life_time * 114.59) * 0.6",
+            0
+          ]
+        },
+        "ring_flat": {
+          "rotation": [
+            0,
+            "query.life_time * 286.48",
+            0
+          ]
+        },
+        "ring_a": {
+          "rotation": [
+            0,
+            "query.life_time * -229.18",
+            0
+          ]
+        },
+        "ring_b": {
+          "rotation": [
+            0,
+            "query.life_time * 171.89",
+            0
+          ]
+        }
+      }
+    }
+  }
+}

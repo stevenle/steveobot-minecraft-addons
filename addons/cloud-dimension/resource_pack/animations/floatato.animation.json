@@ -5,13 +5,32 @@
       "loop": true,
       "bones": {
         "root": {
-          "position": [0, "math.sin(query.life_time * 120.0) * 1.0", 0]
+          "position": [
+            0,
+            "math.sin(query.life_time * 126.05) * 0.6",
+            0
+          ]
         },
         "wing_left": {
-          "rotation": [0, 0, "math.sin(query.life_time * 1100.0) * 30.0"]
+          "rotation": [
+            0,
+            0,
+            "math.sin(query.life_time * 401.07) * 28"
+          ]
         },
         "wing_right": {
-          "rotation": [0, 0, "-math.sin(query.life_time * 1100.0) * 30.0"]
+          "rotation": [
+            0,
+            0,
+            "-math.sin(query.life_time * 401.07) * 28"
+          ]
+        },
+        "halo": {
+          "rotation": [
+            0,
+            "query.life_time * 114.59",
+            0
+          ]
         }
       }
     }

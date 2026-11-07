@@ -59,7 +59,7 @@ sides, feathers in the corners), so he can be fought again.
 ## The Cloud Staff
 
 Use it to fire a wind charge, which pushes mobs back and hits for extra damage.
-It rests for 3 seconds between shots and never breaks. Fire it at your feet to
+It rests for 1.5 seconds between shots and never breaks. Fire it at your feet to
 launch yourself.
 
 ## How it works
@@ -72,11 +72,20 @@ saved in a world dynamic property, so a restart resumes and nothing (mobs
 included) is placed twice. If ticking areas fail, tiles are built whenever a
 player happens to have them loaded.
 
-The Nimbus King and the Charge are generated from the vanilla breeze by
-`assets/entities.mjs` (see that file), keeping its format version and
-component shapes, with their own copies of the breeze render controllers. The
-Floatato's components follow Blub's, which load at the same format version.
-Textures come from `assets/generate.mjs`.
+The Nimbus King's and the Charge's behaviour is generated from the vanilla
+breeze by `assets/entities.mjs` (see that file), keeping its format version
+and component shapes. The Floatato's components follow Blub's, which load at
+the same format version.
+
+The models all come from `assets/models.mjs`: the blocks (Sky Gate portal,
+Puffy cloud, Fan Vent pad, Cloud Throne altar), the mobs (Angel Floatato,
+Spark Orb Charge, Breeze Emperor king) with their animations, and the Cloud
+Staff and Storm Crystal as 3D models in the hand. Each model maps onto its own
+atlas of painted swatches; glowing parts use a lower texture alpha on mobs and
+items (`entity_emissive_alpha`) and an undimmed material instance on blocks.
+The cloud block, placed in thousands, carries block culling rules so the
+lumps hidden by a neighbouring cloud block are not drawn. Item icons and the
+pack icon come from `assets/generate.mjs`.
 
 ## Debug
 

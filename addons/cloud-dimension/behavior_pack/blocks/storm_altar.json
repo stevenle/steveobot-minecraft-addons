@@ -9,19 +9,30 @@
     },
     "components": {
       "minecraft:display_name": "tile.steveo:storm_altar.name",
-      "minecraft:geometry": "minecraft:geometry.full_block",
+      "minecraft:geometry": "geometry.steveo_storm_altar",
       "minecraft:material_instances": {
         "*": {
-          "texture": "steveo_storm_altar_side",
+          "texture": "steveo_storm_altar",
           "render_method": "opaque"
         },
-        "up": {
-          "texture": "steveo_storm_altar_top",
-          "render_method": "opaque"
+        "glow": {
+          "texture": "steveo_storm_altar",
+          "render_method": "opaque",
+          "ambient_occlusion": false,
+          "face_dimming": false
         }
+      },
+      "minecraft:collision_box": {
+        "origin": [-5, 0, -5],
+        "size": [10, 11, 10]
+      },
+      "minecraft:selection_box": {
+        "origin": [-7, 0, -7],
+        "size": [14, 16, 14]
       },
       "minecraft:map_color": "#5A6E9A",
       "minecraft:light_emission": 8,
+      "minecraft:light_dampening": 0,
       "minecraft:destructible_by_explosion": false,
       "minecraft:destructible_by_mining": {
         "seconds_to_destroy": 2

@@ -1,0 +1,45 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.steveo_nimbus_king.hover": {
+      "loop": true,
+      "bones": {
+        "body": {
+          "position": [
+            0,
+            "math.sin(query.life_time * 80.21) * 0.6",
+            0
+          ]
+        },
+        "rods": {
+          "rotation": [
+            0,
+            "query.life_time * 103.13",
+            0
+          ]
+        },
+        "ring_top": {
+          "rotation": [
+            0,
+            "query.life_time * -143.24",
+            0
+          ]
+        },
+        "ring_mid": {
+          "rotation": [
+            0,
+            "query.life_time * 171.89",
+            0
+          ]
+        },
+        "ring_low": {
+          "rotation": [
+            0,
+            "query.life_time * -229.18",
+            0
+          ]
+        }
+      }
+    }
+  }
+}
