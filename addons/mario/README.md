@@ -87,6 +87,8 @@ the kart. Right-click / tap it (**Drive**) to get in.
 
 - Move forward to drive and look where you want to go. It steers like a
   horse, and it is faster than one.
+- Jump to hop with the kart. Hold the button to charge a bigger hop, like a
+  horse, and release to jump. You stay in the seat.
 - It climbs one-block steps, takes no fall, fire, lava, or drowning
   damage, and stays where you leave it.
 - Sneak to get out. Punch it a few times to break it back into the item.
@@ -151,5 +153,8 @@ Everything here has only passed `pnpm check`. Things to check first:
   `entities/kart.json`, down from 0.4 after a Realm test; horses top out
   near 0.34), its size (the model drawn at 1.25x by `scripts.scale` in
   `entity/kart.entity.json`, with the collision box and seat scaled to match), where the driver sits
-  (the seat position), which way the wheels roll, and that the item places
-  it.
+  (the seat position), how high it hops (`minecraft:horse.jump_strength` 0.6,
+  about two blocks when fully charged; the vanilla horse rolls 0.4 to 1.0),
+  which way the wheels roll (the sign on `query.modified_distance_moved` in
+  `animations/kart.animation.json`; a positive X rotation rolls the top of the
+  wheel toward the front), and that the item places it.

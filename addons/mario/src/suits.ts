@@ -120,6 +120,10 @@ system.runInterval(() => {
 // ---------- Squirrel Suit ----------
 
 function fly(player: Player): void {
+  // A rider is never "on ground", and the knockback below would pull the
+  // wearer out of the kart on the first jump or forward press. The kart
+  // handles its own hops.
+  if (player.getComponent('minecraft:riding') !== undefined) return;
   if (player.isOnGround || player.isFlying || player.isGliding || player.isInWater || player.isSneaking) return;
   const jump = player.inputInfo.getButtonState(InputButton.Jump) === ButtonState.Pressed;
   const forward = player.inputInfo.getMovementVector().y;

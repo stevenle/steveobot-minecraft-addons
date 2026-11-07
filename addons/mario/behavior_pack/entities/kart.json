@@ -13,6 +13,9 @@
       "minecraft:movement": { "value": 0.35 },
       "minecraft:movement.basic": {},
       "minecraft:input_ground_controlled": {},
+      "minecraft:can_power_jump": {},
+      "minecraft:jump.static": {},
+      "minecraft:horse.jump_strength": { "value": 0.6 },
       "minecraft:rideable": {
         "seat_count": 1,
         "controlling_seat": 0,
