@@ -1,0 +1,35 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "steveo:cloud_portal_recipe"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "FWF",
+      "WGW",
+      "FWF"
+    ],
+    "key": {
+      "F": {
+        "item": "minecraft:feather"
+      },
+      "W": {
+        "item": "minecraft:white_wool"
+      },
+      "G": {
+        "item": "minecraft:glass"
+      }
+    },
+    "unlock": [
+      {
+        "item": "minecraft:feather"
+      }
+    ],
+    "result": {
+      "item": "steveo:cloud_portal"
+    }
+  }
+}

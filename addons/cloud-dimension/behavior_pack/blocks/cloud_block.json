@@ -1,0 +1,29 @@
+{
+  "format_version": "1.21.90",
+  "minecraft:block": {
+    "description": {
+      "identifier": "steveo:cloud_block",
+      "menu_category": {
+        "category": "nature"
+      }
+    },
+    "components": {
+      "minecraft:display_name": "tile.steveo:cloud_block.name",
+      "minecraft:geometry": {
+        "identifier": "geometry.steveo_cloud_block",
+        "culling": "steveo:cloud_block_culling",
+        "culling_layer": "steveo:cloud"
+      },
+      "minecraft:material_instances": {
+        "*": {
+          "texture": "steveo_cloud_block",
+          "render_method": "opaque"
+        }
+      },
+      "minecraft:map_color": "#F4F8FF",
+      "minecraft:destructible_by_mining": {
+        "seconds_to_destroy": 0.4
+      }
+    }
+  }
+}

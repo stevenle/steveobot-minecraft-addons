@@ -1,0 +1,5 @@
+{
+  "$schema": "../../tools/schemas/addon.schema.json",
+  "name": "Cloud Dimension",
+  "description": "Travel to a world of floating islands, storm the Sky Castle, and defeat the Nimbus King."
+}

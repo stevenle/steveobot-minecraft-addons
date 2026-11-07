@@ -49,11 +49,20 @@ update packs, so removing it takes these steps, in this order:
 - [ ] **Advent Presents** (new add-on). One present to open each real day in
       December, ending in a Christmas Eve surprise. **Needs to ship by about
       Nov 25.** `Date.now()` already works in portal-gun.
-- [ ] **Mob Arena** (new add-on). Place a block to start waves of mobs that keep
+- [x] **Mob Arena** (new add-on, built as `battle-arena`). Place a block to start waves of mobs that keep
       getting harder, with a boss every five waves and rewards between rounds.
       Gives the super gear something to fight, and it is co-op.
 - [ ] **Mario Kart Race Kit** (improves `mario`). Boost pads, item boxes,
       bananas, green shells, and a lap counter, so two players can race.
+- [ ] **Cloud Dimension** (`cloud-dimension`). Dimension, portal, starter
+      island and safety net verified on the Realm (1.0.0, 2026-11-06). 1.1.0
+      adds the rest, not yet tried in-game:
+  - [ ] Island chain with Gust Pads (launch strength may need tuning with
+        `/scriptevent steveo:clouds padpower`)
+  - [ ] Sky Castle with Charge minions in the courtyard and tower chests
+  - [ ] Floatatoes in the glass case: tame with a potato, follow, catch falls
+  - [ ] Nimbus King: 1500 HP, boss bar, volleys, summons Charges, Storm Altar
+  - [ ] Cloud Staff: wind charge, 3 second cooldown
 
 ## Later
 
