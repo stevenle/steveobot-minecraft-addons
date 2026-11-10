@@ -1,5 +1,5 @@
 /**
- * Super Enchantments — every enchantment up to level 20, eight new ones, and
+ * Super Enchantments — every enchantment up to level 20, nine new ones, and
  * an Enchantment Tower to find them in.
  *
  * Bedrock has no data-driven enchantments and `addEnchantment` refuses levels
@@ -18,8 +18,8 @@
  *   is cosmetic. README.md lists which is which.
  *
  * The custom enchantments (Power Knockback, Extra Hit, Super Efficiency, Keen
- * Edge, Super Gems, Ender Blinding, Lightning Strike, Victor's Boon) exist
- * only in that property; they are applied by the fountain, shown in lore, and enacted here.
+ * Edge, Super Gems, Ender Blinding, Lightning Strike, Lightning Shot, Victor's
+ * Boon) exist only in that property; they are applied by the fountain, shown in lore, and enacted here.
  * Ender Blinding
  * also needs behavior_pack/entities/enderman.json, a vanilla copy whose stare
  * trigger skips players with ENDER_BLIND_TAG.
@@ -61,6 +61,8 @@ const STRUCTURE_ID = 'steveo:enchantment_tower';
 const LETTERS_PARTICLE = 'steveo:enchantment_letters';
 const LAPIS_ID = 'minecraft:lapis_lazuli';
 const BEDROCK_ID = 'minecraft:bedrock';
+const FIRE_ID = 'minecraft:fire';
+const ARROW_ID = 'minecraft:arrow';
 /** Item dynamic property: JSON object of enchantment id -> level for super and custom levels. */
 const SUPER_PROP = 'steveo:super_enchantments';
 
@@ -78,6 +80,7 @@ const KEEN_EDGE = 'steveo:keen_edge';
 const SUPER_GEMS = 'steveo:super_gems';
 const ENDER_BLINDING = 'steveo:ender_blinding';
 const LIGHTNING_STRIKE = 'steveo:lightning_strike';
+const LIGHTNING_SHOT = 'steveo:lightning_shot';
 const VICTORS_BOON = 'steveo:victors_boon';
 const CUSTOM_IDS = [
   POWER_KNOCKBACK,
@@ -87,6 +90,7 @@ const CUSTOM_IDS = [
   SUPER_GEMS,
   ENDER_BLINDING,
   LIGHTNING_STRIKE,
+  LIGHTNING_SHOT,
   VICTORS_BOON,
 ] as const;
 /** Player tag the patched enderman.json checks; must match assets/generate.mjs. */
@@ -150,7 +154,7 @@ const EXTRA_HIT_BASE_RADIUS = 2;
 const EXTRA_HIT_RADIUS_PER_LEVEL = 0.4;
 /** Share of the original hit's damage dealt to each nearby mob. */
 const EXTRA_HIT_DAMAGE_SHARE = 0.75;
-/** Lightning Strike: chance per melee hit of calling down a bolt, base plus this much per level. */
+/** Lightning Strike and Lightning Shot: chance per melee hit / arrow hit of calling down a bolt, base plus this much per level. */
 const LIGHTNING_BASE_CHANCE = 0.1;
 const LIGHTNING_CHANCE_PER_LEVEL = 0.02;
 /** Damage the strike adds to the hit itself, on top of whatever the bolt deals. */
@@ -158,6 +162,13 @@ const LIGHTNING_DAMAGE_BASE = 4;
 const LIGHTNING_DAMAGE_PER_LEVEL = 1;
 /** Ticks the wielder is immune to lightning and fire after calling a bolt, so it never hurts them. */
 const LIGHTNING_GRACE_TICKS = 40;
+/** Players this close to a called bolt cannot be set alight by it. */
+const LIGHTNING_SAFE_RADIUS = 8;
+/** Blocks around the strike swept for the fire the bolt lights: this far sideways, and up and down. */
+const LIGHTNING_FIRE_RADIUS = 3;
+const LIGHTNING_FIRE_HEIGHT = 2;
+/** Ticks after the bolt at which players are put out and its ground fire is cleared. */
+const LIGHTNING_CLEANUP_TICKS = [2, 10, LIGHTNING_GRACE_TICKS - 1];
 /** Super Efficiency: seconds to chew through bedrock at level I, and the cut per further level. */
 const BEDROCK_SECONDS = 180;
 const BEDROCK_CUT_PER_LEVEL = 0.04;
@@ -445,6 +456,8 @@ function customApplies(id: string, item: ItemStack): boolean {
       return isHelmet(item);
     case LIGHTNING_STRIKE:
       return item.hasTag('minecraft:is_sword') || item.typeId === 'minecraft:mace';
+    case LIGHTNING_SHOT:
+      return RANGED_TYPES.has(item.typeId);
     default:
       return false;
   }
@@ -603,7 +616,7 @@ world.beforeEvents.itemUse.subscribe((event) => {
   if (facingFountain(event.source)) event.cancel = true;
 });
 
-// ---------- damage: super Sharpness/Smite/Bane/Power, Keen Edge, Lightning Strike, super Protection ----------
+// ---------- damage: super Sharpness/Smite/Bane/Power, Keen Edge, Lightning Strike/Shot, super Protection ----------
 
 function hasFamily(entity: Entity, family: string): boolean {
   try {
@@ -652,52 +665,121 @@ function protectionFactor(player: Player, source: EntityDamageSource): number {
   return 1 - Math.min(PROTECTION_CAP, reduction);
 }
 
-/** Player id -> last tick of their immunity to the bolt they called down. */
-const lightningGrace = new Map<string, number>();
-const LIGHTNING_CAUSES = new Set([EntityDamageCause.lightning, EntityDamageCause.fire, EntityDamageCause.fireTick]);
-
-function shieldedFromOwnBolt(player: Player, source: EntityDamageSource): boolean {
-  const until = lightningGrace.get(player.id);
-  if (until === undefined) return false;
-  if (system.currentTick > until) {
-    lightningGrace.delete(player.id);
-    return false;
-  }
-  return LIGHTNING_CAUSES.has(source.cause);
+interface BoltShield {
+  /** Last tick the shield holds. */
+  until: number;
+  /** The wielder is spared the bolt's own damage too; bystanders only its fire. */
+  lightning: boolean;
 }
 
-/** Calls the bolt down on the target, then puts out the wielder if it set them alight. */
+/** Player id -> their shield from a bolt called down by Lightning Strike or Lightning Shot. */
+const boltShields = new Map<string, BoltShield>();
+const BOLT_FIRE_CAUSES = new Set([EntityDamageCause.fire, EntityDamageCause.fireTick]);
+
+function activeShield(player: Player): BoltShield | undefined {
+  const shield = boltShields.get(player.id);
+  if (shield === undefined) return undefined;
+  if (system.currentTick > shield.until) {
+    boltShields.delete(player.id);
+    return undefined;
+  }
+  return shield;
+}
+
+function shieldFromBolt(player: Player, lightning: boolean): void {
+  // Never downgrade a wielder who is also standing next to someone else's bolt.
+  const keep = activeShield(player)?.lightning ?? false;
+  boltShields.set(player.id, { until: system.currentTick + LIGHTNING_GRACE_TICKS, lightning: lightning || keep });
+}
+
+function shieldedFromBolt(player: Player, source: EntityDamageSource): boolean {
+  const shield = activeShield(player);
+  if (shield === undefined) return false;
+  return BOLT_FIRE_CAUSES.has(source.cause) || (shield.lightning && source.cause === EntityDamageCause.lightning);
+}
+
+/** Every fire block in the box a bolt at `center` can light. */
+function fireNear(dimension: Dimension, center: Vector3): Block[] {
+  const found: Block[] = [];
+  const cx = Math.floor(center.x);
+  const cy = Math.floor(center.y);
+  const cz = Math.floor(center.z);
+  for (let dx = -LIGHTNING_FIRE_RADIUS; dx <= LIGHTNING_FIRE_RADIUS; dx++) {
+    for (let dy = -LIGHTNING_FIRE_HEIGHT; dy <= LIGHTNING_FIRE_HEIGHT; dy++) {
+      for (let dz = -LIGHTNING_FIRE_RADIUS; dz <= LIGHTNING_FIRE_RADIUS; dz++) {
+        try {
+          const block = dimension.getBlock({ x: cx + dx, y: cy + dy, z: cz + dz });
+          if (block?.typeId === FIRE_ID) found.push(block);
+        } catch {
+          // Outside the world or in an unloaded chunk.
+        }
+      }
+    }
+  }
+  return found;
+}
+
+function blockKey(block: Block): string {
+  return `${block.location.x},${block.location.y},${block.location.z}`;
+}
+
+/**
+ * Calls the bolt down on the target. No player near it can be set alight:
+ * they are shielded from fire damage and put out for the grace period, and
+ * the fire the bolt lights on the ground is cleared so it cannot catch them
+ * afterwards. Fire that was already burning there is left alone. The bolt's
+ * own damage still lands on everyone but the wielder.
+ */
 function callLightning(attacker: Player, target: Entity): void {
   if (!target.isValid) return;
+  const { dimension, location } = target;
+  const oldFire = new Set(fireNear(dimension, location).map(blockKey));
+  let nearby: Player[] = [];
   try {
-    target.dimension.spawnEntity('minecraft:lightning_bolt', target.location);
+    nearby = dimension.getPlayers({ location, maxDistance: LIGHTNING_SAFE_RADIUS });
+  } catch {
+    // Shielding bystanders is best effort.
+  }
+  for (const player of nearby) shieldFromBolt(player, false);
+  try {
+    dimension.spawnEntity('minecraft:lightning_bolt', location);
   } catch (err) {
     log.warn(`could not strike ${target.typeId}: ${String(err)}`);
+    return;
   }
-  for (const delay of [2, 10, LIGHTNING_GRACE_TICKS - 1]) {
+  for (const delay of LIGHTNING_CLEANUP_TICKS) {
     system.runTimeout(() => {
-      if (attacker.isValid) attacker.extinguishFire(false);
+      for (const player of [attacker, ...nearby]) {
+        if (player.isValid) player.extinguishFire(false);
+      }
+      for (const block of fireNear(dimension, location)) {
+        if (!oldFire.has(blockKey(block))) block.setType('minecraft:air');
+      }
     }, delay);
   }
 }
 
 /**
- * Lightning Strike: rolls once per melee hit. The bonus damage rides on the
- * hit itself, because a separate applyDamage this tick would land in the
- * victim's invulnerability frames; the bolt follows a tick later and deals
- * its own damage on top. Extra Hit splashes never call bolts.
+ * Lightning Strike rolls once per melee hit, Lightning Shot once per arrow
+ * hit, on the bow or crossbow in hand when the arrow lands. The bonus damage
+ * rides on the hit itself, because a separate applyDamage this tick would
+ * land in the victim's invulnerability frames; the bolt follows a tick later
+ * and deals its own damage on top. Extra Hit splashes never call bolts.
  */
 function lightningBonus(attacker: Player, victim: Entity, source: EntityDamageSource): number {
-  if (source.cause !== EntityDamageCause.entityAttack || splashing) return 0;
-  const level = totalLevel(heldItem(attacker), LIGHTNING_STRIKE);
+  let id: string;
+  if (source.cause === EntityDamageCause.entityAttack && !splashing) id = LIGHTNING_STRIKE;
+  else if (source.cause === EntityDamageCause.projectile && source.damagingProjectile?.typeId === ARROW_ID) id = LIGHTNING_SHOT;
+  else return 0;
+  const level = totalLevel(heldItem(attacker), id);
   if (level === 0 || Math.random() > LIGHTNING_BASE_CHANCE + LIGHTNING_CHANCE_PER_LEVEL * level) return 0;
-  lightningGrace.set(attacker.id, system.currentTick + LIGHTNING_GRACE_TICKS);
+  shieldFromBolt(attacker, true);
   system.run(() => callLightning(attacker, victim));
   return LIGHTNING_DAMAGE_BASE + LIGHTNING_DAMAGE_PER_LEVEL * level;
 }
 
 world.beforeEvents.entityHurt.subscribe((event) => {
-  if (event.hurtEntity instanceof Player && shieldedFromOwnBolt(event.hurtEntity, event.damageSource)) {
+  if (event.hurtEntity instanceof Player && shieldedFromBolt(event.hurtEntity, event.damageSource)) {
     event.cancel = true;
     return;
   }

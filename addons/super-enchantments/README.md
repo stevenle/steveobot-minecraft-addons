@@ -1,6 +1,6 @@
 # Super Enchantments
 
-Every enchantment goes up to level 20, eight new enchantments join the
+Every enchantment goes up to level 20, nine new enchantments join the
 list, and the place to get them is the Super Enchantment Fountain at the
 top of an Enchantment Tower.
 
@@ -122,11 +122,19 @@ Tools Trim add-on): each melee hit has a chance to call a lightning bolt
 down on the mob. The strike adds 4 damage plus 1 per level to the hit, and
 the bolt then deals its own vanilla damage and sets the mob alight. Level I
 is a 12% chance; each level adds 2%, so level XX strikes half the time and
-adds 24 damage. You are immune to your own bolt's lightning and fire for
-two seconds, but other players and pets standing next to the target are
-not. It is real lightning, like Channeling: it can start fires on the
-ground, charge creepers, and turn pigs and villagers into zombified piglins
-and witches.
+adds 24 damage. You are immune to your own bolt for two seconds, and no
+player near the strike can be set on fire by it: players within 8 blocks
+are fireproof and put out for those two seconds, and the fire the bolt
+lights on the ground is cleared. The bolt's own lightning damage still
+hurts other players and pets standing next to the target. Apart from the
+fire it is real lightning, like Channeling: it can charge creepers and turn
+pigs and villagers into zombified piglins and witches.
+
+**Lightning Shot** (bows and crossbows): Lightning Strike for arrows. Each
+arrow that hits a mob has the same chance to call a bolt down on it (12% at
+level I, half the time at level XX), with the same bonus damage and the
+same fire safety for players. The bow or crossbow in your hand when the
+arrow lands is the one that counts, and an arrow that misses calls nothing.
 
 **Victor's Boon** (swords, axes, paxels, maces, tridents, bows, crossbows):
 every mob you kill has a small chance of blessing you with a random
@@ -154,6 +162,7 @@ Chat is the only console on a Realm, so the add-on answers to a script event:
 /scriptevent steveo:enchant apply sharpness 20  # enchant the held item for free
 /scriptevent steveo:enchant apply extra_hit 5   # the new ones work by name too
 /scriptevent steveo:enchant apply lightning_strike 20
+/scriptevent steveo:enchant apply lightning_shot 20
 /scriptevent steveo:enchant apply victors_boon 20
 ```
 
@@ -187,4 +196,8 @@ The tower places, the fountain menu works, and the lore lines render
 - `entityHitBlock` firing on bedrock for the Super Efficiency timer.
 - Ender Blinding: the patched enderman's `has_tag` stare filter.
 - Lightning Strike: the bolt spawning, and the wielder's immunity to it.
+- Lightning Shot: the roll on arrow hits (`damagingProjectile` being the
+  arrow in `entityHurt`).
+- Bolt fire safety: nearby players staying unlit, and the ground fire
+  being cleared.
 - Victor's Boon: the effects, the totem particle, and the action-bar line.
