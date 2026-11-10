@@ -1,21 +1,22 @@
 /**
- * Rabbit Boy Power-Ups — eight items that give you a super power while you
- * hold one in your main hand or off-hand.
+ * Rabbit Boy Power-Ups — items that give you a super power while you hold
+ * one in your main hand or off-hand.
  *
  * Passive powers are plain status effects, re-applied every few ticks to
  * whoever is holding the item, so they fade about a second after the item is
  * put away. Use powers (right-click/tap with the item in the main hand) are
  * scripted below. The Super Power Up counts as holding every other item.
  *
- * The Fire Pepper's bolt is not an entity: the script walks a point along
- * the aim line a couple of blocks per tick, draws flame particles, and
- * raycasts each step. That avoids the script-launched projectile problems in
+ * Bolts (Fire Pepper, Fire Triangle, Water Diamond) are not entities: the
+ * script walks a point along the aim line a couple of blocks per tick, draws
+ * particles, and raycasts each step. That avoids the script-launched projectile problems in
  * CLAUDE.md and leaves nothing behind in the world if the script stops.
  */
 import {
   EntityDamageCause,
   EquipmentSlot,
   ItemStack,
+  MolangVariableMap,
   Player,
   system,
   world,
@@ -24,6 +25,7 @@ import {
   type Vector3,
 } from '@minecraft/server';
 
+import { installFollowLight } from '@shared/light';
 import { createLogger } from '@shared/log';
 import { onItemUse } from '@shared/use';
 
@@ -37,7 +39,10 @@ const FIST = 'steveo:rock_fist';
 const FEATHER = 'steveo:feather_cape_token';
 const RADISH = 'steveo:ghost_radish';
 const SUPER = 'steveo:super_power_up';
-const ALL_ITEMS = [CARROT, BOOTS, PEPPER, SHELL, FIST, FEATHER, RADISH, SUPER] as const;
+const WATER = 'steveo:water_diamond';
+const LIGHT = 'steveo:light_square';
+const FIRE = 'steveo:fire_triangle';
+const ALL_ITEMS = [CARROT, BOOTS, PEPPER, SHELL, FIST, FEATHER, RADISH, SUPER, WATER, LIGHT, FIRE] as const;
 const ITEM_SET: ReadonlySet<string> = new Set(ALL_ITEMS);
 
 /** Status effects each item grants while held: [effect id, amplifier]. */
@@ -48,6 +53,8 @@ const PASSIVE: Readonly<Record<string, ReadonlyArray<readonly [string, number]>>
   [FIST]: [['strength', 0], ['resistance', 0]],
   [FEATHER]: [['slow_falling', 0]],
   [RADISH]: [['invisibility', 0]],
+  [WATER]: [['water_breathing', 0]],
+  [FIRE]: [['fire_resistance', 0]],
 };
 /**
  * What the Super Power Up stands in for. Slow falling and invisibility are
@@ -69,6 +76,8 @@ const COOLDOWN: Readonly<Record<string, number>> = {
   [FIST]: 80,
   [FEATHER]: 40,
   [SUPER]: 400,
+  [WATER]: 12,
+  [FIRE]: 10,
 };
 
 const BOUNCE_UP = 1.5;
@@ -76,8 +85,16 @@ const DASH_FORWARD = 2.2;
 const DASH_UP = 0.35;
 const BOLT_STEP = 2;
 const BOLT_STEPS = 12;
-const BOLT_DAMAGE = 6;
-const BOLT_BURN_SECONDS = 5;
+const FIRE_DAMAGE = 6;
+const BURN_SECONDS = 5;
+const WATER_DAMAGE = 3;
+const WATER_PUSH = 1.4;
+/** How close a monster must come to a Light Square holder to catch fire, in blocks. */
+const LIGHT_BURN_RADIUS = 4;
+const LIGHT_BURN_INTERVAL = 10;
+/** World dynamic property holding the JSON array of lights placed by Light Squares. */
+const LIGHTS_PROP = 'steveo:power_ups_lights';
+const FIRE_BLOCKS: ReadonlySet<string> = new Set(['minecraft:fire', 'minecraft:soul_fire']);
 
 /** The powers each player has right now (item ids, with the Super Power Up expanded). */
 const powers = new Map<string, Set<string>>();
@@ -116,14 +133,15 @@ function tick(): void {
           player.addEffect(effect, EFFECT_TICKS, { amplifier, showParticles: false });
         }
       }
-      if (held.has(SUPER)) sparkle(player);
+      if (held.has(SUPER) || held.has(LIGHT)) sparkle(player);
+      if (held.has(WATER)) player.extinguishFire(true);
     } catch (error) {
       log.error(`update failed for ${player.name}`, error);
     }
   }
 }
 
-/** The Super Power Up's glow: a drifting sparkle somewhere around the holder. */
+/** The glow of the Super Power Up and the Light Square: a drifting sparkle somewhere around the holder. */
 function sparkle(player: Player): void {
   const at = player.location;
   particle(player.dimension, 'minecraft:endrod', {
@@ -224,13 +242,23 @@ function superBlast(player: Player): void {
   player.playSound('random.levelup', { pitch: 0.7 });
 }
 
-function fireBolt(player: Player): void {
+interface BoltSpec {
+  sound: string;
+  /** Draws one point of the trail. */
+  trail: (dimension: Dimension, at: Vector3) => void;
+  /** Called at the end of every step, with the bolt's new position. */
+  onStep?: (dimension: Dimension, at: Vector3) => void;
+  onHit: (shooter: Player, target: Entity, from: Vector3) => void;
+  impactParticle: string;
+}
+
+function shootBolt(player: Player, spec: BoltSpec): void {
   const dimension = player.dimension;
   const dir = player.getViewDirection();
   const head = player.getHeadLocation();
   let pos: Vector3 = { x: head.x + dir.x * 0.8, y: head.y + dir.y * 0.8 - 0.1, z: head.z + dir.z * 0.8 };
   let steps = 0;
-  player.playSound('mob.blaze.shoot', { volume: 0.6 });
+  player.playSound(spec.sound, { volume: 0.6 });
   boltsInFlight++;
 
   const handle = system.runInterval(() => {
@@ -251,17 +279,14 @@ function fireBolt(player: Player): void {
       if (victim) {
         reach = Math.min(reach, victim.distance);
         done = true;
-        victim.entity.applyDamage(
-          BOLT_DAMAGE,
-          player.isValid ? { cause: EntityDamageCause.fire, damagingEntity: player } : { cause: EntityDamageCause.fire },
-        );
-        victim.entity.setOnFire(BOLT_BURN_SECONDS, true);
+        if (player.isValid) spec.onHit(player, victim.entity, pos);
       }
       for (let d = 0; d <= reach; d += 0.5) {
-        particle(dimension, 'minecraft:basic_flame_particle', { x: pos.x + dir.x * d, y: pos.y + dir.y * d, z: pos.z + dir.z * d });
+        spec.trail(dimension, { x: pos.x + dir.x * d, y: pos.y + dir.y * d, z: pos.z + dir.z * d });
       }
       pos = { x: pos.x + dir.x * reach, y: pos.y + dir.y * reach, z: pos.z + dir.z * reach };
-      if (done && (wall || victim)) particle(dimension, 'minecraft:lava_particle', pos);
+      spec.onStep?.(dimension, pos);
+      if (wall || victim) particle(dimension, spec.impactParticle, pos);
     } catch {
       // Flew into an unloaded chunk, or the target vanished.
       done = true;
@@ -273,12 +298,77 @@ function fireBolt(player: Player): void {
   }, 1);
 }
 
+const FIRE_BOLT: BoltSpec = {
+  sound: 'mob.blaze.shoot',
+  trail: (dimension, at) => particle(dimension, 'minecraft:basic_flame_particle', at),
+  onHit: (shooter, target) => {
+    target.applyDamage(FIRE_DAMAGE, { cause: EntityDamageCause.fire, damagingEntity: shooter });
+    target.setOnFire(BURN_SECONDS, true);
+  },
+  impactParticle: 'minecraft:lava_particle',
+};
+
+const WATER_BLUE = new MolangVariableMap();
+WATER_BLUE.setColorRGB('variable.color', { red: 0.25, green: 0.6, blue: 1 });
+
+/** Puts out fire blocks in the 3×3×3 around `at`. */
+function douse(dimension: Dimension, at: Vector3): void {
+  const base = { x: Math.floor(at.x), y: Math.floor(at.y), z: Math.floor(at.z) };
+  for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++) for (let dz = -1; dz <= 1; dz++) {
+    try {
+      const block = dimension.getBlock({ x: base.x + dx, y: base.y + dy, z: base.z + dz });
+      if (block && FIRE_BLOCKS.has(block.typeId)) block.setType('minecraft:air');
+    } catch {
+      // Unloaded chunk or outside the world.
+    }
+  }
+}
+
+const WATER_BOLT: BoltSpec = {
+  sound: 'random.splash',
+  trail: (dimension, at) => {
+    particle(dimension, 'minecraft:water_splash_particle_manual', at);
+    // A tinted trail as well, so the jet is easy to see in the air.
+    try {
+      dimension.spawnParticle('minecraft:colored_flame_particle', at, WATER_BLUE);
+    } catch {
+      // Unloaded chunk or outside the world.
+    }
+  },
+  onStep: douse,
+  onHit: (shooter, target, from) => {
+    target.extinguishFire(true);
+    pushAway(from, target, WATER_PUSH, 0.3);
+    target.applyDamage(WATER_DAMAGE, { cause: EntityDamageCause.entityAttack, damagingEntity: shooter });
+  },
+  impactParticle: 'minecraft:water_splash_particle_manual',
+};
+
+/** Light Square: monsters that come close to a holder catch fire. */
+function lightBurnTick(): void {
+  for (const player of world.getPlayers()) {
+    if (!has(player, LIGHT)) continue;
+    try {
+      const nearby = player.dimension.getEntities({
+        location: player.location,
+        maxDistance: LIGHT_BURN_RADIUS,
+        families: ['monster'],
+      });
+      for (const mob of nearby) mob.setOnFire(BURN_SECONDS, true);
+    } catch {
+      // Left mid-tick.
+    }
+  }
+}
+
 const USE_POWERS: Readonly<Record<string, (player: Player) => void>> = {
   [BOOTS]: bounce,
-  [PEPPER]: fireBolt,
+  [PEPPER]: (player) => shootBolt(player, FIRE_BOLT),
   [FIST]: groundPound,
   [FEATHER]: dash,
   [SUPER]: superBlast,
+  [WATER]: (player) => shootBolt(player, WATER_BOLT),
+  [FIRE]: (player) => shootBolt(player, FIRE_BOLT),
 };
 
 function reportError(player: Player, error: unknown): void {
@@ -310,6 +400,9 @@ onItemUse(
   },
 );
 
+// Light Square: a light follows the holder around.
+const lights = installFollowLight({ property: LIGHTS_PROP, shouldLight: (player) => has(player, LIGHT), log });
+
 // Bounce Boots Charm: no fall damage while held.
 world.beforeEvents.entityHurt.subscribe((event) => {
   if (event.damageSource.cause !== EntityDamageCause.fall) return;
@@ -334,6 +427,7 @@ world.afterEvents.playerLeave.subscribe((event) => {
 world.afterEvents.worldLoad.subscribe(() => {
   system.runInterval(tick, TICK_INTERVAL);
   system.runInterval(swimTick, SWIM_INTERVAL);
+  system.runInterval(lightBurnTick, LIGHT_BURN_INTERVAL);
 });
 
 system.afterEvents.scriptEventReceive.subscribe(
@@ -347,7 +441,7 @@ system.afterEvents.scriptEventReceive.subscribe(
         for (const id of ALL_ITEMS) container?.addItem(new ItemStack(id));
         player.sendMessage({
           translate: 'power_ups.debug.status',
-          with: [String(powers.size), String(boltsInFlight)],
+          with: [String(powers.size), String(boltsInFlight), String(lights.lit), String(lights.stale)],
         });
       } catch (error) {
         reportError(player, error);
