@@ -1,0 +1,60 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:recipe_shapeless": {
+    "description": {
+      "identifier": "steveo:super_power_up_recipe"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "ingredients": [
+      {
+        "item": "steveo:super_carrot"
+      },
+      {
+        "item": "steveo:bounce_boots_charm"
+      },
+      {
+        "item": "steveo:fire_pepper"
+      },
+      {
+        "item": "steveo:bubble_shell"
+      },
+      {
+        "item": "steveo:rock_fist"
+      },
+      {
+        "item": "steveo:feather_cape_token"
+      },
+      {
+        "item": "steveo:ghost_radish"
+      }
+    ],
+    "unlock": [
+      {
+        "item": "steveo:super_carrot"
+      },
+      {
+        "item": "steveo:bounce_boots_charm"
+      },
+      {
+        "item": "steveo:fire_pepper"
+      },
+      {
+        "item": "steveo:bubble_shell"
+      },
+      {
+        "item": "steveo:rock_fist"
+      },
+      {
+        "item": "steveo:feather_cape_token"
+      },
+      {
+        "item": "steveo:ghost_radish"
+      }
+    ],
+    "result": {
+      "item": "steveo:super_power_up"
+    }
+  }
+}

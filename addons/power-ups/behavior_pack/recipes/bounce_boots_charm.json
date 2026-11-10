@@ -1,0 +1,27 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:recipe_shapeless": {
+    "description": {
+      "identifier": "steveo:bounce_boots_charm_recipe"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "ingredients": [
+      {
+        "item": "minecraft:leather_boots"
+      },
+      {
+        "item": "minecraft:slime_ball"
+      }
+    ],
+    "unlock": [
+      {
+        "item": "minecraft:leather_boots"
+      }
+    ],
+    "result": {
+      "item": "steveo:bounce_boots_charm"
+    }
+  }
+}

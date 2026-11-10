@@ -1,0 +1,21 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:item": {
+    "description": {
+      "identifier": "steveo:ghost_radish",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": "steveo_ghost_radish",
+      "minecraft:display_name": {
+        "value": "item.steveo:ghost_radish.name"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:allow_off_hand": {
+        "value": true
+      }
+    }
+  }
+}

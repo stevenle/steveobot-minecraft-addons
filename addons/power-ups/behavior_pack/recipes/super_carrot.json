@@ -1,0 +1,30 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:recipe_shapeless": {
+    "description": {
+      "identifier": "steveo:super_carrot_recipe"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "ingredients": [
+      {
+        "item": "minecraft:carrot"
+      },
+      {
+        "item": "minecraft:gold_ingot"
+      },
+      {
+        "item": "minecraft:sugar"
+      }
+    ],
+    "unlock": [
+      {
+        "item": "minecraft:carrot"
+      }
+    ],
+    "result": {
+      "item": "steveo:super_carrot"
+    }
+  }
+}

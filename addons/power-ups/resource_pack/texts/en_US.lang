@@ -1,0 +1,16 @@
+## Strings for the Rabbit Boy Power-Ups add-on.
+## Client-side translations live in the resource pack; the behavior pack
+## references them by key with RawMessage { translate: ... }.
+
+item.steveo:super_carrot.name=Super Carrot
+item.steveo:bounce_boots_charm.name=Bounce Boots Charm
+item.steveo:fire_pepper.name=Fire Pepper
+item.steveo:bubble_shell.name=Bubble Shell
+item.steveo:rock_fist.name=Rock Fist
+item.steveo:feather_cape_token.name=Feather Cape Token
+item.steveo:ghost_radish.name=Ghost Radish
+item.steveo:super_power_up.name=Super Power Up
+
+## Debug (/scriptevent steveo:power_ups)
+power_ups.debug.status=§7[Power-Ups]§r Loaded. All eight power-ups have been placed in your inventory. Players powered up right now: %s. Fire bolts in the air: %s.
+power_ups.debug.error=§7[Power-Ups]§r §cSomething went wrong: %s
