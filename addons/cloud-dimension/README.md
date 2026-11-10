@@ -24,7 +24,8 @@ where you left, on Slow Falling.
 ## The islands
 
 Look where you want to go and step on a **Gust Pad** to be launched toward the
-next island (with a little Slow Falling for the landing). Five islands lead
+next island (with a little Slow Falling for the landing). Mobs that walk onto
+a pad are launched too, in the direction they are facing. Five islands lead
 from the starter island to the Sky Castle. The islands and the castle are built
 the first time someone visits after installing this version; it takes a minute
 or so, and chat says when the castle has appeared.

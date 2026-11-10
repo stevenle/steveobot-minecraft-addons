@@ -15,6 +15,7 @@ import {
   system,
   world,
   type Dimension,
+  type Entity,
   type Player,
   type RawMessage,
   type Vector3,
@@ -215,18 +216,27 @@ function onPortal(player: Player, at: Vector3): void {
 
 // ---------- Gust Pads ----------
 
-function launch(player: Player): void {
-  if ((padUntil.get(player.id) ?? 0) > system.currentTick) return;
-  padUntil.set(player.id, system.currentTick + 10);
-  const view = player.getViewDirection();
+/** Launches whatever stepped on the pad: players, and any mob (anything with health). */
+function launch(entity: Entity): void {
+  const isPlayer = entity.typeId === 'minecraft:player';
+  if (!isPlayer && !entity.hasComponent('minecraft:health')) return; // Dropped items, arrows, orbs.
+  const now = system.currentTick;
+  if ((padUntil.get(entity.id) ?? 0) > now) return;
+  // Mobs come and go, so drop spent entries rather than let the map grow.
+  if (padUntil.size > 64) for (const [id, until] of padUntil) if (until <= now) padUntil.delete(id);
+  padUntil.set(entity.id, now + 10);
+  // A player flies where they look; a mob flies the way it is facing.
+  const view = entity.getViewDirection();
   const flat = Math.hypot(view.x, view.z) || 1;
   const power = padPower();
-  player.applyKnockback({ x: (view.x / flat) * power.forward, z: (view.z / flat) * power.forward }, power.up);
+  entity.applyKnockback({ x: (view.x / flat) * power.forward, z: (view.z / flat) * power.forward }, power.up);
   // A soft landing on the next island.
-  player.addEffect('slow_falling', 60, { showParticles: false });
-  player.playSound('wind_charge.burst', { pitch: 1.2, volume: 0.7 });
+  entity.addEffect('slow_falling', 60, { showParticles: false });
+  const sound = { pitch: 1.2, volume: 0.7 };
+  if (isPlayer) (entity as Player).playSound('wind_charge.burst', sound);
+  else entity.dimension.playSound('wind_charge.burst', entity.location, sound);
   try {
-    player.dimension.spawnParticle('minecraft:wind_explosion_emitter', player.location);
+    entity.dimension.spawnParticle('minecraft:wind_explosion_emitter', entity.location);
   } catch {
     // The launch works without it.
   }
@@ -261,7 +271,13 @@ system.beforeEvents.startup.subscribe((event) => {
     },
   });
   event.blockComponentRegistry.registerCustomComponent(GUST_PAD, {
-    onStepOn: (e) => onPlayer(e.entity, launch),
+    onStepOn: (e) => {
+      const entity = e.entity;
+      if (!entity) return;
+      system.run(() => {
+        if (entity.isValid) launch(entity);
+      });
+    },
   });
   event.blockComponentRegistry.registerCustomComponent(STORM_ALTAR, {
     onPlayerInteract: (e) => onPlayer(e.player, useAltar),

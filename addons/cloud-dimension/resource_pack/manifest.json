@@ -4,14 +4,14 @@
     "name": "Cloud Dimension RP",
     "description": "Travel to a world of floating islands, storm the Sky Castle, and defeat the Nimbus King.",
     "uuid": "a63a4cb5-c398-40f5-baeb-cfd87d80cfb5",
-    "version": [1, 2, 0],
+    "version": [1, 2, 1],
     "min_engine_version": [1, 26, 40]
   },
   "modules": [
     {
       "type": "resources",
       "uuid": "3ad76576-74bb-44a7-a498-95a3e5f5affd",
-      "version": [1, 2, 0]
+      "version": [1, 2, 1]
     }
   ],
   "metadata": {
