@@ -1,4 +1,4 @@
-// Generates the eight power-up item icons (16×16) and both pack icons
+// Generates the power-up item icons (16×16) and both pack icons
 // (128×128, the Super Carrot scaled up 8×).
 // Run from the repo root:  node addons/power-ups/assets/generate.mjs addons/power-ups
 // The generated output is what gets committed; this script is for regenerating it.
@@ -210,6 +210,70 @@ const SPRITES = {
       '..KeeeeeeeeeeK..',
       '...KKeeeeeeKK...',
       '.....KKKKKK.....',
+    ],
+  },
+  // The three shape friends from the book cover, each with a little smile.
+  water_diamond: {
+    pal: { K: '#12306b', b: '#3b9bff', l: '#bfe2ff', E: '#0b1d47' },
+    px: [
+      '.......KK.......',
+      '......KbbK......',
+      '.....KblbbK.....',
+      '....KblbbbbK....',
+      '...KblbbbbbbK...',
+      '..KbbEbbbbEbbK..',
+      '.KbbbEbbbbEbbbK.',
+      'KbbbbbbbbbbbbbbK',
+      'KbbbbEbbbbEbbbbK',
+      '.KbbbbEEEEbbbbK.',
+      '..KbbbbbbbbbbK..',
+      '...KbbbbbbbbK...',
+      '....KbbbbbbK....',
+      '.....KbbbbK.....',
+      '......KbbK......',
+      '.......KK.......',
+    ],
+  },
+  light_square: {
+    pal: { K: '#7a5a00', y: '#ffe033', l: '#fff8c2', d: '#f0b90b', E: '#3d2c00' },
+    px: [
+      '................',
+      '.KKKKKKKKKKKKKK.',
+      '.KyyyyyyyyyyyyK.',
+      '.KyllyyyyyyyyyK.',
+      '.KylyyyyyyyyyyK.',
+      '.KyyyEyyyyEyyyK.',
+      '.KyyyEyyyyEyyyK.',
+      '.KyyyyyyyyyyyyK.',
+      '.KyyEyyyyyyEyyK.',
+      '.KyyyEyyyyEyyyK.',
+      '.KyyyyEEEEyyyyK.',
+      '.KyyyyyyyyyyyyK.',
+      '.KyyyyyyyyyyydK.',
+      '.KyyyyyyyyyyddK.',
+      '.KKKKKKKKKKKKKK.',
+      '................',
+    ],
+  },
+  fire_triangle: {
+    pal: { K: '#6b0f14', r: '#f03e3e', l: '#ffa8a8', E: '#3d0508' },
+    px: [
+      'KKKKKKKKKKKKKKKK',
+      'KrllrrrrrrrrrrrK',
+      '.KrrrrrrrrrrrrK.',
+      '.KrrrErrrrErrrK.',
+      '..KrrErrrrErrK..',
+      '..KrrrrrrrrrrK..',
+      '...KrErrrrErK...',
+      '...KrrEEEErrK...',
+      '....KrrrrrrK....',
+      '....KrrrrrrK....',
+      '.....KrrrrK.....',
+      '.....KrrrrK.....',
+      '......KrrK......',
+      '......KrrK......',
+      '.......KK.......',
+      '................',
     ],
   },
 };

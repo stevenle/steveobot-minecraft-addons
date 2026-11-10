@@ -25,6 +25,15 @@
     },
     "steveo_super_power_up": {
       "textures": "textures/items/super_power_up"
+    },
+    "steveo_water_diamond": {
+      "textures": "textures/items/water_diamond"
+    },
+    "steveo_light_square": {
+      "textures": "textures/items/light_square"
+    },
+    "steveo_fire_triangle": {
+      "textures": "textures/items/fire_triangle"
     }
   }
 }

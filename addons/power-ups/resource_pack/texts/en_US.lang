@@ -10,7 +10,10 @@ item.steveo:rock_fist.name=Rock Fist
 item.steveo:feather_cape_token.name=Feather Cape Token
 item.steveo:ghost_radish.name=Ghost Radish
 item.steveo:super_power_up.name=Super Power Up
+item.steveo:water_diamond.name=Water Diamond
+item.steveo:light_square.name=Light Square
+item.steveo:fire_triangle.name=Fire Triangle
 
 ## Debug (/scriptevent steveo:power_ups)
-power_ups.debug.status=§7[Power-Ups]§r Loaded. All eight power-ups have been placed in your inventory. Players powered up right now: %s. Fire bolts in the air: %s.
+power_ups.debug.status=§7[Power-Ups]§r Loaded. Every power-up has been placed in your inventory. Players powered up right now: %s. Bolts in the air: %s. Players lit by a Light Square: %s. Leftover lights awaiting cleanup: %s.
 power_ups.debug.error=§7[Power-Ups]§r §cSomething went wrong: %s

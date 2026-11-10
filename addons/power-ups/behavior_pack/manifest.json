@@ -2,7 +2,7 @@
   "format_version": 2,
   "header": {
     "name": "Rabbit Boy Power-Ups BP",
-    "description": "Eight power-up items that give you super powers while you hold one in either hand.",
+    "description": "Power-up items that give you super powers while you hold one in either hand.",
     "uuid": "e28fdd36-03c1-4980-8678-270e00e406a2",
     "version": [1, 0, 0],
     "min_engine_version": [1, 26, 40]
