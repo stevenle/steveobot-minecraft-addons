@@ -4,27 +4,27 @@
     "name": "Cloud Dimension BP",
     "description": "Travel to a world of floating islands, storm the Sky Castle, and defeat the Nimbus King.",
     "uuid": "9e637ca2-0b0b-4d0e-a491-1566180f51d4",
-    "version": [1, 2, 0],
+    "version": [1, 2, 1],
     "min_engine_version": [1, 26, 40]
   },
   "modules": [
     {
       "type": "data",
       "uuid": "ae4f2ca1-da66-40a2-b269-b2e340aeb731",
-      "version": [1, 2, 0]
+      "version": [1, 2, 1]
     },
     {
       "type": "script",
       "language": "javascript",
       "entry": "scripts/main.js",
       "uuid": "22e15d05-672c-4b1c-a719-3830fab4666c",
-      "version": [1, 2, 0]
+      "version": [1, 2, 1]
     }
   ],
   "dependencies": [
     {
       "uuid": "a63a4cb5-c398-40f5-baeb-cfd87d80cfb5",
-      "version": [1, 2, 0]
+      "version": [1, 2, 1]
     },
     {
       "module_name": "@minecraft/server",
