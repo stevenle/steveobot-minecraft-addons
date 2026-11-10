@@ -4,14 +4,14 @@
     "name": "Rabbit Boy Power-Ups RP",
     "description": "Power-up items that give you super powers while you hold one in either hand.",
     "uuid": "cdba5984-b024-4b24-b8c3-afccda9e5c1c",
-    "version": [1, 0, 0],
+    "version": [1, 1, 0],
     "min_engine_version": [1, 26, 40]
   },
   "modules": [
     {
       "type": "resources",
       "uuid": "6ff6e2f7-d138-42aa-8071-7967844ca471",
-      "version": [1, 0, 0]
+      "version": [1, 1, 0]
     }
   ],
   "metadata": {

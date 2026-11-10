@@ -4,27 +4,27 @@
     "name": "Rabbit Boy Power-Ups BP",
     "description": "Power-up items that give you super powers while you hold one in either hand.",
     "uuid": "e28fdd36-03c1-4980-8678-270e00e406a2",
-    "version": [1, 0, 0],
+    "version": [1, 1, 0],
     "min_engine_version": [1, 26, 40]
   },
   "modules": [
     {
       "type": "data",
       "uuid": "27802712-7cc8-4463-b9ae-154cfcb9577d",
-      "version": [1, 0, 0]
+      "version": [1, 1, 0]
     },
     {
       "type": "script",
       "language": "javascript",
       "entry": "scripts/main.js",
       "uuid": "7d14f22e-877a-4ef0-b406-072252e64978",
-      "version": [1, 0, 0]
+      "version": [1, 1, 0]
     }
   ],
   "dependencies": [
     {
       "uuid": "cdba5984-b024-4b24-b8c3-afccda9e5c1c",
-      "version": [1, 0, 0]
+      "version": [1, 1, 0]
     },
     {
       "module_name": "@minecraft/server",
