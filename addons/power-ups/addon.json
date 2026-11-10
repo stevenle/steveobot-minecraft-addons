@@ -1,0 +1,5 @@
+{
+  "$schema": "../../tools/schemas/addon.schema.json",
+  "name": "Rabbit Boy Power-Ups",
+  "description": "Eight power-up items that give you super powers while you hold one in either hand."
+}

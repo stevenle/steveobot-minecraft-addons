@@ -1,0 +1,27 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:recipe_shapeless": {
+    "description": {
+      "identifier": "steveo:ghost_radish_recipe"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "ingredients": [
+      {
+        "item": "minecraft:beetroot"
+      },
+      {
+        "item": "minecraft:fermented_spider_eye"
+      }
+    ],
+    "unlock": [
+      {
+        "item": "minecraft:beetroot"
+      }
+    ],
+    "result": {
+      "item": "steveo:ghost_radish"
+    }
+  }
+}

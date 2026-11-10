@@ -1,0 +1,27 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:item": {
+    "description": {
+      "identifier": "steveo:super_power_up",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": "steveo_super_power_up",
+      "minecraft:display_name": {
+        "value": "item.steveo:super_power_up.name"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:allow_off_hand": {
+        "value": true
+      },
+      "minecraft:rarity": "epic",
+      "minecraft:glint": true,
+      "minecraft:cooldown": {
+        "category": "steveo_super_power_up",
+        "duration": 20
+      }
+    }
+  }
+}

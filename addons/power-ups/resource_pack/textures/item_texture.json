@@ -1,0 +1,30 @@
+{
+  "resource_pack_name": "power-ups",
+  "texture_name": "atlas.items",
+  "texture_data": {
+    "steveo_super_carrot": {
+      "textures": "textures/items/super_carrot"
+    },
+    "steveo_bounce_boots_charm": {
+      "textures": "textures/items/bounce_boots_charm"
+    },
+    "steveo_fire_pepper": {
+      "textures": "textures/items/fire_pepper"
+    },
+    "steveo_bubble_shell": {
+      "textures": "textures/items/bubble_shell"
+    },
+    "steveo_rock_fist": {
+      "textures": "textures/items/rock_fist"
+    },
+    "steveo_feather_cape_token": {
+      "textures": "textures/items/feather_cape_token"
+    },
+    "steveo_ghost_radish": {
+      "textures": "textures/items/ghost_radish"
+    },
+    "steveo_super_power_up": {
+      "textures": "textures/items/super_power_up"
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:item": {
+    "description": {
+      "identifier": "steveo:bounce_boots_charm",
+      "menu_category": {
+        "category": "equipment"
+      }
+    },
+    "components": {
+      "minecraft:icon": "steveo_bounce_boots_charm",
+      "minecraft:display_name": {
+        "value": "item.steveo:bounce_boots_charm.name"
+      },
+      "minecraft:max_stack_size": 1,
+      "minecraft:allow_off_hand": {
+        "value": true
+      },
+      "minecraft:cooldown": {
+        "category": "steveo_bounce_boots_charm",
+        "duration": 2
+      }
+    }
+  }
+}
