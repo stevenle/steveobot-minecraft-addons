@@ -606,8 +606,14 @@ writeBlock('storm_altar', [
 // The root bone binds to the hand; the model is built with its grip at y 0
 // so the hand holds it part-way up. The hold animations position it in the
 // hand in first and third person.
+//
+// The cubes of a bound bone are in the player's model space, so a model built
+// around the origin draws at the player's feet (the staff showed up between
+// the legs, 2026-11-09). The third-person animation moves the grip to the
+// right fist, which is at about [-6, 13, 0], and `hold` adds a tilt: a
+// positive x rotation leans the top of the item forward.
 const ITEM = { emissiveAlpha: true };
-function writeAttachable(name, bones, grip) {
+function writeAttachable(name, bones, grip, hold) {
   const shifted = bones.map((b) => ({
     ...b,
     pivot: b.pivot ? [b.pivot[0], r2(b.pivot[1] - grip), b.pivot[2]] : undefined,
@@ -621,7 +627,7 @@ function writeAttachable(name, bones, grip) {
     format_version: '1.8.0',
     animations: {
       [`animation.steveo_${name}.first_person`]: { loop: true, bones: { root: { rotation: [90, 60, -40], position: [4, 1, 2] } } },
-      [`animation.steveo_${name}.third_person`]: { loop: true, bones: { root: { rotation: [90, 0, -20], position: [0, 3, 1] } } },
+      [`animation.steveo_${name}.third_person`]: { loop: true, bones: { root: hold } },
     },
   });
   writeJson(`resource_pack/attachables/${name}.json`, {
@@ -669,6 +675,8 @@ writeAttachable(
     { name: 'wind', pivot: [0, 22, 0], rotation: [0, 18, 0], cubes: ring(3.6, 21.5, 10, 0.6, 'white', 0.8) },
   ],
   8,
+  // Upright in the fist like a walking staff, the orb leaning a little forward.
+  { rotation: [20, 0, 0], position: [-6, 13, 0] },
 );
 
 // ---------- Storm Crystal: Charged Shard ----------
@@ -689,4 +697,6 @@ writeAttachable(
     { name: 'sparks', pivot: [0, 7, 0], rotation: [0, 20, 0], cubes: ring(4, 7, 4, 0.6, 'bolt', 1) },
   ],
   6,
+  // Upright, just in front of the fist.
+  { rotation: [0, 0, 0], position: [-6, 12, -2] },
 );
