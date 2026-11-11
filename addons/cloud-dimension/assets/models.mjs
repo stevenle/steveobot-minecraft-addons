@@ -675,8 +675,11 @@ writeAttachable(
     { name: 'wind', pivot: [0, 22, 0], rotation: [0, 18, 0], cubes: ring(3.6, 21.5, 10, 0.6, 'white', 0.8) },
   ],
   8,
-  // Upright in the fist like a walking staff, the orb leaning a little forward.
-  { rotation: [20, 0, 0], position: [-6, 13, 0] },
+  // Upright like a wizard's staff, the orb leaning a little forward. The shaft
+  // stands just outside and in front of the fist: centred on the fist it ran
+  // up inside the arm and came out at the shoulder, so it looked tucked into
+  // the armpit (2026-11-10). The arm spans x -8..-4, z -2..2.
+  { rotation: [20, 0, 0], position: [-9, 12, -3] },
 );
 
 // ---------- Storm Crystal: Charged Shard ----------
