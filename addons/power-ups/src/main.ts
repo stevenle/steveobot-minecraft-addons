@@ -308,8 +308,20 @@ const FIRE_BOLT: BoltSpec = {
   impactParticle: 'minecraft:lava_particle',
 };
 
-const WATER_BLUE = new MolangVariableMap();
-WATER_BLUE.setColorRGB('variable.color', { red: 0.25, green: 0.6, blue: 1 });
+/**
+ * The water jet's tint. Built on first use, not at load: the script's top
+ * level runs in early-execution mode, where constructing engine objects can
+ * throw and take the whole script down with it (2026-11-10, on the Realm:
+ * items rendered but no power worked).
+ */
+let waterBlue: MolangVariableMap | undefined;
+function waterTint(): MolangVariableMap {
+  if (!waterBlue) {
+    waterBlue = new MolangVariableMap();
+    waterBlue.setColorRGB('variable.color', { red: 0.25, green: 0.6, blue: 1 });
+  }
+  return waterBlue;
+}
 
 /** Puts out fire blocks in the 3×3×3 around `at`. */
 function douse(dimension: Dimension, at: Vector3): void {
@@ -330,7 +342,7 @@ const WATER_BOLT: BoltSpec = {
     particle(dimension, 'minecraft:water_splash_particle_manual', at);
     // A tinted trail as well, so the jet is easy to see in the air.
     try {
-      dimension.spawnParticle('minecraft:colored_flame_particle', at, WATER_BLUE);
+      dimension.spawnParticle('minecraft:colored_flame_particle', at, waterTint());
     } catch {
       // Unloaded chunk or outside the world.
     }
