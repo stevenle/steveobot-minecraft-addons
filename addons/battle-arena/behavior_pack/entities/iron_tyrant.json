@@ -3,7 +3,6 @@
   "minecraft:entity": {
     "description": {
       "identifier": "steveo:iron_tyrant",
-      "runtime_identifier": "minecraft:iron_golem",
       "is_spawnable": false,
       "is_summonable": true
     },

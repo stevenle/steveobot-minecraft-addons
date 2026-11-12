@@ -8,7 +8,7 @@
  *
  * Debug: /scriptevent steveo:arena <status|start [quick|standard|epic]|skip|boss|summon <boss>|stop|give>
  */
-import { ItemStack, Player, system, world, type Block, type Vector3 } from '@minecraft/server';
+import { EntityDamageCause, ItemStack, Player, system, world, type Block, type Vector3 } from '@minecraft/server';
 import { ActionFormData } from '@minecraft/server-ui';
 
 import { Arena, ARENA_BLOCK, isLit, JOIN_RANGE, log, MOB_PROPERTY, MOB_TAG, msg, PREFIX, setLit } from './arena';
@@ -151,8 +151,19 @@ world.afterEvents.entityDie.subscribe((event) => {
 // the shooter as the damaging entity.
 world.afterEvents.entityHurt.subscribe((event) => {
   const attacker = event.damageSource.damagingEntity;
-  if (!(attacker instanceof Player)) return;
   const hurt = event.hurtEntity;
+  // The Iron Tyrant throws whoever it hits into the air, as an iron golem
+  // does. The golem's own toss came with its runtime identifier, which the
+  // boss no longer has (it would not render with it; see assets/bosses.mjs).
+  if (attacker?.typeId === 'steveo:iron_tyrant' && event.damageSource.cause === EntityDamageCause.entityAttack) {
+    try {
+      hurt.applyKnockback({ x: 0, z: 0 }, 0.6);
+    } catch {
+      // The victim died from the hit.
+    }
+    return;
+  }
+  if (!(attacker instanceof Player)) return;
   try {
     if (!hurt.hasTag(MOB_TAG)) return;
     const key = hurt.getDynamicProperty(MOB_PROPERTY);
