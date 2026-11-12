@@ -162,14 +162,17 @@ const BOSSES = [
     key: 'iron_tyrant',
     from: 'iron_golem',
     fold: [],
-    // The vanilla client file names controller.render.iron_golem, which no
-    // published render controller file defines; the boss rendered nothing.
-    // With our plain controller it was still invisible (2026-11-06): the
-    // vanilla iron_golem material layers the crack overlay as a second
-    // texture, and the plain controller hands it only one. entity_alphatest
-    // is the ordinary single-texture mob material.
-    ownRenderController: true,
-    material: 'entity_alphatest',
+    // The vanilla iron golem client would not render on a custom entity:
+    // invisible with its own render controllers (controller.render.iron_golem
+    // is defined in no published file, so the game special-cases the golem),
+    // invisible with our plain controller (2026-11-06), and still invisible
+    // with the entity_alphatest material (2026-11-11). So nothing here leans
+    // on the golem any more: the boss ships its own copy of the geometry and
+    // texture, its own animations, and has no runtime_identifier, the same
+    // setup as mega-creepers' boss, which renders. The golem's upward toss
+    // came with the runtime identifier; main.ts re-creates it.
+    ownClient: true,
+    noRuntime: true,
     health: 400,
     attack: { damage: { range_min: 10, range_max: 24 } },
     scale: 1.6,
@@ -251,7 +254,7 @@ for (const boss of BOSSES) {
     'minecraft:entity': {
       description: {
         identifier: `steveo:${boss.key}`,
-        runtime_identifier: `minecraft:${boss.from}`,
+        ...(boss.noRuntime ? {} : { runtime_identifier: `minecraft:${boss.from}` }),
         is_spawnable: false,
         is_summonable: true,
       },
@@ -261,13 +264,81 @@ for (const boss of BOSSES) {
     },
   });
 
+  if (boss.ownClient) {
+    writeOwnClient(boss);
+    continue;
+  }
   const client = read(`rp/${boss.client ?? boss.from}.entity.json`);
   const description = client['minecraft:client_entity'].description;
   description.identifier = `steveo:${boss.key}`;
   delete description.spawn_egg;
   if (boss.ownRenderController) description.render_controllers = [OWN_RENDER_CONTROLLER];
-  if (boss.material) description.materials = { default: boss.material };
   write(`resource_pack/entity/${boss.key}.entity.json`, client);
+}
+
+/**
+ * A client entity that names nothing vanilla: the geometry and texture are
+ * copied into the pack under our own names, and the animations use only
+ * queries every mob has. Bone names are the iron golem's.
+ */
+function writeOwnClient(boss) {
+  const geo = read(`rp/${boss.from}.geo.json`);
+  geo.format_version = '1.12.0';
+  geo['minecraft:geometry'][0].description.identifier = `geometry.steveo_${boss.key}`;
+  write(`resource_pack/models/entity/${boss.key}.geo.json`, geo);
+
+  const texture = path.join(out, `resource_pack/textures/entity/${boss.key}.png`);
+  fs.mkdirSync(path.dirname(texture), { recursive: true });
+  fs.copyFileSync(path.join(vanilla, `rp/${boss.from}.png`), texture);
+  console.log(`wrote ${texture}`);
+
+  const anim = `animation.steveo_${boss.key}`;
+  const stride = 'math.cos(query.modified_distance_moved * 38.17) * math.min(query.modified_move_speed, 1.0)';
+  write(`resource_pack/animations/${boss.key}.animation.json`, {
+    format_version: '1.8.0',
+    animations: {
+      [`${anim}.walk`]: {
+        loop: true,
+        bones: {
+          leg0: { rotation: [`${stride} * 40.0`, 0, 0] },
+          leg1: { rotation: [`-${stride} * 40.0`, 0, 0] },
+          arm0: { rotation: [`-${stride} * 25.0`, 0, 0] },
+          arm1: { rotation: [`${stride} * 25.0`, 0, 0] },
+        },
+      },
+      [`${anim}.look_at_target`]: {
+        loop: true,
+        bones: { head: { rotation: ['query.target_x_rotation', 'query.target_y_rotation', 0] } },
+      },
+      // Both arms come up while it has someone to hit.
+      [`${anim}.menace`]: {
+        loop: true,
+        bones: {
+          arm0: { rotation: ['-70.0 + math.sin(query.life_time * 360.0) * 25.0', 0, 0] },
+          arm1: { rotation: ['-70.0 - math.sin(query.life_time * 360.0) * 25.0', 0, 0] },
+        },
+      },
+    },
+  });
+
+  write(`resource_pack/entity/${boss.key}.entity.json`, {
+    format_version: '1.10.0',
+    'minecraft:client_entity': {
+      description: {
+        identifier: `steveo:${boss.key}`,
+        materials: { default: 'entity_alphatest' },
+        textures: { default: `textures/entity/${boss.key}` },
+        geometry: { default: `geometry.steveo_${boss.key}` },
+        animations: {
+          walk: `${anim}.walk`,
+          look_at_target: `${anim}.look_at_target`,
+          menace: `${anim}.menace`,
+        },
+        scripts: { animate: ['walk', 'look_at_target', { menace: 'query.has_target' }] },
+        render_controllers: [OWN_RENDER_CONTROLLER],
+      },
+    },
+  });
 }
 
 // A plain render controller (default geometry, material and texture) for
