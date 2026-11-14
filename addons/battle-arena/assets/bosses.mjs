@@ -179,6 +179,42 @@ const BOSSES = [
     box: { width: 2.2, height: 4.6 },
   },
   {
+    key: 'blaze_sovereign',
+    from: 'blaze',
+    // Always in ranged mode: the vanilla blaze swaps to melee when its
+    // target is within two blocks, through events on being hurt, which are
+    // dropped here. It throws longer, quicker volleys than a blaze.
+    fold: ['ranged_mode'],
+    health: 300,
+    scale: 2.2,
+    box: { width: 1.1, height: 4 },
+    patch: (c) => {
+      delete c['minecraft:on_hurt'];
+      delete c['minecraft:on_hurt_by_player'];
+      Object.assign(c['minecraft:behavior.ranged_attack'], {
+        attack_interval: { min: 2.0, max: 3.5 },
+        charge_shoot_trigger: 2.0,
+        burst_shots: 5,
+      });
+    },
+  },
+  {
+    key: 'hive_mother',
+    from: 'witch',
+    // A witch with a boss's health: she throws potions from further off
+    // and drinks them as a witch does. Her brood is spawned by the script
+    // (see `minions` in src/waves.ts).
+    fold: [],
+    health: 200,
+    scale: 1.8,
+    box: { width: 1.1, height: 3.4 },
+    patch: (c) => {
+      // Replaced by the players-only target goal every boss gets.
+      delete c['minecraft:behavior.nearest_prioritized_attackable_target'];
+      c['minecraft:behavior.ranged_attack'].attack_radius = 16;
+    },
+  },
+  {
     key: 'alpha_ravager',
     from: 'ravager',
     fold: ['minecraft:hostile'],

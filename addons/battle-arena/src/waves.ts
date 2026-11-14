@@ -95,16 +95,31 @@ export interface BossDef {
   readonly nameKey: string;
   /** Blocks of headroom it needs to spawn. */
   readonly height: number;
+  /** Small mobs it keeps calling in while it lives; they vanish when it dies. */
+  readonly minions?: Minions;
 }
 
-function custom(key: string, height: number): BossDef {
-  return { key, entity: `steveo:${key}`, nameKey: `entity.steveo:${key}.name`, height };
+export interface Minions {
+  readonly entity: string;
+  /** Seconds between broods, how many arrive at once, and the most alive at a time. */
+  readonly every: number;
+  readonly count: number;
+  readonly cap: number;
 }
+
+function custom(key: string, height: number, minions?: Minions): BossDef {
+  const def = { key, entity: `steveo:${key}`, nameKey: `entity.steveo:${key}.name`, height };
+  return minions ? { ...def, minions } : def;
+}
+
+// Endermites: always hostile, and unlike silverfish they cannot hide in the
+// arena's stone and leave the fight unfinishable.
+const BROOD: Minions = { entity: 'minecraft:endermite', every: 7, count: 2, cap: 6 };
 
 /** Bosses by tier. Boss slots are spread across the tiers; see `planBosses`. */
 const BOSS_TIERS: readonly (readonly BossDef[])[] = [
-  [custom('zombie_titan', 5), custom('executioner', 5)],
-  [custom('bone_colossus', 5), custom('iron_tyrant', 5)],
+  [custom('zombie_titan', 5), custom('executioner', 5), custom('hive_mother', 4, BROOD)],
+  [custom('bone_colossus', 5), custom('iron_tyrant', 5), custom('blaze_sovereign', 5)],
   [custom('alpha_ravager', 4), custom('wither_king', 4)],
 ];
 
