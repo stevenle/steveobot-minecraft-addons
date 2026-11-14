@@ -276,6 +276,27 @@ const SPRITES = {
       '................',
     ],
   },
+  rabbit_boy_costume: {
+    pal: { K: '#1b2238', w: '#f7fbff', s: '#dbe9f7', E: '#1b2238' },
+    px: [
+      '....KK....KK....',
+      '...KwwK..KwwK...',
+      '...KwsK..KwsK...',
+      '...KwsK..KwsK...',
+      '...KwsK..KwsK...',
+      '...KwsK..KwsK...',
+      '..KKwwKKKKwwKK..',
+      '.KwwwwwwwwwwwwK.',
+      '.KwwwwwwwwwwwwK.',
+      '.KwwwEwwwwEwwwK.',
+      '.KwwwEwwwwEwwwK.',
+      '.KwwwwwwwwwwwwK.',
+      '.KwwwEwwwwEwwwK.',
+      '.KwwwwEEEEwwwwK.',
+      '.KssssssssssssK.',
+      '..KKKKKKKKKKKK..',
+    ],
+  },
 };
 
 function render(sprite, scale) {
@@ -297,6 +318,48 @@ function render(sprite, scale) {
   });
   return png(size, size, buf);
 }
+
+// The Rabbit Boy Costume's worn texture: a 64×64 sheet in the standard skin
+// layout, so each box of models/entity/rabbit_boy_costume.geo.json finds its
+// faces where a player skin would have them. The ears use the otherwise
+// unused strip at (0, 32).
+const COSTUME_BOXES = [
+  // [u, v, width, height, depth]
+  [0, 0, 8, 8, 8], // head
+  [16, 16, 8, 12, 4], // body
+  [40, 16, 4, 12, 4], // right arm
+  [32, 48, 4, 12, 4], // left arm
+  [0, 16, 4, 12, 4], // right leg
+  [16, 48, 4, 12, 4], // left leg
+  [0, 32, 2, 9, 2], // ear (both ears share it)
+];
+const FUR = { top: '#f7fbff', front: '#f7fbff', side: '#dbe9f7', back: '#e6f0fa', bottom: '#c3d6ea' };
+const FACE_INK = '#1b2238';
+// Eyes and smile on the 8×8 front of the head, as [x, y] from its top-left.
+const FACE = [[2, 2], [2, 3], [5, 2], [5, 3], [1, 5], [2, 6], [3, 6], [4, 6], [5, 6], [6, 5]];
+
+function costumeTexture() {
+  const size = 64;
+  const buf = Buffer.alloc(size * size * 4);
+  const fill = (x0, y0, w, h, colour) => {
+    const c = hex(colour);
+    for (let y = y0; y < y0 + h; y++) for (let x = x0; x < x0 + w; x++) {
+      const i = (y * size + x) * 4;
+      buf[i] = c[0]; buf[i + 1] = c[1]; buf[i + 2] = c[2]; buf[i + 3] = c[3];
+    }
+  };
+  for (const [u, v, w, h, d] of COSTUME_BOXES) {
+    fill(u + d, v, w, d, FUR.top);
+    fill(u + d + w, v, w, d, FUR.bottom);
+    fill(u, v + d, d, h, FUR.side);
+    fill(u + d, v + d, w, h, FUR.front);
+    fill(u + d + w, v + d, d, h, FUR.side);
+    fill(u + d + w + d, v + d, w, h, FUR.back);
+  }
+  for (const [x, y] of FACE) fill(8 + x, 8 + y, 1, 1, FACE_INK);
+  return png(size, size, buf);
+}
+fs.writeFileSync(path.join(out, 'resource_pack/textures/models/armor/rabbit_boy_costume.png'), costumeTexture());
 
 for (const [name, sprite] of Object.entries(SPRITES)) {
   fs.writeFileSync(path.join(out, `resource_pack/textures/items/${name}.png`), render(sprite, 1));

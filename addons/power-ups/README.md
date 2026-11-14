@@ -32,10 +32,19 @@ The Ghost Radish is the vanilla invisibility effect: mobs notice you from much
 closer than usual, but armor you wear still shows and a mob right next to you
 can still attack.
 
+## Rabbit Boy Costume
+
+A cosmetic head-slot item (4 white wool and a carrot, shapeless) that dresses
+the wearer as a white rabbit with tall ears. An add-on cannot change a
+player's actual skin, so this is a full-body model drawn over it, the way
+armor is: `resource_pack/attachables/rabbit_boy_costume.json` with its own
+geometry. Other armor still draws on top, and your own hand in first person
+keeps your normal skin.
+
 ## Checking it is installed
 
 Run `/scriptevent steveo:power_ups`. If the add-on is active it puts every
-power-up in your inventory and reports how many players are powered up.
+power-up and the costume in your inventory and reports how many players are powered up.
 
 ## Art
 

@@ -34,6 +34,9 @@
     },
     "steveo_fire_triangle": {
       "textures": "textures/items/fire_triangle"
+    },
+    "steveo_rabbit_boy_costume": {
+      "textures": "textures/items/rabbit_boy_costume"
     }
   }
 }
