@@ -41,6 +41,10 @@ armor is: `resource_pack/attachables/rabbit_boy_costume.json` with its own
 geometry. Other armor still draws on top, and your own hand in first person
 keeps your normal skin.
 
+`assets/rabbit_boy_skin.png` is the same look as a regular 64×64 skin, without
+the ears. Import it on Windows, Android or iOS from Dressing Room → Classic
+Skins → Owned → Import. Consoles cannot import skins.
+
 ## Checking it is installed
 
 Run `/scriptevent steveo:power_ups`. If the add-on is active it puts every

@@ -331,14 +331,14 @@ const COSTUME_BOXES = [
   [32, 48, 4, 12, 4], // left arm
   [0, 16, 4, 12, 4], // right leg
   [16, 48, 4, 12, 4], // left leg
-  [0, 32, 2, 9, 2], // ear (both ears share it)
+  [0, 32, 2, 9, 2], // ear (both ears share it); must stay last
 ];
 const FUR = { top: '#f7fbff', front: '#f7fbff', side: '#dbe9f7', back: '#e6f0fa', bottom: '#c3d6ea' };
 const FACE_INK = '#1b2238';
 // Eyes and smile on the 8×8 front of the head, as [x, y] from its top-left.
 const FACE = [[2, 2], [2, 3], [5, 2], [5, 3], [1, 5], [2, 6], [3, 6], [4, 6], [5, 6], [6, 5]];
 
-function costumeTexture() {
+function costumeTexture({ ears }) {
   const size = 64;
   const buf = Buffer.alloc(size * size * 4);
   const fill = (x0, y0, w, h, colour) => {
@@ -348,7 +348,7 @@ function costumeTexture() {
       buf[i] = c[0]; buf[i + 1] = c[1]; buf[i + 2] = c[2]; buf[i + 3] = c[3];
     }
   };
-  for (const [u, v, w, h, d] of COSTUME_BOXES) {
+  for (const [u, v, w, h, d] of ears ? COSTUME_BOXES : COSTUME_BOXES.slice(0, -1)) {
     fill(u + d, v, w, d, FUR.top);
     fill(u + d + w, v, w, d, FUR.bottom);
     fill(u, v + d, d, h, FUR.side);
@@ -359,7 +359,11 @@ function costumeTexture() {
   for (const [x, y] of FACE) fill(8 + x, 8 + y, 1, 1, FACE_INK);
   return png(size, size, buf);
 }
-fs.writeFileSync(path.join(out, 'resource_pack/textures/models/armor/rabbit_boy_costume.png'), costumeTexture());
+fs.writeFileSync(path.join(out, 'resource_pack/textures/models/armor/rabbit_boy_costume.png'), costumeTexture({ ears: true }));
+// The same sheet as a regular player skin, for importing in the Dressing Room
+// (Classic Skins > Owned > Import). No ears: a skin can only paint the standard
+// body, and the ear strip would show up as a patch on the right leg's overlay.
+fs.writeFileSync(path.join(out, 'assets/rabbit_boy_skin.png'), costumeTexture({ ears: false }));
 
 for (const [name, sprite] of Object.entries(SPRITES)) {
   fs.writeFileSync(path.join(out, `resource_pack/textures/items/${name}.png`), render(sprite, 1));
