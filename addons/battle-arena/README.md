@@ -47,8 +47,8 @@ Or `/scriptevent steveo:arena give`.
   Everyone nearby gets a few seconds of Regeneration II.
 - **Waves** each get a random theme: The Restless Dead (zombies, husks),
   Bone Archers (skeletons, strays, bogged), Illager Raid, Witchcraft
-  (witches, breezes), Nether Legion (wither skeletons, blazes), and The Horde
-  (a bit of everything). The harder themes unlock as the battle goes on. The
+  (witches, breezes), Nether Legion (wither skeletons, blazes), Tiny Terrors
+  (fast baby zombies and husks), and The Horde (a bit of everything). The harder themes unlock as the battle goes on. The
   first wave is always three zombies in leather caps.
 - **Gear** rises evenly from the first fight to the last: leather and wood,
   chainmail and stone, iron, diamond, netherite. Each mob rolls its own

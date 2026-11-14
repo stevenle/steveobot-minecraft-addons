@@ -30,6 +30,9 @@ export interface Theme {
 const ZOMBIE: MobKind = { id: 'minecraft:zombie', weapon: 'sword', armor: true };
 const HUSK: MobKind = { id: 'minecraft:husk', weapon: 'axe', armor: true };
 const ZOMBIE_VILLAGER: MobKind = { id: 'minecraft:zombie_villager_v2', weapon: 'sword', armor: true };
+// Babies: small, fast, and hard to hit. `as_baby` is the vanilla event on both.
+const BABY_ZOMBIE: MobKind = { ...ZOMBIE, spawnEvent: 'minecraft:as_baby' };
+const BABY_HUSK: MobKind = { ...HUSK, spawnEvent: 'minecraft:as_baby' };
 const SKELETON: MobKind = { id: 'minecraft:skeleton', weapon: 'bow', armor: true };
 const STRAY: MobKind = { id: 'minecraft:stray', weapon: 'bow', armor: true };
 const BOGGED: MobKind = { id: 'minecraft:bogged', weapon: 'bow', armor: true };
@@ -49,6 +52,7 @@ export const THEMES: readonly Theme[] = [
   { key: 'illagers', from: 2, mobs: [VINDICATOR, PILLAGER, PILLAGER] },
   { key: 'nether', from: 4, mobs: [WITHER_SKELETON, WITHER_SKELETON, BLAZE] },
   { key: 'witchcraft', from: 3, mobs: [WITCH, ZOMBIE, SKELETON, BREEZE] },
+  { key: 'tiny', from: 3, mobs: [BABY_ZOMBIE, BABY_ZOMBIE, BABY_HUSK] },
   {
     key: 'horde',
     from: 5,
