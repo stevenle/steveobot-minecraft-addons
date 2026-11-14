@@ -365,6 +365,72 @@ fs.writeFileSync(path.join(out, 'resource_pack/textures/models/armor/rabbit_boy_
 // body, and the ear strip would show up as a patch on the right leg's overlay.
 fs.writeFileSync(path.join(out, 'assets/rabbit_boy_skin.png'), costumeTexture({ ears: false }));
 
+// King Viking, the villain, as a regular player skin: horned helmet with a
+// gold crown band, angry brows, a big orange beard, a dark red tunic. Each
+// part lists its rows top to bottom; a one-letter row fills the whole width.
+// `rows` wraps all four sides unless `front` or `side` replaces it.
+const VIKING_PAL = {
+  H: '#8d96a8', // helmet
+  G: '#f2c230', // crown band, belt buckle
+  I: '#f5efd8', // horn
+  s: '#f0b48a', // skin
+  B: '#5a2d0c', // brows
+  E: '#1b2238', // eyes
+  O: '#e8731a', // beard and hair
+  o: '#c25a0e', // beard shade
+  T: '#6d1f3a', // tunic
+  L: '#5b3a1e', // belt, bracers
+  P: '#3a3f4d', // trousers
+  b: '#3a2412', // boots
+};
+const ARM = { top: 'T', bottom: 's', rows: ['T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'L', 's', 's', 's'] };
+const LEG = { top: 'P', bottom: 'b', rows: ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P', 'b', 'b', 'b', 'b'] };
+const VIKING_PARTS = [
+  {
+    box: [0, 0, 8, 8, 8], top: 'H', bottom: 'O',
+    rows: ['H', 'H', 'G', 'O', 'O', 'O', 'O', 'O'],
+    front: ['H', 'H', 'G', 'sBBssBBs', 'ssEssEss', 'OOOssOOO', 'O', 'OoOOOOoO'],
+    side: ['H', 'HHHIIHHH', 'GGIIIIGG', 'sssIIsss', 's', 'O', 'O', 'O'],
+  },
+  {
+    box: [16, 16, 8, 12, 4], top: 'T', bottom: 'T',
+    rows: ['T', 'T', 'T', 'T', 'T', 'T', 'T', 'L', 'T', 'T', 'T', 'T'],
+    front: ['TTOOOOTT', 'TTOOOOTT', 'TTToOTTT', 'T', 'T', 'T', 'T', 'LLLGGLLL', 'T', 'T', 'T', 'T'],
+  },
+  { box: [40, 16, 4, 12, 4], ...ARM },
+  { box: [32, 48, 4, 12, 4], ...ARM },
+  { box: [0, 16, 4, 12, 4], ...LEG },
+  { box: [16, 48, 4, 12, 4], ...LEG },
+];
+
+function vikingSkin() {
+  const size = 64;
+  const buf = Buffer.alloc(size * size * 4);
+  const dot = (x, y, ch) => {
+    const colour = VIKING_PAL[ch];
+    if (!colour) throw new Error(`unknown pixel '${ch}'`);
+    const c = hex(colour);
+    const i = (y * size + x) * 4;
+    buf[i] = c[0]; buf[i + 1] = c[1]; buf[i + 2] = c[2]; buf[i + 3] = c[3];
+  };
+  const face = (x0, y0, w, rows) => rows.forEach((row, y) => {
+    if (row.length !== 1 && row.length !== w) throw new Error(`row '${row}' is not ${w} wide`);
+    for (let x = 0; x < w; x++) dot(x0 + x, y0 + y, row.length === 1 ? row : row[x]);
+  });
+  for (const part of VIKING_PARTS) {
+    const [u, v, w, h, d] = part.box;
+    if (part.rows.length !== h) throw new Error('part rows must match its height');
+    face(u + d, v, w, Array(d).fill(part.top));
+    face(u + d + w, v, w, Array(d).fill(part.bottom));
+    face(u, v + d, d, part.side ?? part.rows);
+    face(u + d, v + d, w, part.front ?? part.rows);
+    face(u + d + w, v + d, d, part.side ?? part.rows);
+    face(u + d + w + d, v + d, w, part.rows);
+  }
+  return png(size, size, buf);
+}
+fs.writeFileSync(path.join(out, 'assets/king_viking_skin.png'), vikingSkin());
+
 for (const [name, sprite] of Object.entries(SPRITES)) {
   fs.writeFileSync(path.join(out, `resource_pack/textures/items/${name}.png`), render(sprite, 1));
 }
