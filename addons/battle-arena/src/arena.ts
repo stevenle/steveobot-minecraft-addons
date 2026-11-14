@@ -35,6 +35,7 @@ import {
   type Kit,
   type MobKind,
   type Mode,
+  type Theme,
   type WavePlan,
 } from './waves';
 
@@ -192,6 +193,8 @@ export class Arena {
   /** Whether the current boss has spawned at least once, and failed spawns so far. */
   private bossSpawned = false;
   private bossSpawnFailures = 0;
+  /** The previous wave's theme, so the next one is different. */
+  private lastTheme: Theme | undefined;
   bossesDefeated = 0;
   ended = false;
 
@@ -340,7 +343,8 @@ export class Arena {
    * so the text is not covering the screen as they arrive.
    */
   private announceWave(now: number): void {
-    const plan = planWave(this.index, this.fights.length, this.fighters.size);
+    const plan = planWave(this.index, this.fights.length, this.fighters.size, this.lastTheme);
+    this.lastTheme = plan.theme;
     this.title(
       msg('arena.wave.title', String(this.waveNumber), String(this.waveCount)),
       msg('arena.wave.subtitle', { translate: `arena.theme.${plan.theme.key}` }, String(plan.mobs.length)),

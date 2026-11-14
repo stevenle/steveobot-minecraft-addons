@@ -4,21 +4,21 @@
     "name": "Battle Arena BP",
     "description": "A placeable arena block that starts escalating, randomized waves of geared mobs, with bosses, until the final boss falls or every fighter has died.",
     "uuid": "094c9c2f-f72a-45d8-b101-ce6233ee39a2",
-    "version": [1, 0, 6],
+    "version": [1, 0, 7],
     "min_engine_version": [1, 26, 40]
   },
   "modules": [
     {
       "type": "data",
       "uuid": "e69c459d-eef2-40a4-8797-2eecc1834eb0",
-      "version": [1, 0, 6]
+      "version": [1, 0, 7]
     },
     {
       "type": "script",
       "language": "javascript",
       "entry": "scripts/main.js",
       "uuid": "86049063-1e35-4d76-98fd-0fcfdcd67d06",
-      "version": [1, 0, 6]
+      "version": [1, 0, 7]
     }
   ],
   "dependencies": [

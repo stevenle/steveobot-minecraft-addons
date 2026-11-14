@@ -195,8 +195,12 @@ export function waveSize(index: number, total: number, players: number): number 
   return Math.min(16, base + 2 * Math.max(0, players - 1));
 }
 
-export function planWave(index: number, total: number, players: number): WavePlan {
-  const open = THEMES.filter((t) => t.from <= index);
+/**
+ * `previous` is the theme of the wave before this one (a boss in between
+ * does not reset it); the same theme never comes up twice running.
+ */
+export function planWave(index: number, total: number, players: number, previous?: Theme): WavePlan {
+  const open = THEMES.filter((t) => t.from <= index && t !== previous);
   // The very first wave is zombies, so the opener is the gentle one.
   const theme = index === 0 ? (THEMES[0] as Theme) : pick(open);
   const gear = gearLevel(index, total);
