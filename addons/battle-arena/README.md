@@ -47,8 +47,8 @@ Or `/scriptevent steveo:arena give`.
   Everyone nearby gets a few seconds of Regeneration II.
 - **Waves** each get a random theme: The Restless Dead (zombies, husks),
   Bone Archers (skeletons, strays, bogged), Illager Raid, Witchcraft
-  (witches, breezes), Nether Legion (wither skeletons, blazes), and The Horde
-  (a bit of everything). The harder themes unlock as the battle goes on. The
+  (witches, breezes), Nether Legion (wither skeletons, blazes), Tiny Terrors
+  (fast baby zombies and husks), and The Horde (a bit of everything). The harder themes unlock as the battle goes on. The
   first wave is always three zombies in leather caps.
 - **Gear** rises evenly from the first fight to the last: leather and wood,
   chainmail and stone, iron, diamond, netherite. Each mob rolls its own
@@ -56,15 +56,17 @@ Or `/scriptevent steveo:arena give`.
   carry Speed, Strength, or Resistance. Waves grow with the battle and add two
   mobs per extra fighter.
 - **Bosses** are one big creature each, alone, with a boss bar: giant
-  versions of vanilla mobs with their own health. Two per tier, picked at
-  random, easiest first:
+  versions of vanilla mobs with their own health. Three in tiers 1 and 2, two
+  in tier 3, picked at random, easiest first:
 
   | Tier | Boss | Based on | Size | Health | Notes |
   |---|---|---|---|---|---|
   | 1 | Zombie Titan | zombie | 2.5× | 280 | hits for 10 |
   | 1 | The Executioner | vindicator | 2.4× | 280 | swings a giant axe for 13 |
+  | 1 | Hive Mother | witch | 1.8× | 200 | throws potions; calls in 2 endermites every 7 s (6 at most), which vanish when she dies |
   | 2 | Bone Colossus | skeleton | 2.5× | 250 | swings a stone sword for 11 |
   | 2 | Iron Tyrant | iron golem | 1.6× | 400 | hits for 10–24, flings you |
+  | 2 | Blaze Sovereign | blaze | 2.2× | 300 | ranged only: volleys of 5 fireballs |
   | 3 | Alpha Ravager | ravager | 1.5× | 450 | hits for 16, roars |
   | 3 | Wither King | wither skeleton | 2.2× | 375 | hits for 12 plus Wither |
   | Epic final | The Warden | vanilla | 1× | 500 | |

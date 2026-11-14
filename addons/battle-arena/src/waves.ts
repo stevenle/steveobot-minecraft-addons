@@ -30,6 +30,9 @@ export interface Theme {
 const ZOMBIE: MobKind = { id: 'minecraft:zombie', weapon: 'sword', armor: true };
 const HUSK: MobKind = { id: 'minecraft:husk', weapon: 'axe', armor: true };
 const ZOMBIE_VILLAGER: MobKind = { id: 'minecraft:zombie_villager_v2', weapon: 'sword', armor: true };
+// Babies: small, fast, and hard to hit. `as_baby` is the vanilla event on both.
+const BABY_ZOMBIE: MobKind = { ...ZOMBIE, spawnEvent: 'minecraft:as_baby' };
+const BABY_HUSK: MobKind = { ...HUSK, spawnEvent: 'minecraft:as_baby' };
 const SKELETON: MobKind = { id: 'minecraft:skeleton', weapon: 'bow', armor: true };
 const STRAY: MobKind = { id: 'minecraft:stray', weapon: 'bow', armor: true };
 const BOGGED: MobKind = { id: 'minecraft:bogged', weapon: 'bow', armor: true };
@@ -49,6 +52,7 @@ export const THEMES: readonly Theme[] = [
   { key: 'illagers', from: 2, mobs: [VINDICATOR, PILLAGER, PILLAGER] },
   { key: 'nether', from: 4, mobs: [WITHER_SKELETON, WITHER_SKELETON, BLAZE] },
   { key: 'witchcraft', from: 3, mobs: [WITCH, ZOMBIE, SKELETON, BREEZE] },
+  { key: 'tiny', from: 3, mobs: [BABY_ZOMBIE, BABY_ZOMBIE, BABY_HUSK] },
   {
     key: 'horde',
     from: 5,
@@ -95,16 +99,31 @@ export interface BossDef {
   readonly nameKey: string;
   /** Blocks of headroom it needs to spawn. */
   readonly height: number;
+  /** Small mobs it keeps calling in while it lives; they vanish when it dies. */
+  readonly minions?: Minions;
 }
 
-function custom(key: string, height: number): BossDef {
-  return { key, entity: `steveo:${key}`, nameKey: `entity.steveo:${key}.name`, height };
+export interface Minions {
+  readonly entity: string;
+  /** Seconds between broods, how many arrive at once, and the most alive at a time. */
+  readonly every: number;
+  readonly count: number;
+  readonly cap: number;
 }
+
+function custom(key: string, height: number, minions?: Minions): BossDef {
+  const def = { key, entity: `steveo:${key}`, nameKey: `entity.steveo:${key}.name`, height };
+  return minions ? { ...def, minions } : def;
+}
+
+// Endermites: always hostile, and unlike silverfish they cannot hide in the
+// arena's stone and leave the fight unfinishable.
+const BROOD: Minions = { entity: 'minecraft:endermite', every: 7, count: 2, cap: 6 };
 
 /** Bosses by tier. Boss slots are spread across the tiers; see `planBosses`. */
 const BOSS_TIERS: readonly (readonly BossDef[])[] = [
-  [custom('zombie_titan', 5), custom('executioner', 5)],
-  [custom('bone_colossus', 5), custom('iron_tyrant', 5)],
+  [custom('zombie_titan', 5), custom('executioner', 5), custom('hive_mother', 4, BROOD)],
+  [custom('bone_colossus', 5), custom('iron_tyrant', 5), custom('blaze_sovereign', 5)],
   [custom('alpha_ravager', 4), custom('wither_king', 4)],
 ];
 
@@ -195,8 +214,12 @@ export function waveSize(index: number, total: number, players: number): number 
   return Math.min(16, base + 2 * Math.max(0, players - 1));
 }
 
-export function planWave(index: number, total: number, players: number): WavePlan {
-  const open = THEMES.filter((t) => t.from <= index);
+/**
+ * `previous` is the theme of the wave before this one (a boss in between
+ * does not reset it); the same theme never comes up twice running.
+ */
+export function planWave(index: number, total: number, players: number, previous?: Theme): WavePlan {
+  const open = THEMES.filter((t) => t.from <= index && t !== previous);
   // The very first wave is zombies, so the opener is the gentle one.
   const theme = index === 0 ? (THEMES[0] as Theme) : pick(open);
   const gear = gearLevel(index, total);

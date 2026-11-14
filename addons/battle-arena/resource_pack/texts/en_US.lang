@@ -10,6 +10,8 @@ entity.steveo:zombie_titan.name=§2Zombie Titan
 entity.steveo:executioner.name=§4The Executioner
 entity.steveo:bone_colossus.name=§fBone Colossus
 entity.steveo:iron_tyrant.name=§7Iron Tyrant
+entity.steveo:blaze_sovereign.name=§6Blaze Sovereign
+entity.steveo:hive_mother.name=§5Hive Mother
 entity.steveo:alpha_ravager.name=§cAlpha Ravager
 entity.steveo:wither_king.name=§8Wither King
 
@@ -50,6 +52,7 @@ arena.theme.skeletons=Bone Archers
 arena.theme.illagers=Illager Raid
 arena.theme.nether=Nether Legion
 arena.theme.witchcraft=Witchcraft
+arena.theme.tiny=Tiny Terrors
 arena.theme.horde=The Horde
 
 ## Bosses

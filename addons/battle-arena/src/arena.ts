@@ -35,6 +35,7 @@ import {
   type Kit,
   type MobKind,
   type Mode,
+  type Theme,
   type WavePlan,
 } from './waves';
 
@@ -192,6 +193,11 @@ export class Arena {
   /** Whether the current boss has spawned at least once, and failed spawns so far. */
   private bossSpawned = false;
   private bossSpawnFailures = 0;
+  /** The current boss's living brood, and the tick its next one is due. */
+  private readonly minions = new Map<string, Entity>();
+  private nextBrood = 0;
+  /** The previous wave's theme, so the next one is different. */
+  private lastTheme: Theme | undefined;
   bossesDefeated = 0;
   ended = false;
 
@@ -340,7 +346,8 @@ export class Arena {
    * so the text is not covering the screen as they arrive.
    */
   private announceWave(now: number): void {
-    const plan = planWave(this.index, this.fights.length, this.fighters.size);
+    const plan = planWave(this.index, this.fights.length, this.fighters.size, this.lastTheme);
+    this.lastTheme = plan.theme;
     this.title(
       msg('arena.wave.title', String(this.waveNumber), String(this.waveCount)),
       msg('arena.wave.subtitle', { translate: `arena.theme.${plan.theme.key}` }, String(plan.mobs.length)),
@@ -388,6 +395,7 @@ export class Arena {
     if (!boss) return;
     this.boss = boss;
     this.bossSpawned = true;
+    this.nextBrood = system.currentTick + 5 * 20;
     this.puff(at);
     const extra = this.fighters.size - 1;
     if (extra > 0) {
@@ -423,11 +431,49 @@ export class Arena {
   // ------------------------------------------------------------------- events
 
   /** Called by main.ts when a tracked mob dies. */
+  /** Calls in the boss's next brood when it is due and there is room under the cap. */
+  private tickMinions(now: number): void {
+    const brood = this.bossDef?.minions;
+    const boss = this.boss;
+    if (!brood || !boss || now < this.nextBrood) return;
+    this.nextBrood = now + brood.every * 20;
+    for (const [id, minion] of this.minions) {
+      if (!minion.isValid) this.minions.delete(id);
+    }
+    try {
+      const at = boss.location;
+      for (let i = 0; i < brood.count && this.minions.size < brood.cap; i++) {
+        const spot = { x: at.x + Math.random() * 3 - 1.5, y: at.y + 0.5, z: at.z + Math.random() * 3 - 1.5 };
+        const minion = this.spawnTracked(brood.entity, spot);
+        if (!minion) continue;
+        this.minions.set(minion.id, minion);
+        this.puff(spot);
+      }
+    } catch {
+      // The boss died this tick.
+    }
+  }
+
+  /** A dead boss takes its brood with it, so the fight ends with the boss. */
+  private clearMinions(): void {
+    for (const [id, minion] of this.minions) {
+      this.mobs.delete(id);
+      try {
+        if (minion.isValid) minion.remove();
+      } catch {
+        // Already gone.
+      }
+    }
+    this.minions.clear();
+  }
+
   onMobDied(entity: Entity, location: Vector3): void {
     this.mobs.delete(entity.id);
+    this.minions.delete(entity.id);
     sweepGear(this.dimension, location);
     if (this.boss && entity.id === this.boss.id) {
       this.boss = undefined;
+      this.clearMinions();
       this.bossDefeated();
     }
   }
@@ -545,6 +591,7 @@ export class Arena {
     // If the spawn fails (area unloaded), it is retried next tick.
     if (this.boss && !this.boss.isValid) this.boss = undefined;
     if (this.bossPending && !this.boss) this.respawnBoss();
+    this.tickMinions(now);
 
     const regroup = now - this.fightStart > STRAGGLER_TICKS && now - this.lastRegroup > REGROUP_TICKS;
     if (regroup) this.lastRegroup = now;
