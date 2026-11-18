@@ -85,6 +85,10 @@ the dungeon was built would despawn before anyone arrived. Each room
 re-arms after 5 minutes if its creepers are gone; trap plates re-arm after
 2 minutes. Creative players do not set anything off and do not wake the boss.
 
+**Defeating the Mega Creeper clears the dungeon.** Rooms stop ambushing and
+trap plates stop firing, so the place is safe to loot. Creepers that were
+already there stay until you deal with them.
+
 ### Chest loot
 
 | Chests | What is in them |

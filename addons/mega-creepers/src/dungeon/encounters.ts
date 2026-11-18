@@ -8,6 +8,8 @@
  *   ticks, unless creepers are still lurking in it.
  * - **Trap plates.** One corridor per dungeon has a pressure plate that
  *   spawns a creeper at each end of the corridor.
+ * - **A cleared dungeon is quiet.** Once its Mega Creeper is defeated,
+ *   rooms stop ambushing and trap plates stop firing.
  * - **The boss.** Walking into the arena wakes the Mega Creeper. If it goes
  *   missing while awake (a /kill, a lost chunk) it comes back.
  * - **The vault.** Sealed creeperite does not mine or blow up. When the
@@ -212,6 +214,7 @@ function visit(record: DungeonRecord, players: Player[]): void {
       if (record.bossState === 'asleep') wakeBoss(record);
       return;
     }
+    if (record.bossState === 'defeated') return;
     ambush(dimension, record, index);
   });
 
@@ -255,7 +258,7 @@ world.afterEvents.pressurePlatePush.subscribe((event) => {
   const { x, y, z } = event.block.location;
   const dimensionId = event.block.dimension.id;
   for (const record of allDungeons()) {
-    if (record.dimension !== dimensionId) continue;
+    if (record.dimension !== dimensionId || record.bossState === 'defeated') continue;
     for (const trap of record.traps) {
       if (trap.x !== x || trap.y !== y || trap.z !== z) continue;
       const trapKey = `${record.id}@${x},${y},${z}`;
