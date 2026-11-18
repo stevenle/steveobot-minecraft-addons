@@ -1,0 +1,28 @@
+{
+  "format_version": "1.21.40",
+  "minecraft:recipe_shapeless": {
+    "description": {
+      "identifier": "steveo:king_viking_costume_recipe"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "ingredients": [
+      {
+        "item": "minecraft:orange_wool",
+        "count": 4
+      },
+      {
+        "item": "minecraft:iron_ingot"
+      }
+    ],
+    "unlock": [
+      {
+        "item": "minecraft:orange_wool"
+      }
+    ],
+    "result": {
+      "item": "steveo:king_viking_costume"
+    }
+  }
+}

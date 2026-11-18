@@ -45,7 +45,7 @@ const FIRE = 'steveo:fire_triangle';
 const ALL_ITEMS = [CARROT, BOOTS, PEPPER, SHELL, FIST, FEATHER, RADISH, SUPER, WATER, LIGHT, FIRE] as const;
 const ITEM_SET: ReadonlySet<string> = new Set(ALL_ITEMS);
 /** Cosmetic only: a head-slot wearable drawn by its attachable, no script behind it. */
-const COSTUME = 'steveo:rabbit_boy_costume';
+const COSTUMES = ['steveo:rabbit_boy_costume', 'steveo:king_viking_costume'] as const;
 
 /** Status effects each item grants while held: [effect id, amplifier]. */
 const PASSIVE: Readonly<Record<string, ReadonlyArray<readonly [string, number]>>> = {
@@ -452,7 +452,7 @@ system.afterEvents.scriptEventReceive.subscribe(
     system.run(() => {
       try {
         const container = player.getComponent('inventory')?.container;
-        for (const id of [...ALL_ITEMS, COSTUME]) container?.addItem(new ItemStack(id));
+        for (const id of [...ALL_ITEMS, ...COSTUMES]) container?.addItem(new ItemStack(id));
         player.sendMessage({
           translate: 'power_ups.debug.status',
           with: [String(powers.size), String(boltsInFlight), String(lights.lit), String(lights.stale)],

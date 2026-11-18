@@ -297,6 +297,27 @@ const SPRITES = {
       '..KKKKKKKKKKKK..',
     ],
   },
+  king_viking_costume: {
+    pal: { K: '#1b2238', H: '#8d96a8', G: '#f2c230', I: '#f5efd8', s: '#f0b48a', B: '#5a2d0c', E: '#1b2238', O: '#e8731a' },
+    px: [
+      '.II..........II.',
+      '.III........III.',
+      '..IIKKKKKKKKII..',
+      '..KHHHHHHHHHHK..',
+      '..KHHHHHHHHHHK..',
+      '..KGGGGGGGGGGK..',
+      '..KsBBBssBBBsK..',
+      '..KssEssssEssK..',
+      '..KssssssssssK..',
+      '..KOOOssssOOOK..',
+      '..KOOOOOOOOOOK..',
+      '..KOOOOOOOOOOK..',
+      '...KOOOOOOOOK...',
+      '....KOOOOOOK....',
+      '.....KOOOOK.....',
+      '......KKKK......',
+    ],
+  },
 };
 
 function render(sprite, scale) {
@@ -403,7 +424,7 @@ const VIKING_PARTS = [
   { box: [16, 48, 4, 12, 4], ...LEG },
 ];
 
-function vikingSkin() {
+function vikingSkin({ horns }) {
   const size = 64;
   const buf = Buffer.alloc(size * size * 4);
   const dot = (x, y, ch) => {
@@ -427,9 +448,13 @@ function vikingSkin() {
     face(u + d + w, v + d, d, part.side ?? part.rows);
     face(u + d + w + d, v + d, w, part.rows);
   }
+  // The costume's 3D horns take their faces from the strip at (0, 32), which a
+  // real skin must leave empty (it is the right leg's overlay there).
+  if (horns) for (let y = 32; y < 44; y++) for (let x = 0; x < 16; x++) dot(x, y, 'I');
   return png(size, size, buf);
 }
-fs.writeFileSync(path.join(out, 'assets/king_viking_skin.png'), vikingSkin());
+fs.writeFileSync(path.join(out, 'assets/king_viking_skin.png'), vikingSkin({ horns: false }));
+fs.writeFileSync(path.join(out, 'resource_pack/textures/models/armor/king_viking_costume.png'), vikingSkin({ horns: true }));
 
 for (const [name, sprite] of Object.entries(SPRITES)) {
   fs.writeFileSync(path.join(out, `resource_pack/textures/items/${name}.png`), render(sprite, 1));

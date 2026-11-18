@@ -32,14 +32,21 @@ The Ghost Radish is the vanilla invisibility effect: mobs notice you from much
 closer than usual, but armor you wear still shows and a mob right next to you
 can still attack.
 
-## Rabbit Boy Costume
+## Costumes
 
-A cosmetic head-slot item (4 white wool and a carrot, shapeless) that dresses
-the wearer as a white rabbit with tall ears. An add-on cannot change a
-player's actual skin, so this is a full-body model drawn over it, the way
-armor is: `resource_pack/attachables/rabbit_boy_costume.json` with its own
-geometry. Other armor still draws on top, and your own hand in first person
-keeps your normal skin.
+Two cosmetic head-slot items that dress the wearer as a character from the
+book. An add-on cannot change a player's actual skin, so each is a full-body
+model drawn over it, the way armor is: an attachable in
+`resource_pack/attachables/` with its own geometry.
+
+| Costume | Look | Recipe (shapeless) |
+|---|---|---|
+| Rabbit Boy Costume | White rabbit with tall ears | 4 white wool, carrot |
+| King Viking Costume | Horned helmet with a crown band, orange beard, dark red tunic | 4 orange wool, iron ingot |
+
+A costume takes the helmet slot. A chestplate, leggings and boots still draw
+on top of it, and so does anything held in the hands. Your own hand in first
+person keeps your normal skin.
 
 `assets/rabbit_boy_skin.png` is the same look as a regular 64×64 skin, without
 the ears. `assets/king_viking_skin.png` is the villain, King Viking, with
@@ -49,7 +56,7 @@ Skins → Owned → Import. Consoles cannot import skins.
 ## Checking it is installed
 
 Run `/scriptevent steveo:power_ups`. If the add-on is active it puts every
-power-up and the costume in your inventory and reports how many players are powered up.
+power-up and both costumes in your inventory and reports how many players are powered up.
 
 ## Art
 
