@@ -311,7 +311,7 @@ const SPRITES = {
       '..KOOOONNOOOOK..',
       '..KOOOOOOOOOOK..',
       '..KOOIIIIIIOOK..',
-      '..KOOOOOOOOOOK..',
+      '..KOIOOOOOOIOK..',
       '...KOOOOOOOOK...',
       '....KOOOOOOK....',
       '.....KOOOOK.....',
@@ -406,7 +406,7 @@ const VIKING_PARTS = [
   {
     box: [0, 0, 8, 8, 8], top: 'H', bottom: 'O',
     rows: ['H', 'H', 'G', 'O', 'O', 'O', 'O', 'O'],
-    front: ['H', 'H', 'G', 'OOssssOO', 'ssONNOss', 'OOONNOOO', 'OOIIIIOO', 'O'],
+    front: ['H', 'H', 'G', 'OOssssOO', 'ssONNOss', 'OOONNOOO', 'OOIIIIOO', 'OIOOOOIO'],
     side: ['H', 'HHHIIHHH', 'GGIIIIGG', 'sssIIsss', 's', 'O', 'O', 'O'],
   },
   {
