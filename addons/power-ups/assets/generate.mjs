@@ -298,7 +298,7 @@ const SPRITES = {
     ],
   },
   king_viking_costume: {
-    pal: { K: '#1b2238', H: '#8d96a8', G: '#f2c230', I: '#f5efd8', s: '#f0b48a', B: '#5a2d0c', E: '#1b2238', O: '#e8731a' },
+    pal: { K: '#111111', H: '#e89a3c', G: '#8b2f8f', I: '#ffffff', s: '#f2a8d4', N: '#e8318c', O: '#111111' },
     px: [
       '.II..........II.',
       '.III........III.',
@@ -306,11 +306,11 @@ const SPRITES = {
       '..KHHHHHHHHHHK..',
       '..KHHHHHHHHHHK..',
       '..KGGGGGGGGGGK..',
-      '..KsBBBssBBBsK..',
-      '..KssEssssEssK..',
-      '..KssssssssssK..',
       '..KOOOssssOOOK..',
+      '..KsssONNOsssK..',
+      '..KOOOONNOOOOK..',
       '..KOOOOOOOOOOK..',
+      '..KOOIIIIIIOOK..',
       '..KOOOOOOOOOOK..',
       '...KOOOOOOOOK...',
       '....KOOOOOOK....',
@@ -386,37 +386,33 @@ fs.writeFileSync(path.join(out, 'resource_pack/textures/models/armor/rabbit_boy_
 // body, and the ear strip would show up as a patch on the right leg's overlay.
 fs.writeFileSync(path.join(out, 'assets/rabbit_boy_skin.png'), costumeTexture({ ears: false }));
 
-// King Viking, the villain, as a regular player skin: horned helmet with a
-// gold crown band, angry brows, a big orange beard, a dark red tunic. Each
+// King Viking, the villain, as a regular player skin, coloured after the
+// book's art: orange helmet with a purple band and white horns, pink face
+// with a magenta nose and black brows, a big black beard showing his teeth,
+// orange top, black belt, purple bottoms, purple hands and orange feet. Each
 // part lists its rows top to bottom; a one-letter row fills the whole width.
 // `rows` wraps all four sides unless `front` or `side` replaces it.
 const VIKING_PAL = {
-  H: '#8d96a8', // helmet
-  G: '#f2c230', // crown band, belt buckle
-  I: '#f5efd8', // horn
-  s: '#f0b48a', // skin
-  B: '#5a2d0c', // brows
-  E: '#1b2238', // eyes
-  O: '#e8731a', // beard and hair
-  o: '#c25a0e', // beard shade
-  T: '#6d1f3a', // tunic
-  L: '#5b3a1e', // belt, bracers
-  P: '#3a3f4d', // trousers
-  b: '#3a2412', // boots
+  H: '#e89a3c', // helmet, top, feet
+  G: '#8b2f8f', // helmet band, bottoms, hands
+  I: '#ffffff', // horns, teeth, belt buckle
+  s: '#f2a8d4', // skin
+  N: '#e8318c', // nose
+  O: '#111111', // brows, beard, belt
 };
-const ARM = { top: 'T', bottom: 's', rows: ['T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'L', 's', 's', 's'] };
-const LEG = { top: 'P', bottom: 'b', rows: ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P', 'b', 'b', 'b', 'b'] };
+const ARM = { top: 'H', bottom: 'G', rows: ['H', 'H', 'H', 'H', 'H', 'H', 'H', 'H', 'H', 'G', 'G', 'G'] };
+const LEG = { top: 'G', bottom: 'H', rows: ['G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'H', 'H', 'H'] };
 const VIKING_PARTS = [
   {
     box: [0, 0, 8, 8, 8], top: 'H', bottom: 'O',
     rows: ['H', 'H', 'G', 'O', 'O', 'O', 'O', 'O'],
-    front: ['H', 'H', 'G', 'sBBssBBs', 'ssEssEss', 'OOOssOOO', 'O', 'OoOOOOoO'],
+    front: ['H', 'H', 'G', 'OOssssOO', 'ssONNOss', 'OOONNOOO', 'OOIIIIOO', 'O'],
     side: ['H', 'HHHIIHHH', 'GGIIIIGG', 'sssIIsss', 's', 'O', 'O', 'O'],
   },
   {
-    box: [16, 16, 8, 12, 4], top: 'T', bottom: 'T',
-    rows: ['T', 'T', 'T', 'T', 'T', 'T', 'T', 'L', 'T', 'T', 'T', 'T'],
-    front: ['TTOOOOTT', 'TTOOOOTT', 'TTToOTTT', 'T', 'T', 'T', 'T', 'LLLGGLLL', 'T', 'T', 'T', 'T'],
+    box: [16, 16, 8, 12, 4], top: 'H', bottom: 'G',
+    rows: ['H', 'H', 'H', 'H', 'H', 'H', 'O', 'O', 'G', 'G', 'G', 'G'],
+    front: ['O', 'HOOOOOOH', 'HOHOOHOH', 'H', 'H', 'H', 'OOOIIOOO', 'O', 'G', 'G', 'G', 'G'],
   },
   { box: [40, 16, 4, 12, 4], ...ARM },
   { box: [32, 48, 4, 12, 4], ...ARM },
