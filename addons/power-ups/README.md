@@ -34,8 +34,9 @@ can still attack.
 
 ## Costumes
 
-Two cosmetic head-slot items that dress the wearer as a character from the
-book. An add-on cannot change a player's actual skin, so each is a full-body
+Two head-slot items that dress the wearer as a character from the book. Each
+protects like a diamond helmet (3 armor points), takes helmet enchantments,
+and never wears out. An add-on cannot change a player's actual skin, so each is a full-body
 model drawn over it, the way armor is: an attachable in
 `resource_pack/attachables/` with its own geometry.
 

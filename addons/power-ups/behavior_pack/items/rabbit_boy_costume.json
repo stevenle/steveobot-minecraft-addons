@@ -16,7 +16,16 @@
       "minecraft:max_stack_size": 1,
       "minecraft:wearable": {
         "slot": "slot.armor.head",
-        "protection": 0
+        "protection": 3
+      },
+      "minecraft:enchantable": {
+        "slot": "armor_head",
+        "value": 10
+      },
+      "minecraft:tags": {
+        "tags": [
+          "minecraft:is_armor"
+        ]
       }
     }
   }

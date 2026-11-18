@@ -44,7 +44,7 @@ const LIGHT = 'steveo:light_square';
 const FIRE = 'steveo:fire_triangle';
 const ALL_ITEMS = [CARROT, BOOTS, PEPPER, SHELL, FIST, FEATHER, RADISH, SUPER, WATER, LIGHT, FIRE] as const;
 const ITEM_SET: ReadonlySet<string> = new Set(ALL_ITEMS);
-/** Cosmetic only: a head-slot wearable drawn by its attachable, no script behind it. */
+/** Head-slot wearables drawn by their attachables; armor comes from the item files, no script behind them. */
 const COSTUMES = ['steveo:rabbit_boy_costume', 'steveo:king_viking_costume'] as const;
 
 /** Status effects each item grants while held: [effect id, amplifier]. */
