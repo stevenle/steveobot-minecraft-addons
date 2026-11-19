@@ -24,8 +24,8 @@ trim**, which is free. Re-trimming with a different material costs one of the
 new material. Creative players trim for free.
 
 The trim shows as a binding where the head meets the handle and a wound grip
-on digging tools and paxels, and as an inlaid fuller and a colored pommel on
-swords. As
+on digging tools and paxels, and on swords as a jewel on the point, an inlaid fuller
+down the blade, a stud on the crossguard, and a colored pommel. As
 with armor, a trim in the tool's own material (gold on a golden pickaxe) uses
 the darker shade of that material.
 

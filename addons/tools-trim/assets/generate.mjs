@@ -66,8 +66,9 @@ const PICK_REQUIREMENTS = [
 // (brightest vanilla pixel -> lo, darkest -> hi). Only opaque pixels are
 // trimmed, so tiers whose silhouettes differ slightly (netherite, the hoes)
 // still come out right. The digging tools get a binding where the head meets
-// the handle and a wrapped grip; the sword gets an inlaid fuller down the
-// blade and a trimmed pommel.
+// the handle and a wrapped grip; the sword gets a jewel on its point, an inlaid
+// fuller running from it down the blade to a stud on the crossguard, and a
+// trimmed pommel.
 // The grip is wound, not painted: every third diagonal across the handle is
 // left bare.
 const GRIP = { rects: [[3, 10, 7, 12]], lo: 1, hi: 6, skip: (x, y) => (y - x) % 3 === 0 };
@@ -80,7 +81,11 @@ const TOOLS = [
   {
     id: 'sword', name: 'Sword', slot: 'all', attackOffset: 0, tags: ['minecraft:is_sword'],
     regions: [
-      { points: [[13, 2], [12, 3], [11, 4], [10, 5], [9, 6], [8, 7]], lo: 1, hi: 1 },
+      { points: [[12, 3], [11, 4], [10, 5], [9, 6], [8, 7]], lo: 1, hi: 1 },
+      // The blade's centre line crosses the guard between two pixels, so the
+      // stud is 2x2: a 3x3 one sits visibly off-centre.
+      { rects: [[5, 9, 6, 10]], lo: 0, hi: 4 },
+      { rects: [[13, 0, 15, 2]], lo: 0, hi: 6 },
       { rects: [[0, 13, 1, 15], [2, 14, 2, 15]], lo: 1, hi: 6 },
     ],
   },
