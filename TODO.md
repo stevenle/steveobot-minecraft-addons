@@ -44,6 +44,22 @@ update packs, so removing it takes these steps, in this order:
 - [ ] Verify with `pnpm realm --realm 34568298 --list` after someone has joined
       (the download lags the upload until then).
 
+## Next deploy: remove the Blub the Axolotl add-on from the Realm
+
+The blub add-on was deleted from the repo on 2026-11-21 (we were not happy with
+how it played), but its packs are still applied to Realm 34568298. Applying
+never removes anything, so:
+
+- [ ] In-game, before the upload: `/kill @e[type=steveo:blub]`. Blub eggs,
+      crowns and bucketed Blubs in inventories and chests turn into unknown
+      items once the pack is gone.
+- [ ] Strip the packs: `pnpm realm <slugs> --realm 34568298 --remove
+      52284003-58b7-4b69-bcda-3cab7e7555df,46bf8921-123c-42ff-aa96-35de6c3a4408
+      --upload --close --yes` (behavior pack, then resource pack header UUIDs,
+      which are no longer in the repo).
+- [ ] Verify with `pnpm realm --realm 34568298 --list` after someone has joined
+      (the download lags the upload until then).
+
 ## Add-ons to build next
 
 - [ ] **Advent Presents** (new add-on). One present to open each real day in
