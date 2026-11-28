@@ -1,0 +1,23 @@
+{
+  "format_version": "1.21.90",
+  "minecraft:block": {
+    "description": {
+      "identifier": "steveo:boss_pad_4",
+      "menu_category": { "category": "construction" }
+    },
+    "components": {
+      "minecraft:display_name": "tile.steveo:boss_pad_4.name",
+      "minecraft:geometry": "minecraft:geometry.full_block",
+      "minecraft:material_instances": {
+        "*": { "texture": "steveo_boss_pad_4", "render_method": "opaque" }
+      },
+      "minecraft:map_color": "#D86A20",
+      "minecraft:light_emission": 9,
+      "minecraft:destructible_by_explosion": false,
+      "minecraft:destructible_by_mining": { "seconds_to_destroy": 50 },
+      "minecraft:loot": "loot_tables/empty.json",
+      "minecraft:tick": { "interval_range": [20, 20], "looping": true },
+      "steveo:boss_pad": {}
+    }
+  }
+}

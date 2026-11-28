@@ -1,0 +1,16 @@
+{
+  "format_version": "1.10.0",
+  "render_controllers": {
+    "controller.render.steveo_super_rabbit_boss": {
+      "geometry": "geometry.default",
+      "materials": [
+        {
+          "*": "material.default"
+        }
+      ],
+      "textures": [
+        "texture.default"
+      ]
+    }
+  }
+}

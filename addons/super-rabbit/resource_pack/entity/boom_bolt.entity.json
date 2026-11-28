@@ -1,0 +1,28 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "steveo:boom_bolt",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/boom_bolt"
+      },
+      "geometry": {
+        "default": "geometry.steveo_boom_bolt"
+      },
+      "animations": {
+        "spin": "animation.steveo_boom_bolt.spin"
+      },
+      "scripts": {
+        "animate": [
+          "spin"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.steveo_boom_bolt"
+      ]
+    }
+  }
+}

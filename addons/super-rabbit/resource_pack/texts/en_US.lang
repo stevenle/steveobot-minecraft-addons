@@ -1,0 +1,41 @@
+entity.steveo:singing_dog.name=Singing Dog
+entity.steveo:viking_bot.name=Viking-Bot
+entity.steveo:robo_crab.name=Robo-Crab
+entity.steveo:robo_lizard.name=Robo-Lizard
+entity.steveo:rocket_robo.name=Rocket-Robo
+entity.steveo:king_viking.name=King Viking
+entity.steveo:billip.name=Billip
+entity.steveo:robo_rabbit_boy.name=Robo-Rabbit Boy
+entity.steveo:super_rabbit_boss.name=Super Rabbit Boss
+entity.steveo:mega_robo.name=Mega-Robo
+entity.steveo:boom_bolt.name=Boom Bolt
+
+item.spawn_egg.entity.steveo:singing_dog.name=Spawn Singing Dog
+item.spawn_egg.entity.steveo:viking_bot.name=Spawn Viking-Bot
+item.spawn_egg.entity.steveo:robo_crab.name=Spawn Robo-Crab
+item.spawn_egg.entity.steveo:robo_lizard.name=Spawn Robo-Lizard
+item.spawn_egg.entity.steveo:rocket_robo.name=Spawn Rocket-Robo
+item.spawn_egg.entity.steveo:king_viking.name=Spawn King Viking
+item.spawn_egg.entity.steveo:billip.name=Spawn Billip
+item.spawn_egg.entity.steveo:robo_rabbit_boy.name=Spawn Robo-Rabbit Boy
+item.spawn_egg.entity.steveo:super_rabbit_boss.name=Spawn Super Rabbit Boss
+item.spawn_egg.entity.steveo:mega_robo.name=Spawn Mega-Robo
+
+tile.steveo:boss_pad_1.name=Floor 1 Boss Pad (Robo-Rabbit Boy)
+tile.steveo:boss_pad_2.name=Floor 2 Boss Pad (Billip)
+tile.steveo:boss_pad_3.name=Floor 3 Boss Pad (Super Rabbit Boss)
+tile.steveo:boss_pad_4.name=Floor 4 Boss Pad (Mega-Robo)
+tile.steveo:boss_pad_5.name=Floor 5 Boss Pad (King Viking)
+
+super_rabbit.king_viking.cry=King Viking: "NO FUN ALLOWED! Robots, get them!"
+super_rabbit.billip.drain=Billip tapped you and drained your speed!
+super_rabbit.boss.floor1=Floor 1 - Assembly Line: Robo-Rabbit Boy activates!
+super_rabbit.boss.floor2=Floor 2 - All-Stars Arena: Billip steps into the ring!
+super_rabbit.boss.floor3=Floor 3 - Shadow Lab: Super Rabbit Boss appears!
+super_rabbit.boss.floor4=Floor 4 - Rocket Forge: Mega-Robo powers up!
+super_rabbit.boss.floor5=Floor 5 - Throne Room: Meanie King Viking commands the tower!
+super_rabbit.boss.defeated=%1 has been defeated!
+super_rabbit.debug.placed.factory=Placed the Boom Boom Factory in front of you! Climb all 5 floors!
+super_rabbit.debug.failed=Could not run command: %1
+super_rabbit.debug.status=Nearby: %1 Singing Dogs, %2 Robots, %3 King Vikings, %4 Crew Bosses, %5 Boom Bolts.
+super_rabbit.debug.help=Usage: /scriptevent steveo:super_rabbit <factory|singing_dog|viking_bot|robo_crab|robo_lizard|rocket_robo|king_viking|billip|robo_rabbit_boy|super_rabbit_boss|mega_robo|status>

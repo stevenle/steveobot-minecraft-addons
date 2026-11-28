@@ -1,0 +1,38 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.steveo_robo_crab.walk": {
+      "loop": true,
+      "bones": {
+        "legs_l": {
+          "rotation": [
+            0,
+            0,
+            "math.sin(query.modified_distance_moved * 50.0) * 18.0 * query.modified_move_speed"
+          ]
+        },
+        "legs_r": {
+          "rotation": [
+            0,
+            0,
+            "-math.sin(query.modified_distance_moved * 50.0) * 18.0 * query.modified_move_speed"
+          ]
+        },
+        "claw_l": {
+          "rotation": [
+            "math.sin(query.life_time * 180.0) * 14.0",
+            0,
+            0
+          ]
+        },
+        "claw_r": {
+          "rotation": [
+            "-math.sin(query.life_time * 180.0) * 14.0",
+            0,
+            0
+          ]
+        }
+      }
+    }
+  }
+}

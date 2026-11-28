@@ -1,0 +1,31 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.steveo_rocket_robo.hover": {
+      "loop": true,
+      "bones": {
+        "body": {
+          "position": [
+            0,
+            "math.sin(query.life_time * 220.0) * 1.5",
+            0
+          ]
+        },
+        "arm_l": {
+          "rotation": [
+            "math.sin(query.life_time * 180.0) * 16.0",
+            0,
+            0
+          ]
+        },
+        "arm_r": {
+          "rotation": [
+            "-math.sin(query.life_time * 180.0) * 16.0",
+            0,
+            0
+          ]
+        }
+      }
+    }
+  }
+}

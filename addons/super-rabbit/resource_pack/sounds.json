@@ -1,0 +1,102 @@
+{
+  "entity_sounds": {
+    "entities": {
+      "steveo:singing_dog": {
+        "volume": 0.9,
+        "pitch": [1.0, 1.2],
+        "events": {
+          "ambient": "mob.wolf.bark",
+          "hurt": "mob.wolf.hurt",
+          "death": "mob.wolf.death",
+          "step": "mob.wolf.step"
+        }
+      },
+      "steveo:viking_bot": {
+        "volume": 0.9,
+        "pitch": [1.1, 1.3],
+        "events": {
+          "ambient": "mob.irongolem.walk",
+          "hurt": "mob.irongolem.hit",
+          "death": "mob.irongolem.death",
+          "step": "mob.irongolem.walk"
+        }
+      },
+      "steveo:robo_crab": {
+        "volume": 0.9,
+        "pitch": [1.2, 1.4],
+        "events": {
+          "hurt": "mob.irongolem.hit",
+          "death": "mob.irongolem.death",
+          "step": "mob.spider.step"
+        }
+      },
+      "steveo:robo_lizard": {
+        "volume": 0.9,
+        "pitch": [1.3, 1.5],
+        "events": {
+          "hurt": "mob.silverfish.hit",
+          "death": "mob.irongolem.death",
+          "step": "mob.silverfish.step"
+        }
+      },
+      "steveo:rocket_robo": {
+        "volume": 0.9,
+        "pitch": [1.1, 1.3],
+        "events": {
+          "ambient": "mob.blaze.breathe",
+          "hurt": "mob.irongolem.hit",
+          "death": "mob.irongolem.death"
+        }
+      },
+      "steveo:king_viking": {
+        "volume": 1.0,
+        "pitch": [0.75, 0.9],
+        "events": {
+          "ambient": "mob.pillager.idle",
+          "hurt": "mob.pillager.hurt",
+          "death": "mob.pillager.death",
+          "step": "mob.ravager.step"
+        }
+      },
+      "steveo:billip": {
+        "volume": 1.0,
+        "pitch": [1.1, 1.3],
+        "events": {
+          "ambient": "mob.slime.big",
+          "hurt": "mob.irongolem.hit",
+          "death": "mob.irongolem.death",
+          "attack": "mob.irongolem.throw"
+        }
+      },
+      "steveo:robo_rabbit_boy": {
+        "volume": 1.0,
+        "pitch": [1.2, 1.4],
+        "events": {
+          "hurt": "mob.irongolem.hit",
+          "death": "mob.irongolem.death",
+          "step": "mob.irongolem.walk"
+        }
+      },
+      "steveo:super_rabbit_boss": {
+        "volume": 1.0,
+        "pitch": [0.65, 0.8],
+        "events": {
+          "ambient": "mob.ravager.ambient",
+          "hurt": "mob.ravager.hurt",
+          "death": "mob.ravager.death",
+          "step": "mob.ravager.step"
+        }
+      },
+      "steveo:mega_robo": {
+        "volume": 1.0,
+        "pitch": [0.55, 0.7],
+        "events": {
+          "ambient": "mob.irongolem.walk",
+          "hurt": "mob.irongolem.hit",
+          "death": "mob.irongolem.death",
+          "step": "mob.irongolem.walk"
+        }
+      }
+    }
+  }
+}
