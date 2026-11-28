@@ -1,0 +1,36 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "steveo:singing_dog",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/singing_dog"
+      },
+      "geometry": {
+        "default": "geometry.steveo_singing_dog"
+      },
+      "animations": {
+        "walk": "animation.steveo_singing_dog.walk",
+        "look": "animation.steveo_singing_dog.look",
+        "tail": "animation.steveo_singing_dog.tail"
+      },
+      "scripts": {
+        "animate": [
+          "walk",
+          "look",
+          "tail"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.steveo_singing_dog"
+      ],
+      "spawn_egg": {
+        "base_color": "#F5E8D0",
+        "overlay_color": "#D82828"
+      }
+    }
+  }
+}

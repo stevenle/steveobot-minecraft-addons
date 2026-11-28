@@ -1,0 +1,38 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Super Rabbit BP",
+    "description": "Super Rabbit Boy characters, King Viking and his robot army, Billip, mini-bosses, and the 5-floor Boom Boom Factory tower.",
+    "uuid": "fabf0cbd-0d99-48b2-b805-048c06ca7a7b",
+    "version": [1, 0, 0],
+    "min_engine_version": [1, 26, 40]
+  },
+  "modules": [
+    {
+      "type": "data",
+      "uuid": "d129a3ce-5143-445f-b3df-81d555145f02",
+      "version": [1, 0, 0]
+    },
+    {
+      "type": "script",
+      "language": "javascript",
+      "entry": "scripts/main.js",
+      "uuid": "c212de2f-5677-40d9-89a0-411495873a0f",
+      "version": [1, 0, 0]
+    }
+  ],
+  "dependencies": [
+    {
+      "uuid": "c7192393-607e-4f10-82fc-54e48e87adab",
+      "version": [1, 0, 0]
+    },
+    {
+      "module_name": "@minecraft/server",
+      "version": "2.9.0"
+    }
+  ],
+  "metadata": {
+    "authors": ["Steven Le"],
+    "license": "MIT"
+  }
+}

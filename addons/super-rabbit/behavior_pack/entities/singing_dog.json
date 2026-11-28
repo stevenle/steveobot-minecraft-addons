@@ -1,0 +1,41 @@
+{
+  "format_version": "1.21.0",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "steveo:singing_dog",
+      "is_spawnable": true,
+      "is_summonable": true
+    },
+    "components": {
+      "minecraft:type_family": { "family": ["steveo_singing_dog", "animal", "mob"] },
+      "minecraft:health": { "value": 20, "max": 20 },
+      "minecraft:collision_box": { "width": 0.7, "height": 0.9 },
+      "minecraft:movement": { "value": 0.28 },
+      "minecraft:movement.basic": {},
+      "minecraft:navigation.walk": { "can_path_over_water": true, "avoid_damage_blocks": true },
+      "minecraft:jump.static": {},
+      "minecraft:physics": {},
+      "minecraft:pushable": { "is_pushable": true, "is_pushable_by_piston": true },
+      "minecraft:breathable": { "total_supply": 15, "suffocate_time": 0 },
+      "minecraft:nameable": {},
+      "minecraft:healable": {
+        "items": [
+          { "item": "minecraft:carrot", "heal_amount": 6 },
+          { "item": "minecraft:bone", "heal_amount": 4 },
+          { "item": "minecraft:golden_carrot", "heal_amount": 20 }
+        ]
+      },
+      "minecraft:loot": { "table": "loot_tables/entities/singing_dog.json" },
+      "minecraft:behavior.float": { "priority": 0 },
+      "minecraft:behavior.panic": { "priority": 1, "speed_multiplier": 1.4 },
+      "minecraft:behavior.tempt": {
+        "priority": 2,
+        "speed_multiplier": 1.15,
+        "items": ["minecraft:carrot", "minecraft:bone", "minecraft:golden_carrot"]
+      },
+      "minecraft:behavior.random_stroll": { "priority": 5, "speed_multiplier": 0.9 },
+      "minecraft:behavior.look_at_player": { "priority": 6, "look_distance": 10 },
+      "minecraft:behavior.random_look_around": { "priority": 7 }
+    }
+  }
+}

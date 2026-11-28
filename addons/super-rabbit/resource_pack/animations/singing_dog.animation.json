@@ -1,0 +1,62 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.steveo_singing_dog.walk": {
+      "loop": true,
+      "bones": {
+        "leg_fl": {
+          "rotation": [
+            "math.cos(query.modified_distance_moved * 42.0) * 38.0 * query.modified_move_speed",
+            0,
+            0
+          ]
+        },
+        "leg_br": {
+          "rotation": [
+            "math.cos(query.modified_distance_moved * 42.0) * 38.0 * query.modified_move_speed",
+            0,
+            0
+          ]
+        },
+        "leg_fr": {
+          "rotation": [
+            "-math.cos(query.modified_distance_moved * 42.0) * 38.0 * query.modified_move_speed",
+            0,
+            0
+          ]
+        },
+        "leg_bl": {
+          "rotation": [
+            "-math.cos(query.modified_distance_moved * 42.0) * 38.0 * query.modified_move_speed",
+            0,
+            0
+          ]
+        }
+      }
+    },
+    "animation.steveo_singing_dog.look": {
+      "loop": true,
+      "bones": {
+        "head": {
+          "rotation": [
+            "query.target_x_rotation",
+            "query.target_y_rotation",
+            0
+          ]
+        }
+      }
+    },
+    "animation.steveo_singing_dog.tail": {
+      "loop": true,
+      "bones": {
+        "tail": {
+          "rotation": [
+            0,
+            "math.sin(query.life_time * 240.0) * 22.0",
+            0
+          ]
+        }
+      }
+    }
+  }
+}

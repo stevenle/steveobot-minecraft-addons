@@ -1,0 +1,32 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "steveo:robo_crab",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/robo_crab"
+      },
+      "geometry": {
+        "default": "geometry.steveo_robo_crab"
+      },
+      "animations": {
+        "walk": "animation.steveo_robo_crab.walk"
+      },
+      "scripts": {
+        "animate": [
+          "walk"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.steveo_robo_crab"
+      ],
+      "spawn_egg": {
+        "base_color": "#D82828",
+        "overlay_color": "#8B93A0"
+      }
+    }
+  }
+}

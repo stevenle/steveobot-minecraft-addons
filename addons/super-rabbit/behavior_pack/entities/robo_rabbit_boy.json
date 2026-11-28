@@ -1,0 +1,49 @@
+{
+  "format_version": "1.21.0",
+  "minecraft:entity": {
+    "description": {
+      "identifier": "steveo:robo_rabbit_boy",
+      "is_spawnable": true,
+      "is_summonable": true
+    },
+    "components": {
+      "minecraft:type_family": { "family": ["steveo_robo_rabbit_boy", "steveo_robot", "steveo_boss", "monster", "mob"] },
+      "minecraft:health": { "value": 80, "max": 80 },
+      "minecraft:attack": { "damage": 5 },
+      "minecraft:boss": { "should_darken_sky": false, "hud_range": 28 },
+      "minecraft:collision_box": { "width": 0.75, "height": 1.85 },
+      "minecraft:movement": { "value": 0.32 },
+      "minecraft:movement.basic": {},
+      "minecraft:navigation.walk": { "can_path_over_water": true, "avoid_damage_blocks": true },
+      "minecraft:jump.static": {},
+      "minecraft:physics": {},
+      "minecraft:pushable": { "is_pushable": true, "is_pushable_by_piston": true },
+      "minecraft:knockback_resistance": { "value": 0.35 },
+      "minecraft:persistent": {},
+      "minecraft:nameable": {},
+      "minecraft:breathable": { "total_supply": 15, "suffocate_time": 0, "breathes_water": true },
+      "minecraft:damage_sensor": {
+        "triggers": [
+          { "cause": "fall", "deals_damage": false }
+        ]
+      },
+      "minecraft:follow_range": { "value": 28, "max": 28 },
+      "minecraft:loot": { "table": "loot_tables/entities/crew_boss.json" },
+      "minecraft:experience_reward": { "on_death": "55" },
+      "minecraft:behavior.float": { "priority": 0 },
+      "minecraft:behavior.hurt_by_target": { "priority": 1 },
+      "minecraft:behavior.melee_attack": { "priority": 2, "speed_multiplier": 1.25, "track_target": true },
+      "minecraft:behavior.nearest_attackable_target": {
+        "priority": 2,
+        "must_see": false,
+        "reselect_targets": true,
+        "entity_types": [
+          { "filters": { "test": "is_family", "subject": "other", "value": "player" }, "max_dist": 28 }
+        ]
+      },
+      "minecraft:behavior.random_stroll": { "priority": 6, "speed_multiplier": 0.9 },
+      "minecraft:behavior.look_at_player": { "priority": 7, "look_distance": 14 },
+      "minecraft:behavior.random_look_around": { "priority": 8 }
+    }
+  }
+}

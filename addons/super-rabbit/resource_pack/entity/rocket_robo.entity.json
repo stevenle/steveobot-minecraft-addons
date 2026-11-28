@@ -1,0 +1,32 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "steveo:rocket_robo",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/rocket_robo"
+      },
+      "geometry": {
+        "default": "geometry.steveo_rocket_robo"
+      },
+      "animations": {
+        "hover": "animation.steveo_rocket_robo.hover"
+      },
+      "scripts": {
+        "animate": [
+          "hover"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.steveo_rocket_robo"
+      ],
+      "spawn_egg": {
+        "base_color": "#BAC2CE",
+        "overlay_color": "#28D8E8"
+      }
+    }
+  }
+}

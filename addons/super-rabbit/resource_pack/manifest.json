@@ -1,0 +1,21 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Super Rabbit RP",
+    "description": "Super Rabbit Boy characters, King Viking and his robot army, Billip, mini-bosses, and the 5-floor Boom Boom Factory tower.",
+    "uuid": "c7192393-607e-4f10-82fc-54e48e87adab",
+    "version": [1, 0, 0],
+    "min_engine_version": [1, 26, 40]
+  },
+  "modules": [
+    {
+      "type": "resources",
+      "uuid": "b99e9b76-2b0e-4cc4-a84c-e8d483a6f8ef",
+      "version": [1, 0, 0]
+    }
+  ],
+  "metadata": {
+    "authors": ["Steven Le"],
+    "license": "MIT"
+  }
+}

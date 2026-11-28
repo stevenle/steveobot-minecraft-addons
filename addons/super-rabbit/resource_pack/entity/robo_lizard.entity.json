@@ -1,0 +1,36 @@
+{
+  "format_version": "1.10.0",
+  "minecraft:client_entity": {
+    "description": {
+      "identifier": "steveo:robo_lizard",
+      "materials": {
+        "default": "entity_alphatest"
+      },
+      "textures": {
+        "default": "textures/entity/robo_lizard"
+      },
+      "geometry": {
+        "default": "geometry.steveo_robo_lizard"
+      },
+      "animations": {
+        "walk": "animation.steveo_robo_lizard.walk",
+        "look": "animation.steveo_robo_lizard.look",
+        "tail": "animation.steveo_robo_lizard.tail"
+      },
+      "scripts": {
+        "animate": [
+          "walk",
+          "look",
+          "tail"
+        ]
+      },
+      "render_controllers": [
+        "controller.render.steveo_robo_lizard"
+      ],
+      "spawn_egg": {
+        "base_color": "#38B848",
+        "overlay_color": "#565D68"
+      }
+    }
+  }
+}
